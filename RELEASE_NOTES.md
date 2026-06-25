@@ -21,7 +21,11 @@
   - Memperbaiki tabrakan teks dan badge 'Status Keamanan' dengan tombol lampiran pada footer kartu aduan [pengaduan.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/eksekutif/pengaduan.php) dengan menyederhanakan data badge dan memangkas label statis yang berlebih.
 - **Tombol Sunting Video & Dokumentasi Admin**: Memperbaiki fungsi tombol sunting video di halaman [settings_video.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/admin/settings_video.php) yang sebelumnya tidak berfungsi karena kesalahan penulisan variabel JavaScript (`editYoutubeInput` seharusnya `editYoutubeId`).
 
+### 🛡️ Security
+- **Pengecualian Kredensial Google OAuth**: Menambahkan pola berkas `client_secret_*.json` ke dalam [.gitignore](file:///f:/Xampp/htdocs/SIPAKATAU/.gitignore) untuk mencegah terunggahnya kredensial sensitif Google OAuth ke repositori publik GitHub secara tidak sengaja.
+
 ---
+
 
 ## [v2.7.0] - 2026-06-25
 ### ✨ Added
