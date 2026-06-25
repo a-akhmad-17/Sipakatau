@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIPAKATAU Sandbox - Demo Interaktif Penuh</title>
+    
+    <!-- Google Fonts: Outfit & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Leaflet GIS CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+
+    <style>
+        :root {
+            --primary-grad: linear-gradient(135deg, #be123c 0%, #f43f5e 50%, #fb7185 100%);
+            --accent-grad: linear-gradient(135deg, #ea580c 0%, #e11d48 60%, #fda4af 100%);
+            --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Dark Theme Variables */
+        html[data-theme="dark"] {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(17, 24, 39, 0.75);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-main: #f3f4f6;
+            --text-muted: #a1a1aa;
+            --navbar-bg: rgba(11, 15, 25, 0.85);
+            --navbar-link: #a1a1aa;
+            --navbar-link-active: #ffffff;
+            --navbar-link-hover-bg: rgba(255, 255, 255, 0.05);
+            --navbar-brand-grad: linear-gradient(to right, #f43f5e, #fda4af);
+            --navbar-brand-icon-color: #f43f5e;
+            --navbar-btn-bg: var(--primary-grad);
+            --navbar-btn-color: #ffffff;
+            --navbar-btn-border: none;
+            --navbar-border: rgba(255, 255, 255, 0.08);
+            --input-bg: rgba(15, 23, 42, 0.6);
+            --input-color: #ffffff;
+            --input-border: rgba(255, 255, 255, 0.1);
+            --card-hover-border: rgba(244, 63, 94, 0.3);
+            --glow-color-1: rgba(244, 63, 94, 0.18);
+            --glow-color-2: rgba(251, 113, 133, 0.15);
+            --sidebar-bg: #0f172a;
+            --hr-border: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Light Theme Variables */
+        html[data-theme="light"] {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --border-color: rgba(0, 0, 0, 0.06);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --navbar-bg: rgba(225, 29, 72, 0.96);
+            --navbar-link: #ffe4e6;
+            --navbar-link-active: #ffffff;
+            --navbar-link-hover-bg: rgba(255, 255, 255, 0.12);
+            --navbar-brand-grad: linear-gradient(to right, #ffffff, #ffe4e6);
+            --navbar-brand-icon-color: #ffffff;
+            --navbar-btn-bg: #ffffff;
+            --navbar-btn-color: #be123c;
+            --navbar-btn-border: 1px solid #be123c;
+            --navbar-border: rgba(255, 255, 255, 0.15);
+            --input-bg: #ffffff;
+            --input-color: #0f172a;
+            --input-border: rgba(0, 0, 0, 0.12);
+            --card-hover-border: rgba(225, 29, 72, 0.25);
+            --glow-color-1: rgba(244, 63, 94, 0.08);
+            --glow-color-2: rgba(251, 113, 133, 0.06);
+            --sidebar-bg: #be123c;
+            --hr-border: rgba(0, 0, 0, 0.08);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+            position: relative;
+            transition: var(--transition-smooth);
+        }
+
+        /* Ambient Glow Background */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, var(--glow-color-1) 0%, rgba(0,0,0,0) 75%);
+            top: -150px;
+            left: -150px;
+            z-index: -1;
+            pointer-events: none;
+            filter: blur(40px);
+            transition: var(--transition-smooth);
+        }
+
+        body::after {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--glow-color-2) 0%, rgba(0,0,0,0) 75%);
+            bottom: 5%;
+            right: -200px;
+            z-index: -1;
+            pointer-events: none;
+            filter: blur(40px);
+            transition: var(--transition-smooth);
+        }
+
+        h1, h2, h3, h4, h5, h6, .font-heading {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            transition: var(--transition-smooth);
+            z-index: 1000;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+        }
+
+        .sidebar-brand {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            background: linear-gradient(to right, #f43f5e, #fda4af);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            text-decoration: none;
+        }
+        html[data-theme="light"] .sidebar-brand {
+            background: linear-gradient(to right, #ffffff, #ffe4e6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: var(--navbar-link) !important;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: var(--transition-smooth);
+            cursor: pointer;
+        }
+        html[data-theme="light"] .sidebar-link {
+            color: #ffe4e6 !important;
+        }
+
+        .sidebar-link:hover, .sidebar-link.active {
+            color: var(--navbar-link-active) !important;
+            background: var(--navbar-link-hover-bg) !important;
+            transform: translateX(4px);
+        }
+        html[data-theme="light"] .sidebar-link:hover, 
+        html[data-theme="light"] .sidebar-link.active {
+            background: rgba(255, 255, 255, 0.15) !important;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        /* Glass Cards */
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+        html[data-theme="dark"] .glass-card {
+            box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+        }
+        .glass-card:hover {
+            border-color: var(--card-hover-border);
+            transform: translateY(-4px);
+            box-shadow: 0 15px 45px rgba(244, 63, 94, 0.12), 0 0 25px var(--glow-color-1);
+        }
+
+        /* Screen Switcher */
+        .app-screen {
+            display: none;
+        }
+        .app-screen.active {
+            display: block;
+            animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        /* Buttons */
+        .btn-portal {
+            background: var(--primary-grad);
+            background-size: 200% auto;
+            border: none;
+            color: white !important;
+            font-weight: 600;
+            padding: 10px 24px;
+            border-radius: 10px;
+            transition: var(--transition-smooth);
+            box-shadow: 0 4px 15px rgba(244, 63, 94, 0.35);
+            text-decoration: none;
+        }
+        .btn-portal:hover {
+            background-position: right center;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(244, 63, 94, 0.55);
+        }
+
+        .btn-theme-toggle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            transition: var(--transition-smooth);
+            border: 1px solid var(--border-color) !important;
+            color: var(--text-main) !important;
+            cursor: pointer;
+        }
+        html[data-theme="light"] .btn-theme-toggle {
+            border-color: rgba(255, 255, 255, 0.45) !important;
+            color: #ffffff !important;
+        }
+        html[data-theme="light"] .btn-theme-toggle:hover {
+            background-color: #ffffff !important;
+            color: #be123c !important;
+        }
+
+        /* Input Controls */
+        .form-control-custom {
+            background-color: var(--input-bg) !important;
+            border: 1px solid var(--input-border) !important;
+            color: var(--input-color) !important;
+            border-radius: 10px;
+            padding: 11px 16px;
+            transition: var(--transition-smooth);
+        }
+        .form-control-custom:focus {
+            border-color: #f43f5e !important;
+            box-shadow: 0 0 0 0.25rem rgba(244, 63, 94, 0.25) !important;
+            animation: focusPulse 2.5s infinite ease-in-out;
+            outline: none;
+        }
+
+        /* Accessibillity Widget */
+        .accessibility-widget {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1050;
+            animation: widgetFloat 5s ease-in-out infinite;
+        }
+        .widget-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 35px rgba(0,0,0,0.12);
+        }
+        .widget-temp {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+        .widget-condition {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        html[data-theme="light"] .widget-condition {
+            color: #475569 !important;
+        }
+        .widget-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+            background: rgba(255,255,255,0.02);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+        .widget-btn:hover {
+            background: var(--primary-grad);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        /* Custom Solid Badge Styles (Global) */
+        .badge-sekretariat {
+            background-color: #6366f1 !important;
+            color: #ffffff !important;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.72rem;
+            border: none !important;
+            display: inline-block;
+        }
+        .badge-ideologi {
+            background-color: #e11d48 !important;
+            color: #ffffff !important;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.72rem;
+            border: none !important;
+            display: inline-block;
+        }
+        .badge-poldagri {
+            background-color: #10b981 !important;
+            color: #ffffff !important;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.72rem;
+            border: none !important;
+            display: inline-block;
+        }
+        .badge-ekososbud {
+            background-color: #d97706 !important;
+            color: #ffffff !important;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.72rem;
+            border: none !important;
+            display: inline-block;
+        }
+
+        /* Override Bootstrap subtles inside Light Mode to solid contrast */
+        html[data-theme="light"] .bg-indigo-subtle,
+        html[data-theme="light"] .org-badge.bg-indigo-subtle {
+            background-color: #6366f1 !important;
+            color: #ffffff !important;
+        }
+        html[data-theme="light"] .bg-primary-subtle,
+        html[data-theme="light"] .org-badge.bg-primary-subtle {
+            background-color: #e11d48 !important;
+            color: #ffffff !important;
+        }
+        html[data-theme="light"] .bg-success-subtle,
+        html[data-theme="light"] .org-badge.bg-success-subtle {
+            background-color: #10b981 !important;
+            color: #ffffff !important;
+        }
+        html[data-theme="light"] .bg-warning-subtle,
+        html[data-theme="light"] .org-badge.bg-warning-subtle {
+            background-color: #d97706 !important;
+            color: #ffffff !important;
+        }
+        html[data-theme="light"] .text-indigo { color: #ffffff !important; }
+        html[data-theme="light"] .text-primary { color: #ffffff !important; }
+        html[data-theme="light"] .text-success { color: #ffffff !important; }
+        html[data-theme="light"] .text-warning { color: #ffffff !important; }
+        html[data-theme="light"] .border-indigo-subtle,
+        html[data-theme="light"] .border-primary-subtle,
+        html[data-theme="light"] .border-success-subtle,
+        html[data-theme="light"] .border-warning-subtle {
+            border: none !important;
+        }
+
+        /* Breadcrumbs styling and contrast fix */
+        .breadcrumb-item + .breadcrumb-item::before {
+            color: var(--text-muted) !important;
+        }
+        .breadcrumb-item a {
+            color: #be123c !important;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition-smooth);
+        }
+        html[data-theme="dark"] .breadcrumb-item a {
+            color: #fda4af !important;
+        }
+        html[data-theme="light"] .breadcrumb-item a {
+            color: #be123c !important;
+        }
+        .breadcrumb-item a:hover {
+            color: #f43f5e !important;
+            text-decoration: underline !important;
+        }
+        .breadcrumb-item.active {
+            color: var(--text-muted) !important;
+        }
+
+        /* Metric Cards */
+        .metric-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition-smooth);
+        }
+        .metric-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--card-hover-border);
+            box-shadow: 0 10px 30px rgba(244, 63, 94, 0.1);
+        }
+        .icon-box {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        .icon-primary {
+            background: rgba(96, 165, 250, 0.15) !important;
+            color: #93c5fd !important;
+            border: 1px solid rgba(96, 165, 250, 0.3) !important;
+        }
+        html[data-theme="light"] .icon-primary {
+            background: rgba(96, 165, 250, 0.1) !important;
+            color: #2563eb !important;
+            border: 1px solid rgba(96, 165, 250, 0.2) !important;
+        }
+        .icon-success {
+            background: rgba(16, 185, 129, 0.15) !important;
+            color: #34d399 !important;
+            border: 1px solid rgba(16, 185, 129, 0.3) !important;
+        }
+        html[data-theme="light"] .icon-success {
+            background: rgba(16, 185, 129, 0.1) !important;
+            color: #059669 !important;
+            border: 1px solid rgba(16, 185, 129, 0.2) !important;
+        }
+        .icon-warning {
+            background: rgba(245, 158, 11, 0.15) !important;
+            color: #fde68a !important;
+            border: 1px solid rgba(245, 158, 11, 0.3) !important;
+        }
+        html[data-theme="light"] .icon-warning {
+            background: rgba(245, 158, 11, 0.1) !important;
+            color: #d97706 !important;
+            border: 1px solid rgba(245, 158, 11, 0.2) !important;
+        }
+        .icon-danger {
+            background: rgba(239, 68, 68, 0.15) !important;
+            color: #fca5a5 !important;
+            border: 1px solid rgba(239, 68, 68, 0.3) !important;
+        }
+        html[data-theme="light"] .icon-danger {
+            background: rgba(239, 68, 68, 0.1) !important;
+            color: #dc2626 !important;
+            border: 1px solid rgba(239, 68, 68, 0.2) !important;
+        }
+
+        .progress-custom {
+            height: 8px;
+            background-color: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .progress-bar-primary { background: linear-gradient(90deg, #60a5fa, #3b82f6); }
+        .progress-bar-success { background: linear-gradient(90deg, #34d399, #10b981); }
+        .progress-bar-warning { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
+        .progress-bar-danger { background: linear-gradient(90deg, #f87171, #ef4444); }
+
+        /* GIS Map Demo Container */
+        #map-demo {
+            height: 400px;
+            width: 100%;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            z-index: 1;
+        }
+        .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+            background: var(--card-bg) !important;
+            color: var(--text-main) !important;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(12px);
+        }
+
+        /* Lock SPJ Warning styling */
+        .lock-warning-box {
+            display: none;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: #fca5a5;
+            font-size: 0.85rem;
+            animation: warningPulse 1.5s infinite ease-in-out;
+        }
+        html[data-theme="light"] .lock-warning-box {
+            color: #b91c1c;
+            background: #fee2e2;
+            border-color: #fca5a5;
+        }
+
+        /* -------------------------------------------------------------------------- */
+        /* Keyframe Animations                                                        */
+        /* -------------------------------------------------------------------------- */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes focusPulse {
+            0%, 100% { box-shadow: 0 0 0 0.25rem rgba(244, 63, 94, 0.25); }
+            50% { box-shadow: 0 0 0 0.38rem rgba(244, 63, 94, 0.45); }
+        }
+        @keyframes widgetFloat {
+            0%, 100% { transform: translateY(-50%) translateY(0); }
+            50% { transform: translateY(-50%) translateY(-8px); }
+        }
+        @keyframes warningPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.3); }
+            50% { box-shadow: 0 0 10px 2px rgba(239, 68, 68, 0.4); border-color: rgba(239, 68, 68, 0.7); }
+        }
+
+        .animate-fade-up {
+            animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Menu (SPA Navigation) -->
+    <div class="sidebar">
+        <a class="sidebar-brand" href="#">
+            <i class="fa-solid fa-shield-halved"></i> SIPAKATAU
+        </a>
+        <nav class="flex-grow-1">
+            <ul class="sidebar-menu">
+                <li><a class="sidebar-link active" onclick="switchScreen('screen-beranda')"><i class="fa-solid fa-house"></i> Beranda Publik</a></li>
+                <li><a class="sidebar-link" onclick="switchScreen('screen-profil')"><i class="fa-solid fa-building"></i> Profil & Bidang</a></li>
+                <li><a class="sidebar-link" onclick="switchScreen('screen-maklumat')"><i class="fa-solid fa-scroll"></i> Maklumat Pelayanan</a></li>
+                <li><a class="sidebar-link" onclick="switchScreen('screen-form-ormas')"><i class="fa-solid fa-pen-to-square"></i> Registrasi Ormas</a></li>
+                <li><a class="sidebar-link" onclick="switchScreen('screen-form-rekomendasi')"><i class="fa-solid fa-file-signature"></i> Rekomendasi Kegiatan</a></li>
+                <li><a class="sidebar-link" onclick="switchScreen('screen-lacak')"><i class="fa-solid fa-magnifying-glass"></i> Lacak & Unduh TTE</a></li>
+                <li><a class="sidebar-link" onclick="switchScreen('screen-login')"><i class="fa-solid fa-right-to-bracket"></i> internal Login</a></li>
+                <li class="mt-4 border-top pt-3 text-muted small uppercase fw-bold tracking-wider" style="font-size:0.65rem; padding-left:16px;">Demo Dashboard</li>
+                <li><a class="sidebar-link" onclick="switchScreen('screen-dash-admin')"><i class="fa-solid fa-user-gear"></i> Dasbor Admin</a></li>
+                <li><a class="sidebar-link" onclick="switchScreen('screen-dash-bidang')"><i class="fa-solid fa-chart-pie"></i> Dasbor Bidang (PPTK)</a></li>
+                <li><a class="sidebar-link" onclick="switchScreen('screen-dash-kaban')"><i class="fa-solid fa-crown"></i> Dasbor Pimpinan</a></li>
+            </ul>
+        </nav>
+        <div class="mt-auto d-flex justify-content-between align-items-center">
+            <span class="small text-muted">Sandbox Mode</span>
+            <button type="button" id="theme-toggle" class="btn-theme-toggle">
+                <i id="theme-toggle-icon" class="fa-solid fa-moon"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Floating Accessibility & Weather Widget -->
+    <div class="accessibility-widget">
+        <div class="widget-card">
+            <div class="widget-weather-box">
+                <i class="fa-solid fa-cloud-sun fa-lg text-warning"></i>
+                <div class="widget-temp">26°C</div>
+                <div class="widget-condition">Cerah Berawan</div>
+            </div>
+            <button class="widget-btn" title="Perbesar Font"><i class="fa-solid fa-plus"></i></button>
+            <button class="widget-btn" title="Perkecil Font"><i class="fa-solid fa-minus"></i></button>
+            <button class="widget-btn" title="Reset Font"><i class="fa-solid fa-arrows-rotate"></i></button>
+        </div>
+    </div>
+
+    <!-- Main Content Container -->
+    <div class="main-content">
+        
+        <!-- =================================================================== -->
+        <!-- 1. SCREEN: BERANDA                                                  -->
+        <!-- =================================================================== -->
+        <div id="screen-beranda" class="app-screen active">
+            <!-- Hero Card -->
+            <div class="glass-card text-center py-5">
+                <h1 class="display-5 fw-bold text-white mb-2">Selamat Datang di SIPAKATAU</h1>
+                <p class="text-muted fs-5 mb-4">Sistem Pelayanan Kesbangpol Terpadu dan Akurat Kabupaten Sinjai</p>
+                <div class="d-flex justify-content-center gap-3">
+                    <button class="btn-portal" onclick="switchScreen('screen-form-ormas')">Daftar Ormas</button>
+                    <button class="btn btn-outline-light px-4 border border-secondary" onclick="switchScreen('screen-form-rekomendasi')">Rekomendasi Kegiatan</button>
+                </div>
+            </div>
+
+            <!-- GIS Peta Sebaran -->
+            <div class="glass-card">
+                <h3 class="mb-3"><i class="fa-solid fa-map-location-dot me-2 text-primary"></i> Peta Sebaran GIS Bakesbangpol Sinjai</h3>
+                <p class="text-muted small">Visualisasi sebaran organisasi, partai politik, aduan masyarakat, dan titik kerawanan konflik sosial di Kabupaten Sinjai secara real-time.</p>
+                <div id="map-demo"></div>
+            </div>
+
+            <!-- Antrean MPP Widget -->
+            <div class="glass-card" id="widget-antrean-mpp">
+                <div class="row align-items-center">
+                    <div class="col-lg-6">
+                        <h3><i class="fa-solid fa-ticket me-2 text-warning"></i> Ambil Antrean MPP Online</h3>
+                        <p class="text-muted small">Dapatkan nomor antrean Mal Pelayanan Publik (MPP) secara langsung untuk pengurusan registrasi ormas, parpol, maupun konsultasi umum.</p>
+                        <form id="form-antrean" class="d-flex flex-column gap-3 mt-3">
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted small">Nama Pemohon</label>
+                                    <input type="text" id="antrean-nama" class="form-control form-control-custom w-100" required placeholder="Nama Lengkap">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted small">NIK (16 Digit)</label>
+                                    <input type="text" id="antrean-nik" class="form-control form-control-custom w-100" pattern="\d{16}" required placeholder="NIK Sesuai KTP">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="form-label text-muted small">Jenis Pelayanan</label>
+                                <select id="antrean-layanan" class="form-select form-control-custom" required>
+                                    <option value="A">Pendaftaran Ormas (Prefix A)</option>
+                                    <option value="B">Rekomendasi Kegiatan (Prefix B)</option>
+                                    <option value="C">Konsultasi / Umum (Prefix C)</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn-portal w-100 mt-2">Ambil Tiket Antrean</button>
+                        </form>
+                    </div>
+                    <!-- Virtual Digital Ticket -->
+                    <div class="col-lg-6 mt-4 mt-lg-0 text-center">
+                        <div id="antrean-ticket-container" style="display:none;" class="p-4 rounded border border-warning border-opacity-20 bg-dark bg-opacity-20 animate-fade-up">
+                            <h5 class="text-warning mb-1 uppercase fw-bold tracking-wider">Tiket Antrean MPP</h5>
+                            <div class="display-3 fw-bold text-white my-3" id="ticket-number">A-001</div>
+                            <div class="text-muted small" id="ticket-name">A. Akhmad Sultan</div>
+                            <div class="text-muted small" id="ticket-nik">7306xxxxxxxxxxxx</div>
+                            <div class="mt-3 py-2 border-top border-bottom border-secondary border-opacity-10 text-muted small" id="ticket-date">18 Jun 2026 • 11:20 WIB</div>
+                            <div class="my-3 d-inline-block bg-white p-2 rounded">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=SIPAKATAU-A-001" style="width: 100px; height: 100px;" alt="QR Code">
+                            </div>
+                            <button onclick="window.print()" class="btn btn-outline-warning btn-sm w-100">Cetak Tiket Digital</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- =================================================================== -->
+        <!-- 2. SCREEN: PROFIL & BIDANG                                          -->
+        <!-- =================================================================== -->
+        <div id="screen-profil" class="app-screen">
+            <!-- Visi Misi -->
+            <div class="row g-4 mb-5">
+                <div class="col-md-6">
+                    <div class="glass-card h-100">
+                        <h3 class="mb-4"><i class="fa-solid fa-eye me-2 text-primary"></i> Visi</h3>
+                        <blockquote class="blockquote mb-0 text-muted" style="font-size: 1.1rem; line-height: 1.8; border-left: 3px solid var(--border-color); padding-left: 15px;">
+                            "Mewujudkan Pelayanan Kesatuan Bangsa dan Politik yang Terpadu, Profesional, dan Akurat di Kabupaten Sinjai."
+                        </blockquote>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="glass-card h-100">
+                        <h3 class="mb-4"><i class="fa-solid fa-bullseye me-2 text-warning"></i> Misi</h3>
+                        <ol class="text-muted d-flex flex-column gap-2 mb-0" style="line-height: 1.7;">
+                            <li>Mengoptimalkan kualitas pelayanan pendaftaran ormas secara digital.</li>
+                            <li>Meningkatkan integrasi koordinasi wasbang, pemilu, dan kerawanan konflik.</li>
+                            <li>Menyediakan data kinerja program kesbangpol yang transparan.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bidang Section -->
+            <div class="glass-card">
+                <h3 class="mb-4"><i class="fa-solid fa-building-user me-2 text-primary"></i> Bidang & Unit Kerja</h3>
+                
+                <div class="d-flex flex-column gap-4">
+                    <!-- Sekretariat -->
+                    <div class="p-4 rounded border-left" style="background: var(--input-bg); border-left: 4px solid #71717a;">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h4 class="text-white mb-1">Sekretariat</h4>
+                                <span class="badge-sekretariat">Pembina Umum</span>
+                            </div>
+                            <div class="icon-box" style="background: rgba(99, 102, 241, 0.1); color: #c7d2fe;"><i class="fa-solid fa-folder-open"></i></div>
+                        </div>
+                        <p class="text-muted mb-0">Sekretariat mempunyai tugas memberikan pelayanan administratif dan koordinasi pelaksanaan tugas sub bagian di lingkungan Badan Kesbangpol Kabupaten Sinjai.</p>
+                    </div>
+                    <!-- Bidang Ideologi -->
+                    <div class="p-4 rounded border-left" style="background: var(--input-bg); border-left: 4px solid #e11d48;">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h4 class="text-white mb-1">Bidang Ideologi Pancasila & Wasbang</h4>
+                                <span class="badge-ideologi">Wasbang & Ideologi</span>
+                            </div>
+                            <div class="icon-box" style="background: rgba(225, 29, 72, 0.1); color: #fda4af;"><i class="fa-solid fa-flag"></i></div>
+                        </div>
+                        <p class="text-muted mb-0">Melaksanakan perumusan bahan kebijakan dan pemantauan di bidang ideologi Pancasila, wawasan kebangsaan, bela negara, serta ketahanan nasional.</p>
+                    </div>
+                    <!-- Bidang Poldagri -->
+                    <div class="p-4 rounded border-left" style="background: var(--input-bg); border-left: 4px solid #10b981;">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h4 class="text-white mb-1">Bidang Politik Dalam Negeri & Ormas</h4>
+                                <span class="badge-poldagri">Poldagri & Ormas</span>
+                            </div>
+                            <div class="icon-box" style="background: rgba(16, 185, 129, 0.1); color: #a7f3d0;"><i class="fa-solid fa-users"></i></div>
+                        </div>
+                        <p class="text-muted mb-0">Memfasilitasi pendaftaran organisasi kemasyarakatan, pembinaan partai politik, penguatan demokrasi lokal, serta fasilitasi pemilu legislatif/presiden.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- =================================================================== -->
+        <!-- 3. SCREEN: MAKLUMAT                                                 -->
+        <!-- =================================================================== -->
+        <div id="screen-maklumat" class="app-screen">
+            <div class="glass-card text-center py-5">
+                <i class="fa-solid fa-scroll fa-4x text-warning mb-4"></i>
+                <h2 class="text-white fw-bold mb-3">MAKLUMAT PELAYANAN</h2>
+                <h5 class="text-muted tracking-wide mb-4">Badan Kesatuan Bangsa dan Politik Kabupaten Sinjai</h5>
+                
+                <div class="border p-4 mx-auto rounded" style="max-width: 700px; background: var(--input-bg); border-color: var(--border-color) !important;">
+                    <blockquote class="blockquote mb-0 fs-5 text-white italic" style="font-family:'Outfit',sans-serif; line-height: 1.8;">
+                        "Dengan ini, kami menyatakan sanggup menyelenggarakan pelayanan sesuai standar pelayanan yang telah ditetapkan dan apabila tidak menepati janji ini, kami siap menerima sanksi sesuai peraturan perundang-undangan yang berlaku."
+                    </blockquote>
+                </div>
+                <div class="mt-4 text-muted small">
+                    <p class="mb-0">Ditetapkan di: <b>Sinjai</b></p>
+                    <p class="mb-0">Kepala Badan Kesatuan Bangsa dan Politik Kabupaten Sinjai</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- =================================================================== -->
+        <!-- 4. SCREEN: FORM REGISTRASI ORMAS                                    -->
+        <!-- =================================================================== -->
+        <div id="screen-form-ormas" class="app-screen">
+            <div class="glass-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="mb-0"><i class="fa-solid fa-pen-to-square me-2 text-primary"></i> Formulir Registrasi Ormas Baru</h3>
+                    <span id="ormas-progress-label" class="fw-bold text-primary">0% Pengisian</span>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="progress progress-custom mb-4" style="height: 10px;">
+                    <div id="ormas-progress-bar" class="progress-bar progress-bar-primary" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+
+                <form id="form-ormas-real" class="d-flex flex-column gap-3">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small">Nama Organisasi</label>
+                            <input type="text" id="ormas-nama" class="form-control form-control-custom w-100" oninput="calculateOrmasProgress()" placeholder="Masukkan Nama Ormas">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small">Jenis Organisasi</label>
+                            <select id="ormas-tipe" class="form-select form-control-custom" onchange="calculateOrmasProgress()">
+                                <option value="">Pilih Jenis</option>
+                                <option value="Yayasan">Yayasan</option>
+                                <option value="LSM">LSM / Lembaga</option>
+                                <option value="Himpunan">Perkumpulan / Himpunan</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small">Email Resmi</label>
+                            <input type="email" id="ormas-email" class="form-control form-control-custom w-100" oninput="calculateOrmasProgress()" placeholder="email@ormas.org">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small">Telepon Pengurus</label>
+                            <input type="text" id="ormas-telp" class="form-control form-control-custom w-100" oninput="calculateOrmasProgress()" placeholder="08xxxxxxxxxx">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="form-label text-muted small">Alamat Kantor</label>
+                        <textarea id="ormas-alamat" rows="3" class="form-control form-control-custom w-100" oninput="calculateOrmasProgress()" placeholder="Jl. Alamat Kantor Ormas Lengkap..."></textarea>
+                    </div>
+                    <div>
+                        <label class="form-label text-muted small">Unggah Berkas Pendukung (Akte, SK Kemenkumham, AD/ART)</label>
+                        <input type="file" id="ormas-file" class="form-control form-control-custom w-100" onchange="calculateOrmasProgress()">
+                    </div>
+                    <button type="button" onclick="submitOrmasForm()" class="btn-portal w-100 mt-3">Ajukan Pendaftaran Ormas</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- =================================================================== -->
+        <!-- 5. SCREEN: FORM REKOMENDASI KEGIATAN                                -->
+        <!-- =================================================================== -->
+        <div id="screen-form-rekomendasi" class="app-screen">
+            <div class="glass-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="mb-0"><i class="fa-solid fa-file-signature me-2 text-primary"></i> Formulir Rekomendasi Kegiatan</h3>
+                    <span id="rekom-progress-label" class="fw-bold text-primary">0% Pengisian</span>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="progress progress-custom mb-4" style="height: 10px;">
+                    <div id="rekom-progress-bar" class="progress-bar progress-bar-primary" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+
+                <form id="form-rekom-real" class="d-flex flex-column gap-3">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small">Nama Pemohon (Lembaga/Individu)</label>
+                            <input type="text" id="rekom-nama" class="form-control form-control-custom w-100" oninput="calculateRekomProgress()" placeholder="Nama Pemohon">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small">Nama Kegiatan</label>
+                            <input type="text" id="rekom-kegiatan" class="form-control form-control-custom w-100" oninput="calculateRekomProgress()" placeholder="Nama Kegiatan / Seminar / Rapat">
+                        </div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small">Tanggal Mulai</label>
+                            <input type="date" id="rekom-tgl-mulai" class="form-control form-control-custom w-100" onchange="calculateRekomProgress()">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small">Tanggal Selesai</label>
+                            <input type="date" id="rekom-tgl-selesai" class="form-control form-control-custom w-100" onchange="calculateRekomProgress()">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="form-label text-muted small">Deskripsi Kegiatan</label>
+                        <textarea id="rekom-deskripsi" rows="3" class="form-control form-control-custom w-100" oninput="calculateRekomProgress()" placeholder="Deskripsikan tujuan dan agenda kegiatan..."></textarea>
+                    </div>
+                    <div>
+                        <label class="form-label text-muted small">Proposal Kegiatan (Format PDF)</label>
+                        <input type="file" id="rekom-file" class="form-control form-control-custom w-100" onchange="calculateRekomProgress()">
+                    </div>
+                    <button type="button" onclick="submitRekomForm()" class="btn-portal w-100 mt-3">Ajukan Rekomendasi</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- =================================================================== -->
+        <!-- 6. SCREEN: LACAK & UNDUH TTE                                        -->
+        <!-- =================================================================== -->
+        <div id="screen-lacak" class="app-screen">
+            <div class="glass-card">
+                <h3><i class="fa-solid fa-magnifying-glass me-2 text-primary"></i> Pelacakan Berkas Publik</h3>
+                <p class="text-muted small">Gunakan Kode Berkas atau UUID Pengajuan yang Anda dapatkan saat mendaftar untuk melacak progres verifikasi dokumen.</p>
+                
+                <div class="d-flex gap-2 my-4">
+                    <input type="text" id="lacak-input" class="form-control form-control-custom" placeholder="Masukkan UUID (contoh: REK-990812)">
+                    <button onclick="lacakBerkasSim()" class="btn-portal px-4">Lacak Berkas</button>
+                </div>
+
+                <!-- Live Tracking Progress Result -->
+                <div id="lacak-result" style="display:none;" class="p-4 rounded border border-secondary border-opacity-10 bg-dark bg-opacity-10 animate-fade-up">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="text-white mb-0" id="lacak-title">Surat Rekomendasi: Seminar Kebangsaan</h5>
+                        <span id="lacak-badge" class="badge bg-success-subtle text-success border border-success-subtle">Selesai (100%)</span>
+                    </div>
+                    <div class="progress progress-custom mb-4" style="height: 10px;">
+                        <div id="lacak-progress-bar" class="progress-bar progress-bar-success" role="progressbar" style="width: 100%"></div>
+                    </div>
+                    
+                    <div class="d-flex flex-column gap-3 small text-muted mb-4">
+                        <div class="d-flex justify-content-between"><span>Nomor Berkas:</span><span class="text-white" id="lacak-uuid">REK-990812</span></div>
+                        <div class="d-flex justify-content-between"><span>Pemohon:</span><span class="text-white" id="lacak-pemohon">Forum Mahasiswa Sinjai</span></div>
+                        <div class="d-flex justify-content-between"><span>Tanggal Pengajuan:</span><span class="text-white">18 Jun 2026</span></div>
+                        <div class="d-flex justify-content-between"><span>Status Log:</span><span class="text-white" id="lacak-log">Dokumen Telah Ditandatangani Digital (TTE BSrE)</span></div>
+                    </div>
+
+                    <!-- PDF Download Simulation Button -->
+                    <div id="tte-download-box" style="display:block;">
+                        <div class="alert alert-success bg-success-subtle border-success-subtle text-success d-flex align-items-center gap-3 rounded p-3 mb-3">
+                            <i class="fa-solid fa-circle-check fa-lg"></i>
+                            <div>TTE Dokumen tervalidasi BSrE BSSN. Siap diunduh dan dicetak secara legal.</div>
+                        </div>
+                        <button onclick="cetakSuratSim()" class="btn btn-success w-100 py-2.5"><i class="fa-solid fa-file-pdf me-2"></i> Cetak Surat Rekomendasi Resmi (TTE)</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Surat TTE Template (Simulated View) -->
+            <div id="print-view-tte" style="display:none;" class="glass-card bg-white text-dark p-5 font-serif border border-dark animate-fade-up" style="max-width: 800px; margin: 30px auto; font-family: 'Times New Roman', serif;">
+                <!-- Kop Surat -->
+                <div class="text-center pb-3 border-bottom border-dark border-3 mb-4">
+                    <h5 class="fw-bold mb-1" style="font-size: 1.1rem;">PEMERINTAH KABUPATEN SINJAI</h5>
+                    <h4 class="fw-bold mb-1" style="font-size: 1.35rem;">BADAN KESATUAN BANGSA DAN POLITIK</h4>
+                    <p class="small mb-0" style="font-size:0.85rem;">Jl. Sinjai - Watampone, Biringere, Sinjai, Sulawesi Selatan 92600</p>
+                    <p class="small mb-0" style="font-size:0.85rem;">Email: kesbangpol@sinjaikab.go.id • WhatsApp: 0811-7671-545</p>
+                </div>
+                
+                <!-- Surat Details -->
+                <div class="text-center mb-4">
+                    <h5 class="fw-bold mb-1 text-decoration-underline" style="font-size: 1.1rem; text-transform: uppercase;">SURAT REKOMENDASI KEGIATAN</h5>
+                    <p class="small">Nomor: 045.2/342/Bakesbangpol/VI/2026</p>
+                </div>
+
+                <p class="mb-3" style="text-indent: 40px; text-align: justify; line-height: 1.6;">Berdasarkan permohonan yang diajukan oleh <b id="tte-print-pemohon">Forum Mahasiswa Sinjai</b> mengenai pelaksanaan kegiatan <b id="tte-print-kegiatan">Seminar Kebangsaan</b>, Badan Kesatuan Bangsa dan Politik Kabupaten Sinjai dengan ini menyatakan memberikan REKOMENDASI KEGIATAN kepada:</p>
+                
+                <table class="table table-borderless table-sm mb-4 small" style="line-height: 1.6;">
+                    <tr><td width="30%">Nama Lembaga/Pemohon</td><td>: <span id="tte-print-tbl-pemohon">Forum Mahasiswa Sinjai</span></td></tr>
+                    <tr><td>Tujuan/Nama Kegiatan</td><td>: <span id="tte-print-tbl-kegiatan">Seminar Kebangsaan</span></td></tr>
+                    <tr><td>Waktu Pelaksanaan</td><td>: 18 Juni 2026 s.d 20 Juni 2026</td></tr>
+                    <tr><td>Tempat Kegiatan</td><td>: Aula Kantor Bupati Sinjai</td></tr>
+                </table>
+
+                <p class="mb-4" style="text-indent: 40px; text-align: justify; line-height: 1.6;">Rekomendasi ini diberikan dengan ketentuan pemohon wajib menjaga ketertiban, mematuhi norma hukum yang berlaku, serta melaporkan hasil pelaksanaan kegiatan kepada Kepala Badan Kesbangpol setelah kegiatan selesai.</p>
+
+                <!-- Signature digital BSrE -->
+                <div class="row pt-4 align-items-center">
+                    <div class="col-6">
+                        <div class="border p-2 d-inline-block text-center small text-muted" style="border: 1px dashed #71717a !important; font-size: 0.65rem; line-height: 1.3;">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=VALID-TTE-BSRE-KESBANGPOL-SINJAI" style="width: 60px; height: 60px; margin-bottom: 5px;" alt="BSrE QR"><br>
+                            Dokumen Ditandatangani Digital<br>
+                            Sertifikasi BSrE BSSN RI
+                        </div>
+                    </div>
+                    <div class="col-6 text-end small">
+                        <p class="mb-0">Kepala Badan Kesbangpol Sinjai,</p>
+                        <p class="fw-bold mb-4 pt-4 text-decoration-underline">A. AKHMAD SULTAN, S.STP., M.Si</p>
+                        <p class="text-muted">NIP. 197403072007011016</p>
+                    </div>
+                </div>
+
+                <button onclick="window.print()" class="btn btn-outline-dark btn-sm w-100 mt-4 d-print-none">Print Cetakan Resmi</button>
+            </div>
+        </div>
+
+        <!-- =================================================================== -->
+        <!-- 7. SCREEN: INTERNAL LOGIN                                           -->
+        <!-- =================================================================== -->
+        <div id="screen-login" class="app-screen">
+            <div class="glass-card mx-auto" style="max-width: 450px; margin-top: 40px;">
+                <div class="text-center mb-4">
+                    <i class="fa-solid fa-shield-halved fa-3x text-primary mb-3"></i>
+                    <h3 class="text-white">internal Portal Login</h3>
+                    <p class="text-muted small">Pilih Akun Cepat Simulasi:</p>
+                </div>
+                
+                <div class="d-flex flex-column gap-2 mb-4">
+                    <button class="btn btn-outline-light text-start px-3 py-2.5 d-flex justify-content-between align-items-center border border-secondary" onclick="loginSimulate('admin')">
+                        <span><i class="fa-solid fa-user-gear me-2"></i> <b>Admin</b> (Dashboard Kontrol)</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                    <button class="btn btn-outline-light text-start px-3 py-2.5 d-flex justify-content-between align-items-center border border-secondary" onclick="loginSimulate('pptk')">
+                        <span><i class="fa-solid fa-chart-pie me-2"></i> <b>PPTK Bidang</b> (Input SPJ & Form)</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                    <button class="btn btn-outline-light text-start px-3 py-2.5 d-flex justify-content-between align-items-center border border-secondary" onclick="loginSimulate('kaban')">
+                        <span><i class="fa-solid fa-crown me-2"></i> <b>Kaban / Pimpinan</b> (Executive Chart)</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- =================================================================== -->
+        <!-- 8. SCREEN: DASHBOARD ADMIN                                          -->
+        <!-- =================================================================== -->
+        <div id="screen-dash-admin" class="app-screen">
+            <!-- Header -->
+            <div class="glass-card d-flex justify-content-between align-items-center py-4">
+                <div>
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1.5 rounded-pill mb-2 font-heading" style="font-weight:600;"><i class="fa-solid fa-user-gear me-1"></i> Admin Panel</span>
+                    <h2 class="text-white mb-0">Dasbor Administrator</h2>
+                </div>
+                <button onclick="loginSimulate('guest')" class="btn btn-outline-danger btn-sm">Log Out</button>
+            </div>
+
+            <!-- Tab Kontrol Admin -->
+            <div class="glass-card">
+                <ul class="nav nav-tabs border-secondary border-opacity-10 mb-4" id="adminTabs" role="tablist">
+                    <li class="nav-item"><button class="nav-link text-white active" onclick="switchAdminTab('tab-mpp')">Antrean MPP Hari Ini</button></li>
+                    <li class="nav-item"><button class="nav-link text-white" onclick="switchAdminTab('tab-lock-spj')">Penguncian SPJ Bulanan</button></li>
+                </ul>
+
+                <!-- Tab MPP Content -->
+                <div id="tab-mpp" class="admin-tab-pane">
+                    <h5><i class="fa-solid fa-ticket me-2 text-warning"></i> Pemanggilan & Kontrol Antrean MPP</h5>
+                    <p class="text-muted small">Panggil nomor antrean Mal Pelayanan Publik (MPP) yang diajukan oleh pemohon.</p>
+                    
+                    <div class="table-responsive mt-3">
+                        <table class="table table-dark table-hover border-secondary border-opacity-10 small">
+                            <thead>
+                                <tr>
+                                    <th>Nomor</th>
+                                    <th>Nama Pemohon</th>
+                                    <th>NIK</th>
+                                    <th>Layanan</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbl-antrean-body">
+                                <tr>
+                                    <td>A-001</td>
+                                    <td>Budi Wijaya</td>
+                                    <td>7306010203040001</td>
+                                    <td>Pendaftaran Ormas</td>
+                                    <td><span class="badge bg-warning-subtle text-warning">Menunggu</span></td>
+                                    <td>
+                                        <button onclick="callAntrean('A-001')" class="btn btn-primary btn-sm px-3"><i class="fa-solid fa-volume-high"></i> Panggil</button>
+                                        <button onclick="doneAntrean('A-001')" class="btn btn-success btn-sm px-3"><i class="fa-solid fa-check"></i> Selesai</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab Lock SPJ Content -->
+                <div id="tab-lock-spj" class="admin-tab-pane" style="display:none;">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <h5><i class="fa-solid fa-lock me-2 text-danger"></i> Kontrol Penguncian SPJ</h5>
+                            <p class="text-muted small">Kunci pengajuan SPJ bulanan bidang Bakesbangpol Sinjai untuk masa tertutup.</p>
+                            
+                            <div class="d-flex flex-column gap-3 mt-3">
+                                <div>
+                                    <label class="form-label text-muted small">Kunci Bulan Baru</label>
+                                    <input type="month" id="lock-month-input" class="form-control form-control-custom w-100">
+                                </div>
+                                <button onclick="lockNewMonth()" class="btn-portal w-100">Kunci Periode SPJ</button>
+                            </div>
+                        </div>
+                        <div class="col-md-6 border-start border-secondary border-opacity-10">
+                            <h5>Periode Kunci Terdaftar:</h5>
+                            <ul id="locked-months-list" class="list-group list-group-flush bg-transparent mt-3">
+                                <li class="list-group-item bg-transparent text-white d-flex justify-content-between align-items-center">
+                                    <span>Mei 2026</span>
+                                    <button onclick="unlockMonth('2026-05')" class="btn btn-outline-danger btn-sm">Buka Kunci</button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- =================================================================== -->
+        <!-- 9. SCREEN: DASHBOARD BIDANG (PPTK)                                  -->
+        <!-- =================================================================== -->
+        <div id="screen-dash-bidang" class="app-screen">
+            <!-- Header -->
+            <div class="glass-card d-flex justify-content-between align-items-center py-4">
+                <div>
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1.5 rounded-pill mb-2 font-heading" style="font-weight:600;"><i class="fa-solid fa-chart-pie me-1"></i> PPTK Panel</span>
+                    <h2 class="text-white mb-0">Dasbor PPTK Bidang</h2>
+                </div>
+                <button onclick="loginSimulate('guest')" class="btn btn-outline-danger btn-sm">Log Out</button>
+            </div>
+
+            <!-- Form input SPJ Kegiatan -->
+            <div class="glass-card">
+                <h3><i class="fa-solid fa-file-invoice-dollar me-2 text-primary"></i> Input Laporan SPJ Bulanan</h3>
+                <p class="text-muted small">Input kegiatan dan realisasi anggaran bidang Kesbangpol. Jika bulan pelaporan telah dikunci oleh Admin, input laporan akan terblokir otomatis.</p>
+                
+                <!-- Locked Warning Alert -->
+                <div id="lock-warning-alert" class="lock-warning-box mb-4">
+                    <i class="fa-solid fa-triangle-exclamation me-2 fa-lg animate-pulse"></i>
+                    <b>BULAN TERKUNCI!</b> Periode SPJ ini telah dikunci oleh Admin. Anda tidak dapat mengajukan laporan di bulan ini.
+                </div>
+
+                <form id="form-spj-real" class="d-flex flex-column gap-3 mt-3">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small">Pilih Bulan Laporan SPJ</label>
+                            <input type="month" id="spj-month-select" onchange="checkSpjMonthLock()" class="form-control form-control-custom w-100" value="2026-06">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small">Nama Kegiatan Bidang</label>
+                            <input type="text" id="spj-kegiatan" class="form-control form-control-custom w-100" required placeholder="Contoh: Rapat Koordinasi Forum">
+                        </div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small">Realisasi Fisik (%)</label>
+                            <input type="number" id="spj-fisik" class="form-control form-control-custom w-100" required min="0" max="100" placeholder="0-100">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small">Realisasi Anggaran (Rupiah)</label>
+                            <input type="number" id="spj-anggaran" class="form-control form-control-custom w-100" required placeholder="Masukkan Nominal SPJ">
+                        </div>
+                    </div>
+                    <button type="button" id="btn-submit-spj" onclick="submitSpjSim()" class="btn-portal w-100 mt-2">Kirim Laporan SPJ</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- =================================================================== -->
+        <!-- 10. SCREEN: DASHBOARD KABAN (PIMPINAN)                             -->
+        <!-- =================================================================== -->
+        <div id="screen-dash-kaban" class="app-screen">
+            <!-- Header -->
+            <div class="glass-card d-flex justify-content-between align-items-center py-4">
+                <div>
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1.5 rounded-pill mb-2 font-heading" style="font-weight:600;"><i class="fa-solid fa-crown me-1"></i> Pimpinan Panel</span>
+                    <h2 class="text-white mb-0">Dasbor Pimpinan (Kaban)</h2>
+                </div>
+                <button onclick="loginSimulate('guest')" class="btn btn-outline-danger btn-sm">Log Out</button>
+            </div>
+
+            <!-- Staggered metric card overview -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-6 col-lg-3">
+                    <div class="metric-card">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="text-muted small fw-semibold">Realisasi Keuangan</span>
+                            <div class="icon-box icon-success"><i class="fa-solid fa-rupiah-sign"></i></div>
+                        </div>
+                        <h3 class="fw-bold mb-1" id="kaban-persen-keuangan">87.5%</h3>
+                        <div class="progress progress-custom"><div class="progress-bar progress-bar-success" style="width: 87.5%"></div></div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="metric-card">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="text-muted small fw-semibold">Realisasi Fisik</span>
+                            <div class="icon-box icon-primary"><i class="fa-solid fa-chart-line"></i></div>
+                        </div>
+                        <h3 class="fw-bold mb-1">92.0%</h3>
+                        <div class="progress progress-custom"><div class="progress-bar progress-bar-primary" style="width: 92%"></div></div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="metric-card">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="text-muted small fw-semibold">Ormas Terdaftar</span>
+                            <div class="icon-box icon-warning"><i class="fa-solid fa-users"></i></div>
+                        </div>
+                        <h3 class="fw-bold mb-1">138 Ormas</h3>
+                        <div class="progress progress-custom"><div class="progress-bar progress-bar-warning" style="width: 100%"></div></div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="metric-card">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="text-muted small fw-semibold">Kasus Kerawanan</span>
+                            <div class="icon-box icon-danger"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                        </div>
+                        <h3 class="fw-bold mb-1">1 Titik Aktif</h3>
+                        <div class="progress progress-custom"><div class="progress-bar progress-bar-danger" style="width: 30%"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart Kinerja Bidang -->
+            <div class="glass-card">
+                <h3><i class="fa-solid fa-chart-simple me-2 text-primary"></i> Perbandingan Target & Realisasi Bidang</h3>
+                <p class="text-muted small">Visualisasi pencapaian realisasi keuangan dan realisasi fisik per bidang di Bakesbangpol Sinjai hari ini.</p>
+                <div style="height: 300px; width: 100%; position: relative;">
+                    <canvas id="chartKinerjaBidang"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Leaflet GIS Map JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    <!-- Chart.js JS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // State management local sandbox
+        let activeTheme = 'dark';
+        let lockedMonths = ['2026-05'];
+        let antreanList = [
+            { id: 'A-001', nama: 'Forum Mahasiswa Sinjai', nik: '7306010203040001', layanan: 'Pendaftaran Ormas', status: 'Menunggu' },
+            { id: 'B-001', nama: 'Dewan Masjid Indonesia', nik: '7306010203040002', layanan: 'Rekomendasi Kegiatan', status: 'Menunggu' }
+        ];
+        let map;
+        let chart;
+
+        // Screen Switcher
+        function switchScreen(screenId) {
+            document.querySelectorAll('.app-screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            const targetScreen = document.getElementById(screenId);
+            if (targetScreen) {
+                targetScreen.classList.add('active');
+            }
+
+            // Highlight sidebar
+            const links = document.querySelectorAll('.sidebar-link');
+            links.forEach(l => {
+                if (l.getAttribute('onclick').includes(screenId)) {
+                    l.classList.add('active');
+                }
+            });
+
+            // Init Leaflet GIS map if screen-beranda active
+            if (screenId === 'screen-beranda') {
+                setTimeout(initDemoMap, 300);
+            }
+
+            // Init Chart.js if screen-dash-kaban active
+            if (screenId === 'screen-dash-kaban') {
+                setTimeout(initDemoChart, 300);
+            }
+        }
+
+        // Init Peta GIS Leaflet Sinjai
+        function initDemoMap() {
+            if (map) return; // already init
+            
+            map = L.map('map-demo').setView([-5.1326, 120.2500], 12);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            // Layer marker cluster
+            const markers = L.markerClusterGroup();
+            
+            // Add custom seeder points
+            const pointOrmas = L.marker([-5.1326, 120.2500]).bindPopup('<b>Bakesbangpol Sinjai</b><br>Kantor Pusat Pelayanan.');
+            const pointConflict = L.marker([-5.1450, 120.2620]).bindPopup('<b>Titik Konflik Aksi Damai</b><br>Status: Pemantauan.');
+            const pointParpol = L.marker([-5.1200, 120.2350]).bindPopup('<b>Sekretariat DPC Partai Parpol</b><br>Lengkap Terdaftar.');
+
+            markers.addLayer(pointOrmas);
+            markers.addLayer(pointConflict);
+            markers.addLayer(pointParpol);
+            
+            map.addLayer(markers);
+        }
+
+        // Init Chart.js Executive Diagram
+        function initDemoChart() {
+            if (chart) return; // already init
+            
+            const ctx = document.getElementById('chartKinerjaBidang').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Sekretariat', 'Wasbang & Ideologi', 'Poldagri & Ormas', 'Ekososbud'],
+                    datasets: [
+                        {
+                            label: 'Realisasi Keuangan (%)',
+                            data: [87.5, 78.2, 91.0, 65.4],
+                            backgroundColor: '#10b981',
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'Realisasi Fisik (%)',
+                            data: [92.0, 84.0, 95.0, 72.8],
+                            backgroundColor: '#6366f1',
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#f3f4f6' } }
+                    }
+                }
+            });
+        }
+
+        // MPP Antrean Submit
+        document.getElementById('form-antrean').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const nama = document.getElementById('antrean-nama').value;
+            const NIK = document.getElementById('antrean-nik').value;
+            const layanan = document.getElementById('antrean-layanan').value;
+            
+            const prefix = layanan;
+            const formatNum = String(antreanList.filter(item => item.id.startsWith(prefix)).length + 1).padStart(3, '0');
+            const id = `${prefix}-${formatNum}`;
+
+            const labelLayanan = layanan === 'A' ? 'Pendaftaran Ormas' : (layanan === 'B' ? 'Rekomendasi Kegiatan' : 'Konsultasi / Umum');
+            
+            // Add to database state
+            const newAntrean = { id, nama, NIK, layanan: labelLayanan, status: 'Menunggu' };
+            antreanList.push(newAntrean);
+
+            // Show ticket digital
+            document.getElementById('ticket-number').innerText = id;
+            document.getElementById('ticket-name').innerText = nama;
+            document.getElementById('ticket-nik').innerText = NIK;
+            document.getElementById('antrean-ticket-container').style.display = 'block';
+
+            // Refresh table admin
+            renderAdminAntrean();
+            alert('Antrean MPP Berhasil Didapatkan!');
+        });
+
+        // Render Antrean admin
+        function renderAdminAntrean() {
+            const tbody = document.getElementById('tbl-antrean-body');
+            tbody.innerHTML = '';
+            
+            antreanList.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${item.id}</td>
+                    <td>${item.nama}</td>
+                    <td>${item.nik}</td>
+                    <td>${item.layanan}</td>
+                    <td><span class="badge ${item.status === 'Menunggu' ? 'bg-warning-subtle text-warning' : (item.status === 'Dilayani' ? 'bg-primary-subtle text-primary' : 'bg-success-subtle text-success')}">${item.status}</span></td>
+                    <td>
+                        ${item.status === 'Menunggu' ? `<button onclick="callAntrean('${item.id}')" class="btn btn-primary btn-sm px-2"><i class="fa-solid fa-volume-high"></i> Panggil</button>` : ''}
+                        ${item.status === 'Dilayani' ? `<button onclick="doneAntrean('${item.id}')" class="btn btn-success btn-sm px-2"><i class="fa-solid fa-check"></i> Selesai</button>` : ''}
+                        ${item.status === 'Selesai' ? `<i class="fa-solid fa-circle-check text-success fa-lg"></i>` : ''}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function callAntrean(id) {
+            const item = antreanList.find(i => i.id === id);
+            if (item) {
+                item.status = 'Dilayani';
+                renderAdminAntrean();
+                alert(`Panggilan Antrean: Nomor ${id} atas nama ${item.nama} menuju Loket Pelayanan Kesbangpol MPP Sinjai.`);
+            }
+        }
+
+        function doneAntrean(id) {
+            const item = antreanList.find(i => i.id === id);
+            if (item) {
+                item.status = 'Selesai';
+                renderAdminAntrean();
+                alert(`Antrean ${id} selesai dilayani.`);
+            }
+        }
+
+        // Switch Admin Tabs
+        function switchAdminTab(tabId) {
+            document.querySelectorAll('.admin-tab-pane').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            document.getElementById(tabId).style.display = 'block';
+
+            document.querySelectorAll('#adminTabs button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        // Lock SPJ functions
+        function lockNewMonth() {
+            const val = document.getElementById('lock-month-input').value;
+            if (!val) return alert('Pilih bulan terlebih dahulu.');
+
+            if (!lockedMonths.includes(val)) {
+                lockedMonths.push(val);
+                renderLockedMonths();
+                alert(`Bulan SPJ ${val} berhasil dikunci.`);
+            }
+        }
+
+        function unlockMonth(month) {
+            lockedMonths = lockedMonths.filter(m => m !== month);
+            renderLockedMonths();
+            alert(`Bulan SPJ ${month} berhasil dibuka.`);
+        }
+
+        function renderLockedMonths() {
+            const list = document.getElementById('locked-months-list');
+            list.innerHTML = '';
+            lockedMonths.forEach(m => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item bg-transparent text-white d-flex justify-content-between align-items-center';
+                li.innerHTML = `
+                    <span>${m}</span>
+                    <button onclick="unlockMonth('${m}')" class="btn btn-outline-danger btn-sm">Buka Kunci</button>
+                `;
+                list.appendChild(li);
+            });
+
+            checkSpjMonthLock(); // refresh state PPTK input
+        }
+
+        // PPTK Check Month Lock
+        function checkSpjMonthLock() {
+            const month = document.getElementById('spj-month-select').value;
+            const isLocked = lockedMonths.includes(month);
+            const alertBox = document.getElementById('lock-warning-alert');
+            const submitBtn = document.getElementById('btn-submit-spj');
+            
+            if (isLocked) {
+                alertBox.style.display = 'block';
+                submitBtn.disabled = true;
+                submitBtn.innerText = 'Bulan Terkunci (SIPD)';
+                submitBtn.classList.remove('btn-portal');
+                submitBtn.classList.add('btn-outline-danger');
+            } else {
+                alertBox.style.display = 'none';
+                submitBtn.disabled = false;
+                submitBtn.innerText = 'Kirim Laporan SPJ';
+                submitBtn.classList.add('btn-portal');
+                submitBtn.classList.remove('btn-outline-danger');
+            }
+        }
+
+        function submitSpjSim() {
+            const kegiatan = document.getElementById('spj-kegiatan').value;
+            if (!kegiatan) return alert('Tulis nama kegiatan.');
+            
+            alert('Laporan SPJ Kegiatan berhasil disimpan dan disinkronisasi ke Dashboard Eksekutif Kaban.');
+            // Add progress simulation to Chart.js
+            if (chart) {
+                chart.data.datasets[0].data[2] += 2.0; // Poldagri keuangan naik
+                chart.update();
+            }
+        }
+
+        // Calculate progress formulir
+        function calculateOrmasProgress() {
+            let progress = 0;
+            if (document.getElementById('ormas-nama').value.trim()) progress += 20;
+            if (document.getElementById('ormas-tipe').value) progress += 15;
+            if (document.getElementById('ormas-email').value.trim()) progress += 15;
+            if (document.getElementById('ormas-telp').value.trim()) progress += 15;
+            if (document.getElementById('ormas-alamat').value.trim()) progress += 15;
+            if (document.getElementById('ormas-file').files.length > 0) progress += 20;
+
+            const progressBar = document.getElementById('ormas-progress-bar');
+            progressBar.style.width = progress + '%';
+            document.getElementById('ormas-progress-label').innerText = progress + '% Pengisian';
+
+            if (progress === 100) {
+                progressBar.className = 'progress-bar progress-bar-success';
+            } else {
+                progressBar.className = 'progress-bar progress-bar-primary';
+            }
+        }
+
+        function calculateRekomProgress() {
+            let progress = 0;
+            if (document.getElementById('rekom-nama').value.trim()) progress += 20;
+            if (document.getElementById('rekom-kegiatan').value.trim()) progress += 15;
+            if (document.getElementById('rekom-tgl-mulai').value) progress += 15;
+            if (document.getElementById('rekom-tgl-selesai').value) progress += 15;
+            if (document.getElementById('rekom-deskripsi').value.trim()) progress += 15;
+            if (document.getElementById('rekom-file').files.length > 0) progress += 20;
+
+            const progressBar = document.getElementById('rekom-progress-bar');
+            progressBar.style.width = progress + '%';
+            document.getElementById('rekom-progress-label').innerText = progress + '% Pengisian';
+
+            if (progress === 100) {
+                progressBar.className = 'progress-bar progress-bar-success';
+            } else {
+                progressBar.className = 'progress-bar progress-bar-primary';
+            }
+        }
+
+        function submitOrmasForm() {
+            alert('Pendaftaran Ormas Berhasil Diajukan. Silakan lacak pengajuan menggunakan UUID: ORM-771241');
+        }
+
+        function submitRekomForm() {
+            alert('Rekomendasi Kegiatan Berhasil Diajukan. Silakan lacak pengajuan menggunakan UUID: REK-990812');
+        }
+
+        // Lacak & Cetak TTE Berkas
+        function lacakBerkasSim() {
+            const input = document.getElementById('lacak-input').value.trim();
+            if (!input) return alert('Masukkan UUID pelacakan.');
+
+            const resultBox = document.getElementById('lacak-result');
+            const title = document.getElementById('lacak-title');
+            const pemohon = document.getElementById('lacak-pemohon');
+            const uuid = document.getElementById('lacak-uuid');
+            
+            if (input.includes('ORM')) {
+                title.innerText = 'Pendaftaran Ormas: Yayasan Peduli Pemuda';
+                pemohon.innerText = 'Yayasan Peduli Pemuda';
+                uuid.innerText = 'ORM-771241';
+                document.getElementById('tte-download-box').style.display = 'none'; // ormas tidak cetak TTE model ini
+                resultBox.style.display = 'block';
+            } else if (input.includes('REK')) {
+                title.innerText = 'Surat Rekomendasi: Seminar Kebangsaan';
+                pemohon.innerText = 'Forum Mahasiswa Sinjai';
+                uuid.innerText = 'REK-990812';
+                document.getElementById('tte-download-box').style.display = 'block';
+                resultBox.style.display = 'block';
+            } else {
+                alert('UUID Berkas tidak ditemukan di dalam replika Sandbox database.');
+            }
+        }
+
+        function cetakSuratSim() {
+            const pemohon = document.getElementById('lacak-pemohon').innerText;
+            const title = document.getElementById('lacak-title').innerText;
+
+            document.getElementById('tte-print-pemohon').innerText = pemohon;
+            document.getElementById('tte-print-tbl-pemohon').innerText = pemohon;
+            document.getElementById('tte-print-kegiatan').innerText = title;
+            document.getElementById('tte-print-tbl-kegiatan').innerText = title;
+
+            document.getElementById('print-view-tte').style.display = 'block';
+        }
+
+        // Login Portal Simulation
+        function loginSimulate(role) {
+            if (role === 'admin') {
+                switchScreen('screen-dash-admin');
+                renderAdminAntrean();
+                renderLockedMonths();
+            } else if (role === 'pptk') {
+                switchScreen('screen-dash-bidang');
+                checkSpjMonthLock();
+            } else if (role === 'kaban') {
+                switchScreen('screen-dash-kaban');
+            } else {
+                switchScreen('screen-beranda');
+            }
+        }
+
+        // Google Fonts Theme Toggle handler
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const themeToggleIcon = document.getElementById('theme-toggle-icon');
+            
+            function updateToggleIcon(theme) {
+                if (theme === 'light') {
+                    themeToggleIcon.classList.remove('fa-moon');
+                    themeToggleIcon.classList.add('fa-sun');
+                    themeToggleIcon.style.color = '#eab308';
+                } else {
+                    themeToggleIcon.classList.remove('fa-sun');
+                    themeToggleIcon.classList.add('fa-moon');
+                    themeToggleIcon.style.color = '';
+                }
+            }
+
+            themeToggleBtn.addEventListener('click', () => {
+                activeTheme = activeTheme === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', activeTheme);
+                updateToggleIcon(activeTheme);
+            });
+
+            // init map
+            initDemoMap();
+        });
+    </script>
+</body>
+</html>

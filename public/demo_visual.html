@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Visual SIPAKATAU - Kesbangpol Kab. Sinjai</title>
+    
+    <!-- Google Fonts: Outfit & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-grad: linear-gradient(135deg, #be123c 0%, #f43f5e 50%, #fb7185 100%);
+            --accent-grad: linear-gradient(135deg, #ea580c 0%, #e11d48 60%, #fda4af 100%);
+            --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Dark Theme Variables */
+        html[data-theme="dark"] {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(17, 24, 39, 0.75);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-main: #f3f4f6;
+            --text-muted: #a1a1aa;
+            --navbar-bg: rgba(11, 15, 25, 0.85);
+            --navbar-link: #a1a1aa;
+            --navbar-link-active: #ffffff;
+            --navbar-link-hover-bg: rgba(255, 255, 255, 0.05);
+            --navbar-brand-grad: linear-gradient(to right, #f43f5e, #fda4af);
+            --navbar-brand-icon-color: #f43f5e;
+            --navbar-btn-bg: var(--primary-grad);
+            --navbar-btn-color: #ffffff;
+            --navbar-btn-border: none;
+            --navbar-btn-hover-bg: var(--primary-grad);
+            --navbar-btn-hover-color: #ffffff;
+            --navbar-border: rgba(255, 255, 255, 0.08);
+            --input-bg: rgba(15, 23, 42, 0.6);
+            --input-color: #ffffff;
+            --input-border: rgba(255, 255, 255, 0.1);
+            --card-hover-border: rgba(244, 63, 94, 0.3);
+            --glow-color-1: rgba(244, 63, 94, 0.18);
+            --glow-color-2: rgba(251, 113, 133, 0.15);
+            --hr-border: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Light Theme Variables */
+        html[data-theme="light"] {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --border-color: rgba(0, 0, 0, 0.06);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --navbar-bg: rgba(225, 29, 72, 0.96);
+            --navbar-link: #ffe4e6;
+            --navbar-link-active: #ffffff;
+            --navbar-link-hover-bg: rgba(255, 255, 255, 0.12);
+            --navbar-brand-grad: linear-gradient(to right, #ffffff, #ffe4e6);
+            --navbar-brand-icon-color: #ffffff;
+            --navbar-btn-bg: #ffffff;
+            --navbar-btn-color: #be123c;
+            --navbar-btn-border: 1px solid #be123c;
+            --navbar-btn-hover-bg: #ffe4e6;
+            --navbar-btn-hover-color: #9f1239;
+            --navbar-border: rgba(255, 255, 255, 0.15);
+            --input-bg: #ffffff;
+            --input-color: #0f172a;
+            --input-border: rgba(0, 0, 0, 0.12);
+            --card-hover-border: rgba(225, 29, 72, 0.25);
+            --glow-color-1: rgba(244, 63, 94, 0.08);
+            --glow-color-2: rgba(251, 113, 133, 0.06);
+            --hr-border: rgba(0, 0, 0, 0.08);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            position: relative;
+            transition: var(--transition-smooth);
+        }
+
+        /* Ambient Glow Background */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, var(--glow-color-1) 0%, rgba(0,0,0,0) 75%);
+            top: -150px;
+            left: -150px;
+            z-index: -1;
+            pointer-events: none;
+            filter: blur(40px);
+            transition: var(--transition-smooth);
+        }
+
+        body::after {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--glow-color-2) 0%, rgba(0,0,0,0) 75%);
+            bottom: 5%;
+            right: -200px;
+            z-index: -1;
+            pointer-events: none;
+            filter: blur(40px);
+            transition: var(--transition-smooth);
+        }
+
+        h1, h2, h3, h4, h5, h6, .font-heading {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        /* Glassmorphism Navbar */
+        .navbar-custom {
+            background: var(--navbar-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--navbar-border);
+            padding: 15px 0;
+            transition: var(--transition-smooth);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+        }
+        html[data-theme="dark"] .navbar-custom {
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        .navbar-brand-custom {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 1.55rem;
+            background: var(--navbar-brand-grad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            transition: var(--transition-smooth);
+        }
+        .navbar-brand-custom:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+        .navbar-brand-custom i {
+            color: var(--navbar-brand-icon-color) !important;
+            transition: var(--transition-smooth);
+        }
+        .navbar-brand-custom:hover i {
+            transform: rotate(15deg);
+        }
+
+        .nav-link-custom {
+            color: var(--navbar-link) !important;
+            font-weight: 600;
+            padding: 8px 16px !important;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: var(--transition-smooth);
+        }
+
+        .nav-link-custom:hover, .nav-link-custom.active {
+            color: var(--navbar-link-active) !important;
+            background: var(--navbar-link-hover-bg) !important;
+            transform: translateY(-1px);
+        }
+
+        .navbar-custom .btn-portal {
+            background: var(--navbar-btn-bg) !important;
+            color: var(--navbar-btn-color) !important;
+            border: var(--navbar-btn-border) !important;
+            box-shadow: none !important;
+        }
+        .navbar-custom .btn-portal:hover {
+            background: var(--navbar-btn-hover-bg) !important;
+            color: var(--navbar-btn-hover-color) !important;
+        }
+
+        .btn-portal {
+            background: var(--primary-grad);
+            background-size: 200% auto;
+            border: none;
+            color: white !important;
+            font-weight: 600;
+            padding: 10px 24px;
+            border-radius: 10px;
+            transition: var(--transition-smooth);
+            box-shadow: 0 4px 15px rgba(244, 63, 94, 0.35);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-portal:hover {
+            background-position: right center;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(244, 63, 94, 0.55);
+        }
+
+        /* Premium Glass Card */
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.08);
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+
+        html[data-theme="dark"] .glass-card {
+            box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.35);
+        }
+
+        .glass-card:hover {
+            border-color: var(--card-hover-border);
+            transform: translateY(-6px) scale(1.005);
+            box-shadow: 0 15px 45px rgba(244, 63, 94, 0.12), 0 0 25px var(--glow-color-1);
+        }
+
+        /* Adaptive Form Input Styles with Glow Pulsing on Focus */
+        .form-control-custom {
+            background-color: var(--input-bg) !important;
+            border: 1px solid var(--input-border) !important;
+            color: var(--input-color) !important;
+            border-radius: 10px;
+            padding: 11px 16px;
+            transition: var(--transition-smooth);
+        }
+        .form-control-custom:focus {
+            border-color: #f43f5e !important;
+            box-shadow: 0 0 0 0.25rem rgba(244, 63, 94, 0.25) !important;
+            animation: focusPulse 2.5s infinite ease-in-out;
+            outline: none;
+        }
+
+        /* Custom Theme Toggle Button Styles */
+        .btn-theme-toggle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            transition: var(--transition-smooth);
+            border: 1px solid var(--border-color) !important;
+            color: var(--text-main) !important;
+            cursor: pointer;
+        }
+
+        .navbar-custom .btn-theme-toggle {
+            border-color: var(--navbar-border) !important;
+            color: var(--navbar-link) !important;
+        }
+
+        .navbar-custom .btn-theme-toggle:hover {
+            background-color: var(--navbar-link-hover-bg) !important;
+            color: var(--navbar-link-active) !important;
+            transform: scale(1.05);
+        }
+
+        /* Light mode adjustments for navbar buttons to avoid color clashes */
+        html[data-theme="light"] .navbar-custom .btn-theme-toggle {
+            border-color: rgba(255, 255, 255, 0.45) !important;
+            background-color: rgba(255, 255, 255, 0.08) !important;
+            color: #ffffff !important;
+        }
+        
+        html[data-theme="light"] .navbar-custom .btn-theme-toggle:hover {
+            background-color: #ffffff !important;
+            border-color: #ffffff !important;
+            color: #be123c !important;
+        }
+
+        /* Logout button style inside navbar for Light Mode (Red theme) */
+        html[data-theme="light"] .navbar-custom .btn-outline-danger {
+            color: #ffffff !important;
+            border-color: rgba(255, 255, 255, 0.5) !important;
+            background-color: rgba(255, 255, 255, 0.08) !important;
+            transition: var(--transition-smooth);
+        }
+        
+        html[data-theme="light"] .navbar-custom .btn-outline-danger:hover {
+            color: #be123c !important;
+            background-color: #ffffff !important;
+            border-color: #ffffff !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Custom Solid Badge Styles (Global) */
+        .badge-sekretariat {
+            background-color: #6366f1 !important;
+            color: #ffffff !important;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.72rem;
+            border: none !important;
+            display: inline-block;
+        }
+        .badge-ideologi {
+            background-color: #e11d48 !important;
+            color: #ffffff !important;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.72rem;
+            border: none !important;
+            display: inline-block;
+        }
+        .badge-poldagri {
+            background-color: #10b981 !important;
+            color: #ffffff !important;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.72rem;
+            border: none !important;
+            display: inline-block;
+        }
+        .badge-ekososbud {
+            background-color: #d97706 !important;
+            color: #ffffff !important;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.72rem;
+            border: none !important;
+            display: inline-block;
+        }
+
+        /* Override Bootstrap subtles inside Light Mode to solid contrast */
+        html[data-theme="light"] .bg-indigo-subtle,
+        html[data-theme="light"] .org-badge.bg-indigo-subtle {
+            background-color: #6366f1 !important;
+            color: #ffffff !important;
+        }
+        html[data-theme="light"] .bg-primary-subtle,
+        html[data-theme="light"] .org-badge.bg-primary-subtle {
+            background-color: #e11d48 !important;
+            color: #ffffff !important;
+        }
+        html[data-theme="light"] .bg-success-subtle,
+        html[data-theme="light"] .org-badge.bg-success-subtle {
+            background-color: #10b981 !important;
+            color: #ffffff !important;
+        }
+        html[data-theme="light"] .bg-warning-subtle,
+        html[data-theme="light"] .org-badge.bg-warning-subtle {
+            background-color: #d97706 !important;
+            color: #ffffff !important;
+        }
+        html[data-theme="light"] .text-indigo, 
+        html[data-theme="light"] .org-badge.text-indigo {
+            color: #ffffff !important;
+        }
+        html[data-theme="light"] .text-primary,
+        html[data-theme="light"] .org-badge.text-primary {
+            color: #ffffff !important;
+        }
+        html[data-theme="light"] .text-success,
+        html[data-theme="light"] .org-badge.text-success {
+            color: #ffffff !important;
+        }
+        html[data-theme="light"] .text-warning,
+        html[data-theme="light"] .org-badge.text-warning {
+            color: #ffffff !important;
+        }
+        html[data-theme="light"] .border-indigo-subtle,
+        html[data-theme="light"] .border-primary-subtle,
+        html[data-theme="light"] .border-success-subtle,
+        html[data-theme="light"] .border-warning-subtle {
+            border: none !important;
+        }
+
+        /* Floating Accessibility & Weather Widget */
+        .accessibility-widget {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1050;
+            animation: widgetFloat 5s ease-in-out infinite;
+        }
+        .widget-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 35px rgba(0,0,0,0.12);
+            transition: var(--transition-smooth);
+        }
+        html[data-theme="dark"] .widget-card {
+            box-shadow: 0 10px 35px rgba(0,0,0,0.35);
+        }
+        .widget-weather-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+            width: 100%;
+        }
+        .widget-temp {
+            font-size: 0.92rem;
+            font-weight: 700;
+            margin-top: 4px;
+            color: var(--text-main);
+        }
+        .widget-condition {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        html[data-theme="light"] .widget-condition {
+            color: #475569 !important;
+        }
+        .widget-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+        .widget-btn:hover {
+            background: var(--primary-grad);
+            color: white;
+            border-color: transparent;
+            transform: scale(1.1);
+            box-shadow: 0 4px 10px rgba(244, 63, 94, 0.35);
+        }
+
+        /* Breadcrumbs styling and contrast fix */
+        .breadcrumb-item + .breadcrumb-item::before {
+            color: var(--text-muted) !important;
+        }
+        .breadcrumb-item a {
+            color: #be123c !important;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition-smooth);
+        }
+        html[data-theme="dark"] .breadcrumb-item a {
+            color: #fda4af !important;
+        }
+        html[data-theme="light"] .breadcrumb-item a {
+            color: #be123c !important;
+        }
+        .breadcrumb-item a:hover {
+            color: #f43f5e !important;
+            text-decoration: underline !important;
+        }
+        .breadcrumb-item.active {
+            color: var(--text-muted) !important;
+        }
+
+        /* Metrik Card */
+        .metric-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition-smooth);
+        }
+        .metric-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--card-hover-border);
+            box-shadow: 0 10px 30px rgba(244, 63, 94, 0.1);
+        }
+        .icon-box {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        .icon-success {
+            background: rgba(16, 185, 129, 0.15) !important;
+            color: #34d399 !important;
+            border: 1px solid rgba(16, 185, 129, 0.3) !important;
+        }
+        html[data-theme="light"] .icon-success {
+            background: rgba(16, 185, 129, 0.1) !important;
+            color: #059669 !important;
+            border: 1px solid rgba(16, 185, 129, 0.2) !important;
+        }
+        
+        .progress-custom {
+            height: 8px;
+            background-color: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .progress-bar-success {
+            background: linear-gradient(90deg, #34d399, #10b981);
+        }
+
+        /* -------------------------------------------------------------------------- */
+        /* Keyframe Animations & Animation Helpers                                    */
+        /* -------------------------------------------------------------------------- */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes focusPulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0.25rem rgba(244, 63, 94, 0.25);
+            }
+            50% {
+                box-shadow: 0 0 0 0.38rem rgba(244, 63, 94, 0.45);
+            }
+        }
+        @keyframes widgetFloat {
+            0%, 100% {
+                transform: translateY(-50%) translateY(0);
+            }
+            50% {
+                transform: translateY(-50%) translateY(-8px);
+            }
+        }
+
+        .animate-fade-up {
+            animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation Header -->
+    <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+        <div class="container">
+            <a class="navbar-brand-custom" href="#">
+                <i class="fa-solid fa-shield-halved text-primary"></i> SIPAKATAU
+            </a>
+            <div class="ms-auto d-flex align-items-center gap-3">
+                <a href="#" class="nav-link-custom active d-none d-md-block">Beranda</a>
+                <a href="#" class="nav-link-custom d-none d-md-block">Profil</a>
+                <a href="#" class="nav-link-custom d-none d-md-block">Layanan</a>
+                
+                <button type="button" id="theme-toggle" class="btn-theme-toggle">
+                    <i id="theme-toggle-icon" class="fa-solid fa-moon"></i>
+                </button>
+                
+                <a href="#" class="btn btn-outline-danger px-3 d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-right-from-bracket"></i> Log Out
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Floating Accessibility Widget -->
+    <div class="accessibility-widget">
+        <div class="widget-card">
+            <div class="widget-weather-box">
+                <i class="fa-solid fa-cloud-sun fa-lg text-warning"></i>
+                <div class="widget-temp">26°C</div>
+                <div class="widget-condition">Cerah Berawan</div>
+            </div>
+            <button class="widget-btn" title="Perbesar Font"><i class="fa-solid fa-plus"></i></button>
+            <button class="widget-btn" title="Perkecil Font"><i class="fa-solid fa-minus"></i></button>
+            <button class="widget-btn" title="Reset Font"><i class="fa-solid fa-arrows-rotate"></i></button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container my-5">
+        
+        <!-- Breadcrumbs Section -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="#"><i class="fa-solid fa-house me-1"></i>Beranda</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Demo Peningkatan Visual</li>
+            </ol>
+        </nav>
+
+        <!-- Welcome Banner -->
+        <div class="glass-card mb-5 text-center py-5 animate-fade-up delay-1">
+            <h1 class="display-6 fw-bold mb-2">Halaman Peninjauan Visual Premium</h1>
+            <p class="text-muted mb-0">SIPAKATAU (Sistem Pelayanan Kesbangpol Terpadu dan Akurat Kabupaten Sinjai)</p>
+        </div>
+
+        <div class="row g-4">
+            <!-- Col 1: Metrik & Form Input -->
+            <div class="col-lg-6">
+                <div class="glass-card h-100 animate-fade-up delay-2 d-flex flex-column gap-4">
+                    <h3 class="mb-0">Metrik & Input Interaktif</h3>
+                    
+                    <!-- Metric Card Example -->
+                    <div class="metric-card">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="text-muted small fw-semibold">Realisasi Keuangan</span>
+                            <div class="icon-box icon-success">
+                                <i class="fa-solid fa-rupiah-sign"></i>
+                            </div>
+                        </div>
+                        <h3 class="fw-bold mb-1">87.5%</h3>
+                        <p class="text-muted small mb-2">Target SPJ Bidang Kesbangpol Tercapai</p>
+                        <div class="progress progress-custom">
+                            <div class="progress-bar progress-bar-success" role="progressbar" style="width: 87.5%" aria-valuenow="87.5" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+
+                    <!-- Form Input Active Glow Example -->
+                    <div>
+                        <label class="form-label fw-semibold mb-2">Coba Klik Form Ini (Pulsing Glow Focus):</label>
+                        <input type="text" class="form-control form-control-custom w-100" placeholder="Ketik sesuatu di sini untuk melihat pendaran warna...">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Col 2: Shape Badges solid & Layout Kartu -->
+            <div class="col-lg-6">
+                <div class="glass-card h-100 animate-fade-up delay-3 d-flex flex-column gap-4">
+                    <h3 class="mb-0">Shape Badges Solid & Kontras Tinggi</h3>
+                    <p class="text-muted">Di bawah ini adalah peninjauan bentuk *shape* badge unit kerja/bidang dalam format solid yang sangat kontras di Light Mode:</p>
+                    
+                    <div class="d-flex flex-wrap gap-2 pt-2">
+                        <span class="badge-sekretariat">Sekretariat</span>
+                        <span class="badge-ideologi">Ideologi & Wasbang</span>
+                        <span class="badge-poldagri">Politik Dalam Negeri & Ormas</span>
+                        <span class="badge-ekososbud">Ketahanan Ekonomi, Sosbud & Agama</span>
+                    </div>
+
+                    <div class="p-3 rounded border" style="background: rgba(255,255,255,0.02); border-color: var(--border-color) !important;">
+                        <h5 class="fw-bold mb-2">Petunjuk Pengujian</h5>
+                        <p class="text-muted small mb-0">Klik tombol lingkaran toggle tema di navbar pojok kanan atas untuk berpindah dari tema gelap ke terang. Perhatikan transisi warna yang halus, hilangnya shape kosong, kontras breadcrumbs, serta pendaran border yang tetap hidup.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="mt-auto py-4 text-center border-top" style="border-color: var(--border-color) !important; background: var(--navbar-bg);">
+        <div class="container text-muted small">
+            <p class="mb-0">&copy; 2026 SIPAKATAU. All Rights Reserved. Developer Partner: <b>Diskominfo Sinjai</b></p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const themeToggleIcon = document.getElementById('theme-toggle-icon');
+            
+            function updateToggleIcon(theme) {
+                if (theme === 'light') {
+                    themeToggleIcon.classList.remove('fa-moon');
+                    themeToggleIcon.classList.add('fa-sun');
+                    themeToggleIcon.style.color = '#eab308';
+                } else {
+                    themeToggleIcon.classList.remove('fa-sun');
+                    themeToggleIcon.classList.add('fa-moon');
+                    themeToggleIcon.style.color = '';
+                }
+            }
+
+            // Init theme
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateToggleIcon(savedTheme);
+
+            if (themeToggleBtn) {
+                themeToggleBtn.addEventListener('click', () => {
+                    const activeTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+                    const targetTheme = activeTheme === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-theme', targetTheme);
+                    localStorage.setItem('theme', targetTheme);
+                    updateToggleIcon(targetTheme);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
