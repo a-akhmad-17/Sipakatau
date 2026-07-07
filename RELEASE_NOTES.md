@@ -1,5 +1,13 @@
 # RELEASE NOTES - SIPAKATAU
 
+## [v2.9.4] - 2026-07-07
+### ✨ Added
+- **Peningkatan Event Listener Tindakan Modal**: Mengubah penanganan klik tindakan modal pelacakan dari string template inline `onclick` menjadi standard JavaScript `addEventListener` dan dynamic node creation (`document.createElement`). Ini memperbaiki bug tombol detail/kelola pendaftaran ormas yang tidak dapat diklik akibat konflik tanda kutip ganda pada file JSON berkas ormas yang memecah atribut HTML.
+- **Aksi Cepat Hapus Ajuan**: Menambahkan tombol aksi cepat dengan ikon tong sampah (Hapus) langsung pada setiap baris di tabel utama pelacakan berkas agar admin dapat menghapus pendaftaran, rekomendasi, maupun aduan secara instan tanpa harus masuk ke dalam modal detail.
+- **Peningkatan Kontras Filter**: Menambahkan class CSS khusus `.btn-filter-custom` untuk tombol filter kategori pelacakan. Ini memperbaiki masalah keterbacaan teks agar kontrasnya tajam dan tidak tenggelam dengan latar belakang glassmorphic.
+
+---
+
 ## [v2.9.3] - 2026-07-07
 ### ✨ Added
 - **Tabel Pelacakan Terpadu & Filter Ajuan**: Mengganti tampilan Kanban board pada tab pelacakan progres berkas admin (`#tab-tracking`) menjadi sebuah tabel utama tunggal terpadu yang menampilkan seluruh pengajuan (Pendaftaran Ormas, Rekomendasi Kegiatan, dan Aduan Masyarakat) yang berurutan secara dinamis berdasarkan tanggal masuk. Ditambahkan pula tombol filter tipe ajuan di bagian atas tabel untuk menyaring data secara dinamis (Semua, Ormas, Rekomendasi, Aduan).

@@ -157,6 +157,23 @@
         background: var(--border-color) !important;
         transform: translateX(4px);
     }
+    .btn-filter-custom {
+        background: rgba(255, 255, 255, 0.05);
+        color: rgba(255, 255, 255, 0.8) !important;
+        border: 1px solid var(--border-color);
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+    .btn-filter-custom:hover {
+        background: rgba(255, 255, 255, 0.15);
+        color: #fff !important;
+    }
+    .btn-filter-custom.active {
+        background: #0dcaf0 !important;
+        color: #000 !important;
+        border-color: #0dcaf0 !important;
+        font-weight: bold;
+    }
 </style>
 <?= $this->endSection() ?>
 
@@ -484,16 +501,16 @@
                 </div>
                 <!-- Filter Buttons -->
                 <div class="btn-group" role="group" aria-label="Filter Ajuan">
-                    <button type="button" class="btn btn-sm btn-outline-info active" id="btn-filter-all" onclick="filterTrackingTable('all', this)">
+                    <button type="button" class="btn btn-sm btn-filter-custom active" id="btn-filter-all" onclick="filterTrackingTable('all', this)">
                         Semua Ajuan
                     </button>
-                    <button type="button" class="btn btn-sm btn-outline-info" id="btn-filter-ormas" onclick="filterTrackingTable('ormas', this)">
+                    <button type="button" class="btn btn-sm btn-filter-custom" id="btn-filter-ormas" onclick="filterTrackingTable('ormas', this)">
                         Pendaftaran Ormas
                     </button>
-                    <button type="button" class="btn btn-sm btn-outline-info" id="btn-filter-rekomendasi" onclick="filterTrackingTable('rekomendasi', this)">
+                    <button type="button" class="btn btn-sm btn-filter-custom" id="btn-filter-rekomendasi" onclick="filterTrackingTable('rekomendasi', this)">
                         Rekomendasi Kegiatan
                     </button>
-                    <button type="button" class="btn btn-sm btn-outline-info" id="btn-filter-aduan" onclick="filterTrackingTable('aduan', this)">
+                    <button type="button" class="btn btn-sm btn-filter-custom" id="btn-filter-aduan" onclick="filterTrackingTable('aduan', this)">
                         Aduan Masyarakat
                     </button>
                 </div>
@@ -609,47 +626,65 @@
                                         <?php endif; ?>
                                     </td>
                                     <td class="text-center align-middle">
-                                        <button type="button" class="btn btn-sm btn-info text-white px-3 py-1 btn-detail-tracking" 
-                                                data-type="<?= $aj['type'] ?>"
-                                                data-id="<?= esc($aj['id']) ?>"
-                                                <?php if ($aj['type'] === 'ormas'): 
-                                                    $d = $aj['data']; ?>
-                                                    data-registrasi="<?= esc($d['nomor_registrasi']) ?>"
-                                                    data-nama="<?= esc($d['nama_ormas']) ?>"
-                                                    data-alamat="<?= esc($d['alamat']) ?>"
-                                                    data-email="<?= esc($d['email']) ?>"
-                                                    data-telepon="<?= esc($d['telepon']) ?>"
-                                                    data-status="<?= esc($d['status_verifikasi']) ?>"
-                                                    data-progress="<?= esc($d['progress_percentage']) ?>"
-                                                    data-file="<?= esc($d['file_berkas'] ?? '') ?>" 
-                                                    data-tipe-ormas="<?= esc($d['tipe_ormas'] ?? 'Lokal') ?>"
-                                                    data-sk-kepengurusan="<?= !empty($d['tgl_sk_kepengurusan']) ? date('d F Y', strtotime($d['tgl_sk_kepengurusan'])) : '-' ?>" 
-                                                    data-sk-kedaluwarsa="<?= !empty($d['tgl_sk_kedaluwarsa']) ? date('d F Y', strtotime($d['tgl_sk_kedaluwarsa'])) : '-' ?>"
-                                                    data-tanggal="<?= date('d F Y H:i:s', strtotime($d['created_at'])) ?>"
-                                                <?php elseif ($aj['type'] === 'rekomendasi'): 
-                                                    $d = $aj['data']; ?>
-                                                    data-nama="<?= esc($d['pemohon']) ?>"
-                                                    data-kegiatan="<?= esc($d['nama_kegiatan']) ?>"
-                                                    data-deskripsi="<?= esc($d['deskripsi'] ?? '-') ?>"
-                                                    data-status="<?= esc($d['status_rekomendasi']) ?>"
-                                                    data-file="<?= esc($d['file_proposal'] ?? '') ?>" 
-                                                    data-mulai="<?= date('d F Y', strtotime($d['tgl_mulai'])) ?>" 
-                                                    data-selesai="<?= date('d F Y', strtotime($d['tgl_selesai'])) ?>"
-                                                    data-tte="<?= esc($d['pdf_tte_path'] ?? '') ?>"
-                                                    data-tanggal="<?= date('d F Y H:i:s', strtotime($d['created_at'])) ?>"
-                                                <?php else: 
-                                                    $d = $aj['data']; 
-                                                    $det = json_decode($d['after_data'], true) ?? []; ?>
-                                                    data-nama="Anonim / Pelapor"
-                                                    data-judul="<?= esc($det['judul'] ?? 'Tanpa Judul') ?>"
-                                                    data-kategori="<?= esc($det['kategori'] ?? 'Lainnya') ?>"
-                                                    data-bidang="<?= esc($det['nama_bidang'] ?? 'Umum') ?>"
-                                                    data-deskripsi="<?= esc($det['deskripsi'] ?? '-') ?>"
-                                                    data-file="<?= esc($det['berkas'] ?? '') ?>"
-                                                    data-tanggal="<?= date('d F Y H:i:s', strtotime($d['created_at'])) ?>"
-                                                <?php endif; ?>>
-                                            <i class="fa-solid fa-list-check me-1"></i> Detail / Kelola
-                                        </button>
+                                        <div class="d-flex justify-content-center gap-1.5">
+                                            <button type="button" class="btn btn-sm btn-info text-white px-2.5 py-1 btn-detail-tracking" 
+                                                    data-type="<?= $aj['type'] ?>"
+                                                    data-id="<?= esc($aj['id']) ?>"
+                                                    <?php if ($aj['type'] === 'ormas'): 
+                                                        $d = $aj['data']; ?>
+                                                        data-registrasi="<?= esc($d['nomor_registrasi']) ?>"
+                                                        data-nama="<?= esc($d['nama_ormas']) ?>"
+                                                        data-alamat="<?= esc($d['alamat']) ?>"
+                                                        data-email="<?= esc($d['email']) ?>"
+                                                        data-telepon="<?= esc($d['telepon']) ?>"
+                                                        data-status="<?= esc($d['status_verifikasi']) ?>"
+                                                        data-progress="<?= esc($d['progress_percentage']) ?>"
+                                                        data-file="<?= esc($d['file_berkas'] ?? '') ?>" 
+                                                        data-tipe-ormas="<?= esc($d['tipe_ormas'] ?? 'Lokal') ?>"
+                                                        data-sk-kepengurusan="<?= !empty($d['tgl_sk_kepengurusan']) ? date('d F Y', strtotime($d['tgl_sk_kepengurusan'])) : '-' ?>" 
+                                                        data-sk-kedaluwarsa="<?= !empty($d['tgl_sk_kedaluwarsa']) ? date('d F Y', strtotime($d['tgl_sk_kedaluwarsa'])) : '-' ?>"
+                                                        data-tanggal="<?= date('d F Y H:i:s', strtotime($d['created_at'])) ?>"
+                                                    <?php elseif ($aj['type'] === 'rekomendasi'): 
+                                                        $d = $aj['data']; ?>
+                                                        data-nama="<?= esc($d['pemohon']) ?>"
+                                                        data-kegiatan="<?= esc($d['nama_kegiatan']) ?>"
+                                                        data-deskripsi="<?= esc($d['deskripsi'] ?? '-') ?>"
+                                                        data-status="<?= esc($d['status_rekomendasi']) ?>"
+                                                        data-file="<?= esc($d['file_proposal'] ?? '') ?>" 
+                                                        data-mulai="<?= date('d F Y', strtotime($d['tgl_mulai'])) ?>" 
+                                                        data-selesai="<?= date('d F Y', strtotime($d['tgl_selesai'])) ?>"
+                                                        data-tte="<?= esc($d['pdf_tte_path'] ?? '') ?>"
+                                                        data-tanggal="<?= date('d F Y H:i:s', strtotime($d['created_at'])) ?>"
+                                                    <?php else: 
+                                                        $d = $aj['data']; 
+                                                        $det = json_decode($d['after_data'], true) ?? []; ?>
+                                                        data-nama="Anonim / Pelapor"
+                                                        data-judul="<?= esc($det['judul'] ?? 'Tanpa Judul') ?>"
+                                                        data-kategori="<?= esc($det['kategori'] ?? 'Lainnya') ?>"
+                                                        data-bidang="<?= esc($det['nama_bidang'] ?? 'Umum') ?>"
+                                                        data-deskripsi="<?= esc($det['deskripsi'] ?? '-') ?>"
+                                                        data-file="<?= esc($det['berkas'] ?? '') ?>"
+                                                        data-tanggal="<?= date('d F Y H:i:s', strtotime($d['created_at'])) ?>"
+                                                    <?php endif; ?>>
+                                                <i class="fa-solid fa-list-check me-1"></i> Detail
+                                            </button>
+                                            <?php if ($aj['type'] === 'ormas'): ?>
+                                                <form action="<?= base_url('admin/delete-pendaftaran/' . $aj['id']) ?>" method="POST" class="d-inline" onsubmit="return confirm('Hapus berkas pendaftaran Ormas ini secara permanen?')">
+                                                    <?= csrf_field() ?>
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger px-2.5 py-1" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+                                                </form>
+                                            <?php elseif ($aj['type'] === 'rekomendasi'): ?>
+                                                <form action="<?= base_url('admin/delete-rekomendasi/' . $aj['id']) ?>" method="POST" class="d-inline" onsubmit="return confirm('Hapus berkas rekomendasi kegiatan ini secara permanen?')">
+                                                    <?= csrf_field() ?>
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger px-2.5 py-1" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+                                                </form>
+                                            <?php else: ?>
+                                                <form action="<?= base_url('admin/delete-pengaduan/' . $aj['id']) ?>" method="POST" class="d-inline" onsubmit="return confirm('Hapus laporan pengaduan ini secara permanen?')">
+                                                    <?= csrf_field() ?>
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger px-2.5 py-1" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+                                                </form>
+                                            <?php endif; ?>
+                                        </div>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -2315,32 +2350,75 @@ document.addEventListener('DOMContentLoaded', function() {
                 mStep4.checked = progress == 100;
 
                 // Action buttons for ormas
-                let actionHtml = '';
                 if (status === 'Pending') {
-                    actionHtml += `
-                        <button type="button" class="btn btn-warning text-dark fw-bold" onclick="triggerVerifikasiModal('${id}', '${nama.replace(/'/g, "\\'")}', '${tipeOrmas}', '${(file || '').replace(/'/g, "\\'")}')">
-                            <i class="fa-solid fa-list-check me-1"></i> Verifikasi Berkas
-                        </button>
-                        <button type="button" class="btn btn-danger text-white fw-bold" onclick="triggerTolakModal('${id}', '${nama.replace(/'/g, "\\'")}')">
-                            <i class="fa-solid fa-circle-xmark me-1"></i> Tolak Pendaftaran
-                        </button>
-                    `;
+                    const verifBtn = document.createElement('button');
+                    verifBtn.type = 'button';
+                    verifBtn.className = 'btn btn-warning text-dark fw-bold me-2';
+                    verifBtn.innerHTML = '<i class="fa-solid fa-list-check me-1"></i> Verifikasi Berkas';
+                    verifBtn.addEventListener('click', () => {
+                        modalDetailTracking.hide();
+                        setTimeout(() => {
+                            window.openVerifikasiModal({
+                                getAttribute: function(attr) {
+                                    if (attr === 'data-id') return id;
+                                    if (attr === 'data-nama') return nama;
+                                    if (attr === 'data-tipe-ormas') return tipeOrmas;
+                                    if (attr === 'data-file') return file;
+                                    return '';
+                                }
+                            });
+                        }, 350);
+                    });
+                    actionsContainer.appendChild(verifBtn);
+
+                    const rejectBtn = document.createElement('button');
+                    rejectBtn.type = 'button';
+                    rejectBtn.className = 'btn btn-danger text-white fw-bold me-2';
+                    rejectBtn.innerHTML = '<i class="fa-solid fa-circle-xmark me-1"></i> Tolak Pendaftaran';
+                    rejectBtn.addEventListener('click', () => {
+                        modalDetailTracking.hide();
+                        setTimeout(() => {
+                            window.openTolakModal({
+                                getAttribute: function(attr) {
+                                    if (attr === 'data-id') return id;
+                                    if (attr === 'data-nama') return nama;
+                                    return '';
+                                }
+                            });
+                        }, 350);
+                    });
+                    actionsContainer.appendChild(rejectBtn);
                 } else if (status === 'Approved' && progress < 100) {
-                    actionHtml += `
-                        <button type="button" class="btn btn-primary text-white fw-bold" onclick="triggerTerbitkanModal('${id}', '${nama.replace(/'/g, "\\'")}')">
-                            <i class="fa-solid fa-file-arrow-up me-1"></i> Terbitkan Surat
-                        </button>
-                    `;
+                    const publishBtn = document.createElement('button');
+                    publishBtn.type = 'button';
+                    publishBtn.className = 'btn btn-primary text-white fw-bold me-2';
+                    publishBtn.innerHTML = '<i class="fa-solid fa-file-arrow-up me-1"></i> Terbitkan Surat';
+                    publishBtn.addEventListener('click', () => {
+                        modalDetailTracking.hide();
+                        setTimeout(() => {
+                            window.openTerbitkanModal({
+                                getAttribute: function(attr) {
+                                    if (attr === 'data-id') return id;
+                                    if (attr === 'data-nama') return nama;
+                                    return '';
+                                }
+                            });
+                        }, 350);
+                    });
+                    actionsContainer.appendChild(publishBtn);
                 }
 
                 // Delete button
-                actionHtml += `
-                    <form action="<?= base_url('admin/delete-pendaftaran') ?>/${id}" method="POST" onsubmit="return confirm('Hapus berkas pendaftaran Ormas ini secara permanen?')" class="d-inline">
-                        <?= csrf_field() ?>
-                        <button type="submit" class="btn btn-outline-danger"><i class="fa-solid fa-trash me-1"></i> Hapus Permanen</button>
-                    </form>
+                const deleteForm = document.createElement('form');
+                deleteForm.action = `<?= base_url('admin/delete-pendaftaran') ?>/${id}`;
+                deleteForm.method = 'POST';
+                deleteForm.className = 'd-inline';
+                deleteForm.onsubmit = () => confirm('Hapus berkas pendaftaran Ormas ini secara permanen?');
+                deleteForm.innerHTML = `
+                    <?= csrf_field() ?>
+                    <button type="submit" class="btn btn-outline-danger"><i class="fa-solid fa-trash me-1"></i> Hapus Permanen</button>
                 `;
-                actionsContainer.innerHTML = actionHtml;
+                actionsContainer.appendChild(deleteForm);
 
             } else if (type === 'rekomendasi') {
                 const kegiatan = this.getAttribute('data-kegiatan');
@@ -2383,35 +2461,52 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 // Action buttons for Rekomendasi
-                let actionHtml = '';
                 if (status === 'Pending') {
-                    actionHtml += `
-                        <form action="<?= base_url('admin/proses-rekomendasi') ?>/${id}/approve_bidang" method="POST" onsubmit="return confirm('Setujui pengajuan rekomendasi ini?')" class="d-inline">
-                            <?= csrf_field() ?>
-                            <button type="submit" class="btn btn-success text-white fw-bold"><i class="fa-solid fa-check me-1"></i> Setujui Rekomendasi</button>
-                        </form>
-                        <form action="<?= base_url('admin/proses-rekomendasi') ?>/${id}/reject" method="POST" onsubmit="return confirm('Tolak pengajuan rekomendasi ini?')" class="d-inline">
-                            <?= csrf_field() ?>
-                            <button type="submit" class="btn btn-danger text-white fw-bold"><i class="fa-solid fa-xmark me-1"></i> Tolak</button>
-                        </form>
+                    const approveForm = document.createElement('form');
+                    approveForm.action = `<?= base_url('admin/proses-rekomendasi') ?>/${id}/approve_bidang`;
+                    approveForm.method = 'POST';
+                    approveForm.className = 'd-inline me-2';
+                    approveForm.onsubmit = () => confirm('Setujui pengajuan rekomendasi ini?');
+                    approveForm.innerHTML = `
+                        <?= csrf_field() ?>
+                        <button type="submit" class="btn btn-success text-white fw-bold"><i class="fa-solid fa-check me-1"></i> Setujui Rekomendasi</button>
                     `;
+                    actionsContainer.appendChild(approveForm);
+
+                    const rejectForm = document.createElement('form');
+                    rejectForm.action = `<?= base_url('admin/proses-rekomendasi') ?>/${id}/reject`;
+                    rejectForm.method = 'POST';
+                    rejectForm.className = 'd-inline me-2';
+                    rejectForm.onsubmit = () => confirm('Tolak pengajuan rekomendasi ini?');
+                    rejectForm.innerHTML = `
+                        <?= csrf_field() ?>
+                        <button type="submit" class="btn btn-danger text-white fw-bold"><i class="fa-solid fa-xmark me-1"></i> Tolak</button>
+                    `;
+                    actionsContainer.appendChild(rejectForm);
                 } else if (status === 'Approved' && !ttePath) {
-                    actionHtml += `
-                        <form action="<?= base_url('admin/proses-rekomendasi') ?>/${id}/terbitkan_tte" method="POST" onsubmit="return confirm('Simulasikan penerbitan TTE untuk surat rekomendasi ini?')" class="d-inline">
-                            <?= csrf_field() ?>
-                            <button type="submit" class="btn btn-primary text-white fw-bold"><i class="fa-solid fa-signature me-1"></i> Terbitkan TTE</button>
-                        </form>
+                    const tteForm = document.createElement('form');
+                    tteForm.action = `<?= base_url('admin/proses-rekomendasi') ?>/${id}/terbitkan_tte`;
+                    tteForm.method = 'POST';
+                    tteForm.className = 'd-inline me-2';
+                    tteForm.onsubmit = () => confirm('Simulasikan penerbitan TTE untuk surat rekomendasi ini?');
+                    tteForm.innerHTML = `
+                        <?= csrf_field() ?>
+                        <button type="submit" class="btn btn-primary text-white fw-bold"><i class="fa-solid fa-signature me-1"></i> Terbitkan TTE</button>
                     `;
+                    actionsContainer.appendChild(tteForm);
                 }
 
                 // Delete button
-                actionHtml += `
-                    <form action="<?= base_url('admin/delete-rekomendasi') ?>/${id}" method="POST" onsubmit="return confirm('Hapus berkas rekomendasi kegiatan ini secara permanen?')" class="d-inline">
-                        <?= csrf_field() ?>
-                        <button type="submit" class="btn btn-outline-danger"><i class="fa-solid fa-trash me-1"></i> Hapus Permanen</button>
-                    </form>
+                const deleteForm = document.createElement('form');
+                deleteForm.action = `<?= base_url('admin/delete-rekomendasi') ?>/${id}`;
+                deleteForm.method = 'POST';
+                deleteForm.className = 'd-inline';
+                deleteForm.onsubmit = () => confirm('Hapus berkas rekomendasi kegiatan ini secara permanen?');
+                deleteForm.innerHTML = `
+                    <?= csrf_field() ?>
+                    <button type="submit" class="btn btn-outline-danger"><i class="fa-solid fa-trash me-1"></i> Hapus Permanen</button>
                 `;
-                actionsContainer.innerHTML = actionHtml;
+                actionsContainer.appendChild(deleteForm);
 
             } else if (type === 'aduan') {
                 const judul = this.getAttribute('data-judul');
@@ -2450,22 +2545,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 // Action buttons for Aduan
-                let actionHtml = '';
                 if (file) {
-                    actionHtml += `
-                        <form action="<?= base_url('admin/delete-file-pengaduan') ?>/${id}" method="POST" onsubmit="return confirm('Hapus file bukti pengaduan ini?')" class="d-inline">
-                            <?= csrf_field() ?>
-                            <button type="submit" class="btn btn-warning text-dark fw-bold"><i class="fa-solid fa-trash-can me-1"></i> Hapus File Bukti</button>
-                        </form>
-                    `;
-                }
-                actionHtml += `
-                    <form action="<?= base_url('admin/delete-pengaduan') ?>/${id}" method="POST" onsubmit="return confirm('Hapus laporan pengaduan ini secara permanen?')" class="d-inline">
+                    const deleteFileForm = document.createElement('form');
+                    deleteFileForm.action = `<?= base_url('admin/delete-file-pengaduan') ?>/${id}`;
+                    deleteFileForm.method = 'POST';
+                    deleteFileForm.className = 'd-inline me-2';
+                    deleteFileForm.onsubmit = () => confirm('Hapus file bukti pengaduan ini?');
+                    deleteFileForm.innerHTML = `
                         <?= csrf_field() ?>
-                        <button type="submit" class="btn btn-outline-danger"><i class="fa-solid fa-trash me-1"></i> Hapus Aduan</button>
-                    </form>
+                        <button type="submit" class="btn btn-warning text-dark fw-bold"><i class="fa-solid fa-trash-can me-1"></i> Hapus File Bukti</button>
+                    `;
+                    actionsContainer.appendChild(deleteFileForm);
+                }
+
+                const deleteAduanForm = document.createElement('form');
+                deleteAduanForm.action = `<?= base_url('admin/delete-pengaduan') ?>/${id}`;
+                deleteAduanForm.method = 'POST';
+                deleteAduanForm.className = 'd-inline';
+                deleteAduanForm.onsubmit = () => confirm('Hapus laporan pengaduan ini secara permanen?');
+                deleteAduanForm.innerHTML = `
+                    <?= csrf_field() ?>
+                    <button type="submit" class="btn btn-outline-danger"><i class="fa-solid fa-trash me-1"></i> Hapus Aduan</button>
                 `;
-                actionsContainer.innerHTML = actionHtml;
+                actionsContainer.appendChild(deleteAduanForm);
             }
             
             modalDetailTracking.show();
@@ -2516,7 +2618,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Filter function for unified tracking table
     window.filterTrackingTable = function(type, btn) {
-        const filterButtons = document.querySelectorAll('[id^="btn-filter-"]');
+        const filterButtons = document.querySelectorAll('.btn-filter-custom');
         filterButtons.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
 
