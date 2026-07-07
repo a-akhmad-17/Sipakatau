@@ -51,6 +51,14 @@
                 </div>
 
                 <div class="mb-3">
+                    <label for="phone" class="form-label small text-muted">Nomor Telepon / WhatsApp <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text input-group-text-custom"><i class="fa-solid fa-phone"></i></span>
+                        <input type="text" name="phone" id="phone" class="form-control form-control-custom" placeholder="Contoh: 08123456789" value="<?= old('phone') ?>" required>
+                    </div>
+                </div>
+
+                <div class="mb-3">
                     <label for="password" class="form-label small text-muted">Kata Sandi (Password) <span class="text-danger">*</span></label>
                     <div class="input-group">
                         <span class="input-group-text input-group-text-custom"><i class="fa-solid fa-lock"></i></span>

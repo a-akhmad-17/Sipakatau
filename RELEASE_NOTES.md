@@ -1,5 +1,15 @@
 # RELEASE NOTES - SIPAKATAU
 
+## [v2.9.7] - 2026-07-07
+### ✨ Added
+- **Form Input Nomor Telepon pada Registrasi Akun**: Menambahkan kolom input nomor telepon/WhatsApp pada form pendaftaran akun baru (`register.php`) agar admin Kesbangpol dapat langsung menghubungi pengguna jika SKT telah diterbitkan.
+- **Validasi & Penyimpanan Data Registrasi**: Memperbarui controller `Auth::attemptRegister` untuk melakukan validasi nomor telepon dan menyimpannya secara otomatis ke kolom `phone` tabel `sys_users`.
+
+### 🔄 Changed
+- **Penyelarasan Warna Teks Tema (Light Mode)**: Mengganti kelas CSS `text-white` statis pada baris tabel dan panel informasi admin (`dashboard.php`) dengan kelas adaptif `text-main` agar tulisan tidak berwarna putih di atas latar belakang putih saat mode terang aktif.
+
+---
+
 ## [v2.9.6] - 2026-07-07
 ### ✨ Added
 - **Pembaruan Alur Wizard Pengajuan Ormas (Multi-Step Form)**: Memecah form pendaftaran ormas di `form_pengajuan.php` menjadi 3 langkah / visual wizard:

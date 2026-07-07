@@ -13,7 +13,7 @@ class Auth extends BaseController
             $userRole = session()->get('role');
             $redirects = [
                 'admin' => 'admin',
-                'pptk'  => 'bidang',
+                'kabid' => 'bidang',
                 'kaban' => 'eksekutif',
                 'user'  => 'user',
                 'ormas' => 'user'
@@ -54,7 +54,7 @@ class Auth extends BaseController
             // Kirim notifikasi login ke Telegram
             $roleNames = [
                 'admin' => 'Administrator (OPD)',
-                'pptk'  => 'PPTK Bidang',
+                'kabid' => 'Kepala Bidang',
                 'kaban' => 'Kepala Badan (Kaban)',
                 'user'  => 'User Biasa',
                 'ormas' => 'Ormas Terdaftar'
@@ -74,7 +74,7 @@ class Auth extends BaseController
 
             $redirects = [
                 'admin' => 'admin',
-                'pptk'  => 'bidang',
+                'kabid' => 'bidang',
                 'kaban' => 'eksekutres', // wait, let's keep eksekutif
                 'kaban' => 'eksekutif',
                 'user'  => 'user',
@@ -105,7 +105,7 @@ class Auth extends BaseController
             $userRole = session()->get('role');
             $redirects = [
                 'admin' => 'admin',
-                'pptk'  => 'bidang',
+                'kabid' => 'bidang',
                 'kaban' => 'eksekutif',
                 'user'  => 'user',
                 'ormas' => 'user'
@@ -122,6 +122,7 @@ class Auth extends BaseController
         $validation->setRules([
             'username' => 'required|min_length[3]|max_length[50]|is_unique[sys_users.username]',
             'email'    => 'required|valid_email|max_length[100]',
+            'phone'    => 'required|min_length[5]|max_length[20]',
             'password' => 'required|min_length[6]|max_length[255]',
             'password_confirm' => 'required|matches[password]'
         ], [
@@ -135,6 +136,11 @@ class Auth extends BaseController
                 'required' => 'Alamat email wajib diisi.',
                 'valid_email' => 'Format alamat email tidak valid.',
                 'max_length' => 'Alamat email maksimal 100 karakter.'
+            ],
+            'phone' => [
+                'required' => 'Nomor telepon wajib diisi.',
+                'min_length' => 'Nomor telepon minimal 5 karakter.',
+                'max_length' => 'Nomor telepon maksimal 20 karakter.'
             ],
             'password' => [
                 'required' => 'Kata sandi wajib diisi.',
@@ -152,6 +158,7 @@ class Auth extends BaseController
 
         $username = $this->request->getPost('username');
         $email = $this->request->getPost('email');
+        $phone = $this->request->getPost('phone');
         $password = $this->request->getPost('password');
 
         $db = \Config\Database::connect();
@@ -166,6 +173,7 @@ class Auth extends BaseController
             'id'         => $userId,
             'username'   => $username,
             'email'      => $email,
+            'phone'      => $phone,
             'password'   => password_hash($password, PASSWORD_BCRYPT),
             'role'       => 'user',
             'status'     => 'active',
@@ -176,7 +184,7 @@ class Auth extends BaseController
         $db->table('sys_users')->insert($userData);
 
         helper('app');
-        log_activity('REGISTER_USER_PUBLIK', [], ['user_id' => $userId, 'username' => $username, 'email' => $email], 'sys_users', $userId);
+        log_activity('REGISTER_USER_PUBLIK', [], ['user_id' => $userId, 'username' => $username, 'email' => $email, 'phone' => $phone], 'sys_users', $userId);
 
         return redirect()->to('login')->with('success', 'Akun pendaftaran Anda berhasil dibuat. Silakan masuk untuk memulai pengajuan.');
     }
@@ -345,7 +353,7 @@ class Auth extends BaseController
         // Telegram Notification
         $roleNames = [
             'admin' => 'Administrator (OPD)',
-            'pptk'  => 'PPTK Bidang',
+            'kabid' => 'Kepala Bidang',
             'kaban' => 'Kepala Badan (Kaban)',
             'user'  => 'User Biasa',
             'ormas' => 'Ormas Terdaftar'
@@ -362,7 +370,7 @@ class Auth extends BaseController
 
         $redirects = [
             'admin' => 'admin',
-            'pptk'  => 'bidang',
+            'kabid' => 'bidang',
             'kaban' => 'eksekutif',
             'user'  => 'user',
             'ormas' => 'user'

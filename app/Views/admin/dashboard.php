@@ -340,7 +340,7 @@
                                 data-telepon="<?= esc(strtolower($o['telepon'])) ?>"
                                 data-tipe="<?= $tipe ?>">
                                 <td>
-                                    <div class="fw-bold text-white"><?= esc($o['nama_ormas']) ?></div>
+                                    <div class="fw-bold text-main"><?= esc($o['nama_ormas']) ?></div>
                                     <span class="small text-muted">ID: <?= substr($o['id'], 0, 8) ?>...</span>
                                 </td>
                                 <td>
@@ -444,7 +444,7 @@
                                                 <i class="fa-solid fa-building-flag text-white"></i>
                                             <?php endif; ?>
                                         </div>
-                                        <div class="fw-bold text-white"><?= esc($p['nama_parpol']) ?></div>
+                                        <div class="fw-bold text-main"><?= esc($p['nama_parpol']) ?></div>
                                     </div>
                                 </td>
                                 <td><?= esc($p['ketua']) ?></td>
@@ -590,7 +590,7 @@
                                 <tr class="tracking-row" data-type="<?= $aj['type'] ?>">
                                     <td class="text-center align-middle"><?= $idx + 1 ?></td>
                                     <td class="align-middle">
-                                        <div class="fw-bold text-white"><?= esc($aj['title']) ?></div>
+                                        <div class="fw-bold text-main"><?= esc($aj['title']) ?></div>
                                         <div class="text-warning small" style="font-size:0.75rem;"><?= esc($aj['sub_title']) ?></div>
                                     </td>
                                     <td class="text-center align-middle">
@@ -762,7 +762,7 @@
                                 ?>
                                     <div class="d-flex justify-content-between align-items-center p-2 rounded hotspot-item" style="background: var(--card-bg); border: 1px solid var(--border-color); cursor: pointer;" onclick="focusHotspot('<?= esc($h['id']) ?>')">
                                         <div class="min-w-0 flex-grow-1">
-                                            <div class="fw-bold text-white small text-truncate"><?= esc($h['nama']) ?></div>
+                                            <div class="fw-bold text-main small text-truncate"><?= esc($h['nama']) ?></div>
                                             <div class="text-muted" style="font-size: 0.7rem;"><?= esc($h['level']) ?> • <?= esc($h['latitude']) ?>, <?= esc($h['longitude']) ?></div>
                                         </div>
                                         <form action="<?= base_url('admin/delete-hotspot/' . $h['id']) ?>" method="POST" onsubmit="event.stopPropagation(); return confirm('Hapus titik kerawanan ini?')">
@@ -821,10 +821,10 @@
                                     </td>
                                     <td>
                                         <span class="badge <?= $badge['class'] ?> mb-1" style="font-size:0.75rem;"><?= $badge['label'] ?></span>
-                                        <div class="fw-bold text-white"><?= esc($detail['judul'] ?? 'Tanpa Judul') ?></div>
+                                        <div class="fw-bold text-main"><?= esc($detail['judul'] ?? 'Tanpa Judul') ?></div>
                                     </td>
                                     <td>
-                                        <div class="text-white small"><i class="fa-solid fa-building me-1 text-muted"></i><?= esc($detail['nama_bidang'] ?? 'Umum / Seluruhnya') ?></div>
+                                        <div class="text-main small"><i class="fa-solid fa-building me-1 text-muted"></i><?= esc($detail['nama_bidang'] ?? 'Umum / Seluruhnya') ?></div>
                                     </td>
                                     <td>
                                         <p class="small text-muted mb-0" style="white-space: pre-line; line-height: 1.5; max-height: 100px; overflow-y: auto;">
@@ -913,17 +913,17 @@
                             ?>
                                 <tr>
                                     <td class="text-center">
-                                        <div class="display-6 fw-bold text-white mb-0" style="font-size: 1.5rem; font-family: 'Outfit', sans-serif;"><?= esc($a['nomor_antrean']) ?></div>
+                                        <div class="display-6 fw-bold text-main mb-0" style="font-size: 1.5rem; font-family: 'Outfit', sans-serif;"><?= esc($a['nomor_antrean']) ?></div>
                                     </td>
                                     <td>
-                                        <div class="fw-bold text-white"><?= esc($a['nama_pengambil']) ?></div>
+                                        <div class="fw-bold text-main"><?= esc($a['nama_pengambil']) ?></div>
                                         <span class="small text-muted">NIK: <?= esc($a['nik']) ?></span>
                                     </td>
                                     <td>
-                                        <span class="small text-white-50"><i class="fa-solid fa-circle-info text-info me-1"></i><?= $layName ?></span>
+                                        <span class="small text-muted"><i class="fa-solid fa-circle-info text-info me-1"></i><?= $layName ?></span>
                                     </td>
                                     <td>
-                                        <div class="text-white small"><?= date('H:i', strtotime($a['created_at'])) ?> WITA</div>
+                                        <div class="text-main small"><?= date('H:i', strtotime($a['created_at'])) ?> WITA</div>
                                     </td>
                                     <td class="text-center">
                                         <span class="badge <?= $statusBadge ?> px-3 py-1.5 rounded-pill"><?= esc($a['status']) ?></span>
@@ -996,7 +996,7 @@
                             <?php foreach ($requestHapus as $rh): ?>
                                 <tr>
                                     <td class="text-center fw-semibold text-warning"><?= esc($rh['nomor_registrasi']) ?></td>
-                                    <td class="text-white fw-bold"><?= esc($rh['nama_ormas']) ?></td>
+                                    <td class="text-main fw-bold"><?= esc($rh['nama_ormas']) ?></td>
                                     <td class="text-muted small"><?= esc($rh['alamat']) ?></td>
                                     <td><?= date('d M Y H:i', strtotime($rh['updated_at'] ?: $rh['created_at'])) ?></td>
                                     <td class="text-center">
@@ -2349,7 +2349,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     tr.innerHTML = `
                         <td class="text-center align-middle">${fileIdx}</td>
                         <td class="align-middle">
-                            <div class="fw-bold text-white small">${req.name}</div>
+                            <div class="fw-bold text-main small">${req.name}</div>
                             <div class="text-muted" style="font-size: 0.72rem;">${req.desc}</div>
                         </td>
                         <td class="text-center align-middle">${statusBadge}</td>
