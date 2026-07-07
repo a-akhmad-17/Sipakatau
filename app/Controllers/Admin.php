@@ -48,7 +48,6 @@ class Admin extends BaseController
         $settingsMap['struktur_organisasi'] = isset($settingsMap['struktur_organisasi']) ? json_decode($settingsMap['struktur_organisasi'], true) : [];
         $settingsMap['video_edukasi'] = isset($settingsMap['video_edukasi']) ? json_decode($settingsMap['video_edukasi'], true) : [];
         $settingsMap['titik_kerawanan'] = isset($settingsMap['titik_kerawanan']) ? json_decode($settingsMap['titik_kerawanan'], true) : [];
-        $settingsMap['locked_spj_months'] = isset($settingsMap['locked_spj_months']) ? json_decode($settingsMap['locked_spj_months'], true) : [];
 
         // Ambil data pengaduan masyarakat
         $pengaduan = $db->table('log_activities')
@@ -184,6 +183,9 @@ class Admin extends BaseController
         $telepon = $this->request->getPost('telepon');
         $latitude = $this->request->getPost('latitude');
         $longitude = $this->request->getPost('longitude');
+        $hasKursi = $this->request->getPost('has_kursi') ? 1 : 0;
+        $periodeDewan = $this->request->getPost('periode_dewan');
+        $levelDewan = $this->request->getPost('level_dewan');
 
         if (empty($namaParpol)) {
             return redirect()->back()->with('error', 'Nama Partai Politik wajib diisi.');
@@ -215,16 +217,19 @@ class Admin extends BaseController
         );
 
         $insertData = [
-            'id'          => $parpolId,
-            'nama_parpol' => $namaParpol,
-            'lambang'     => $logoFilename,
-            'file_sk'     => $skFilename,
-            'alamat'      => $alamat,
-            'telepon'     => $telepon,
-            'ketua'       => $ketua,
-            'latitude'    => !empty($latitude) ? (double)$latitude : null,
-            'longitude'   => !empty($longitude) ? (double)$longitude : null,
-            'created_at'  => date('Y-m-d H:i:s')
+            'id'            => $parpolId,
+            'nama_parpol'   => $namaParpol,
+            'lambang'       => $logoFilename,
+            'file_sk'       => $skFilename,
+            'alamat'        => $alamat,
+            'telepon'       => $telepon,
+            'ketua'         => $ketua,
+            'latitude'      => !empty($latitude) ? (double)$latitude : null,
+            'longitude'     => !empty($longitude) ? (double)$longitude : null,
+            'has_kursi'     => $hasKursi,
+            'periode_dewan' => !empty($periodeDewan) ? $periodeDewan : null,
+            'level_dewan'   => !empty($levelDewan) ? $levelDewan : null,
+            'created_at'    => date('Y-m-d H:i:s')
         ];
 
         $db->table('mst_parpol')->insert($insertData);
@@ -246,6 +251,9 @@ class Admin extends BaseController
         $telepon = $this->request->getPost('telepon');
         $latitude = $this->request->getPost('latitude');
         $longitude = $this->request->getPost('longitude');
+        $hasKursi = $this->request->getPost('has_kursi') ? 1 : 0;
+        $periodeDewan = $this->request->getPost('periode_dewan');
+        $levelDewan = $this->request->getPost('level_dewan');
 
         $parpol = $db->table('mst_parpol')->where('id', $id)->get()->getRowArray();
         if (!$parpol) {
@@ -254,13 +262,16 @@ class Admin extends BaseController
 
         $beforeData = $parpol;
         $updateData = [
-            'nama_parpol' => $namaParpol,
-            'ketua'       => $ketua,
-            'alamat'      => $alamat,
-            'telepon'     => $telepon,
-            'latitude'    => !empty($latitude) ? (double)$latitude : null,
-            'longitude'   => !empty($longitude) ? (double)$longitude : null,
-            'updated_at'  => date('Y-m-d H:i:s')
+            'nama_parpol'   => $namaParpol,
+            'ketua'         => $ketua,
+            'alamat'        => $alamat,
+            'telepon'       => $telepon,
+            'latitude'      => !empty($latitude) ? (double)$latitude : null,
+            'longitude'     => !empty($longitude) ? (double)$longitude : null,
+            'has_kursi'     => $hasKursi,
+            'periode_dewan' => !empty($periodeDewan) ? $periodeDewan : null,
+            'level_dewan'   => !empty($levelDewan) ? $levelDewan : null,
+            'updated_at'    => date('Y-m-d H:i:s')
         ];
 
         $destination = ROOTPATH . 'public/uploads/parpol';
@@ -461,13 +472,70 @@ class Admin extends BaseController
         $visi = $settingsMap['profil_visi'] ?? '';
         $misi = isset($settingsMap['profil_misi']) ? json_decode($settingsMap['profil_misi'], true) : [];
 
+        $piketPhone = $db->table('sys_settings')->where('key', 'piket_phone')->get()->getRowArray();
+        $tteNama1 = $db->table('sys_settings')->where('key', 'tte_nama_1')->get()->getRowArray();
+        $tteNip1 = $db->table('sys_settings')->where('key', 'tte_nip_1')->get()->getRowArray();
+        $tteNama2 = $db->table('sys_settings')->where('key', 'tte_nama_2')->get()->getRowArray();
+        $tteNip2 = $db->table('sys_settings')->where('key', 'tte_nip_2')->get()->getRowArray();
+
         $data = [
-            'title' => 'Pengaturan Visi & Misi - SIPAKATAU',
-            'visi'  => $visi,
-            'misi'  => $misi
+            'title'       => 'Pengaturan Visi & Misi - SIPAKATAU',
+            'visi'        => $visi,
+            'misi'        => $misi,
+            'piket_phone' => $piketPhone ? $piketPhone['value'] : '0811-7671-545',
+            'tte_nama_1'  => $tteNama1 ? $tteNama1['value'] : 'A. Akhmad Sultan, S.STP.',
+            'tte_nip_1'   => $tteNip1 ? $tteNip1['value'] : '19870102 201001 1 001',
+            'tte_nama_2'  => $tteNama2 ? $tteNama2['value'] : 'Andi Azis, S.Sos.',
+            'tte_nip_2'   => $tteNip2 ? $tteNip2['value'] : '19790506 200501 1 002',
         ];
 
         return view('admin/settings_visi_misi', $data);
+    }
+
+    public function updatePortalSettings()
+    {
+        $db = \Config\Database::connect();
+        helper('app');
+
+        $piketPhone = $this->request->getPost('piket_phone');
+        $tteNama1 = $this->request->getPost('tte_nama_1');
+        $tteNip1 = $this->request->getPost('tte_nip_1');
+        $tteNama2 = $this->request->getPost('tte_nama_2');
+        $tteNip2 = $this->request->getPost('tte_nip_2');
+
+        // Fetch old values for audit logging
+        $oldPiket = $db->table('sys_settings')->where('key', 'piket_phone')->get()->getRowArray();
+        $oldNama1 = $db->table('sys_settings')->where('key', 'tte_nama_1')->get()->getRowArray();
+        $oldNip1 = $db->table('sys_settings')->where('key', 'tte_nip_1')->get()->getRowArray();
+        $oldNama2 = $db->table('sys_settings')->where('key', 'tte_nama_2')->get()->getRowArray();
+        $oldNip2 = $db->table('sys_settings')->where('key', 'tte_nip_2')->get()->getRowArray();
+
+        $beforeData = [
+            'piket_phone' => $oldPiket ? $oldPiket['value'] : null,
+            'tte_nama_1'  => $oldNama1 ? $oldNama1['value'] : null,
+            'tte_nip_1'   => $oldNip1 ? $oldNip1['value'] : null,
+            'tte_nama_2'  => $oldNama2 ? $oldNama2['value'] : null,
+            'tte_nip_2'   => $oldNip2 ? $oldNip2['value'] : null,
+        ];
+
+        $afterData = [
+            'piket_phone' => $piketPhone,
+            'tte_nama_1'  => $tteNama1,
+            'tte_nip_1'   => $tteNip1,
+            'tte_nama_2'  => $tteNama2,
+            'tte_nip_2'   => $tteNip2,
+        ];
+
+        // Save
+        $db->table('sys_settings')->replace(['key' => 'piket_phone', 'value' => $piketPhone, 'group' => 'portal', 'updated_at' => date('Y-m-d H:i:s')]);
+        $db->table('sys_settings')->replace(['key' => 'tte_nama_1', 'value' => $tteNama1, 'group' => 'tte', 'updated_at' => date('Y-m-d H:i:s')]);
+        $db->table('sys_settings')->replace(['key' => 'tte_nip_1', 'value' => $tteNip1, 'group' => 'tte', 'updated_at' => date('Y-m-d H:i:s')]);
+        $db->table('sys_settings')->replace(['key' => 'tte_nama_2', 'value' => $tteNama2, 'group' => 'tte', 'updated_at' => date('Y-m-d H:i:s')]);
+        $db->table('sys_settings')->replace(['key' => 'tte_nip_2', 'value' => $tteNip2, 'group' => 'tte', 'updated_at' => date('Y-m-d H:i:s')]);
+
+        log_activity('UPDATE_PORTAL_SETTINGS', $beforeData, $afterData, 'sys_settings', 'piket_phone');
+
+        return redirect()->to('admin/settings/visi-misi')->with('success', 'Pengaturan Portal & TTE Srikandi berhasil diperbarui.');
     }
 
     public function settingsBidang()
@@ -510,20 +578,6 @@ class Admin extends BaseController
         ];
 
         return view('admin/settings_video', $data);
-    }
-
-    public function settingsSpj()
-    {
-        $db = \Config\Database::connect();
-        $setting = $db->table('sys_settings')->where('key', 'locked_spj_months')->get()->getRowArray();
-        $lockedMonths = $setting ? json_decode($setting['value'], true) : [];
-
-        $data = [
-            'title'         => 'Pengaturan Kunci SPJ - SIPAKATAU',
-            'locked_months' => $lockedMonths
-        ];
-
-        return view('admin/settings_spj', $data);
     }
 
     public function updateVisi()
@@ -637,12 +691,73 @@ class Admin extends BaseController
         return redirect()->to('admin/settings/visi-misi')->with('success', 'Butir misi berhasil dihapus.');
     }
 
+    public function tambahBidang()
+    {
+        $db = \Config\Database::connect();
+        helper('app');
+
+        $title = trim($this->request->getPost('title'));
+        $subtitle = trim($this->request->getPost('subtitle'));
+        $icon = trim($this->request->getPost('icon')) ?: 'fa-folder-open';
+        $color = trim($this->request->getPost('color')) ?: '#71717a';
+        $desc = trim($this->request->getPost('description'));
+        $subUnits = $this->request->getPost('sub_units') ?? [];
+
+        if (empty($title)) {
+            return redirect()->to('admin/settings/bidang')->with('error', 'Nama Bidang wajib diisi.');
+        }
+
+        $id = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $title));
+
+        // Clean sub-units
+        $subUnitsClean = array_values(array_filter(array_map('trim', $subUnits)));
+
+        $existingSetting = $db->table('sys_settings')->where('key', 'profil_bidang')->get()->getRowArray();
+        $bidangData = $existingSetting ? json_decode($existingSetting['value'], true) : [];
+
+        // Check if ID already exists
+        foreach ($bidangData as $b) {
+            if ($b['id'] === $id) {
+                $id .= '_' . mt_rand(10, 99);
+                break;
+            }
+        }
+
+        $beforeBidang = $bidangData;
+        $newBidang = [
+            'id'          => $id,
+            'title'       => $title,
+            'subtitle'    => $subtitle,
+            'icon'        => $icon,
+            'color'       => $color,
+            'description' => $desc,
+            'sub_units'   => $subUnitsClean
+        ];
+
+        $bidangData[] = $newBidang;
+
+        $db->table('sys_settings')->replace([
+            'key'        => 'profil_bidang',
+            'value'      => json_encode($bidangData),
+            'group'      => 'profil',
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
+
+        log_activity('TAMBAH_BIDANG_CMS', $beforeBidang, $bidangData, 'sys_settings', 'profil_bidang');
+
+        return redirect()->to('admin/settings/bidang')->with('success', 'Bidang baru "' . $title . '" berhasil ditambahkan.');
+    }
+
     public function updateBidang()
     {
         $db = \Config\Database::connect();
         helper('app');
 
         $bidangId = $this->request->getPost('bidang_id');
+        $title = trim($this->request->getPost('title'));
+        $subtitle = trim($this->request->getPost('subtitle'));
+        $icon = trim($this->request->getPost('icon')) ?: 'fa-folder-open';
+        $color = trim($this->request->getPost('color')) ?: '#71717a';
         $desc = trim($this->request->getPost('description'));
         $subUnits = $this->request->getPost('sub_units') ?? [];
 
@@ -661,6 +776,10 @@ class Admin extends BaseController
 
         foreach ($bidangData as &$b) {
             if ($b['id'] === $bidangId) {
+                $b['title'] = $title;
+                $b['subtitle'] = $subtitle;
+                $b['icon'] = $icon;
+                $b['color'] = $color;
                 $b['description'] = $desc;
                 $b['sub_units'] = $subUnitsClean;
                 $updated = true;
@@ -682,6 +801,45 @@ class Admin extends BaseController
         log_activity('UPDATE_BIDANG_DAN_UNIT', $beforeBidang, $bidangData, 'sys_settings', 'profil_bidang');
 
         return redirect()->to('admin/settings/bidang')->with('success', 'Data Bidang & Unit berhasil diperbarui.');
+    }
+
+    public function deleteBidang(string $id)
+    {
+        $db = \Config\Database::connect();
+        helper('app');
+
+        $existingSetting = $db->table('sys_settings')->where('key', 'profil_bidang')->get()->getRowArray();
+        if (!$existingSetting) {
+            return redirect()->to('admin/settings/bidang')->with('error', 'Data bidang tidak ditemukan.');
+        }
+
+        $bidangData = json_decode($existingSetting['value'], true) ?: [];
+        $beforeBidang = $bidangData;
+
+        $deletedBidang = null;
+        $newBidangData = [];
+        foreach ($bidangData as $b) {
+            if ($b['id'] === $id) {
+                $deletedBidang = $b;
+            } else {
+                $newBidangData[] = $b;
+            }
+        }
+
+        if (!$deletedBidang) {
+            return redirect()->to('admin/settings/bidang')->with('error', 'Bidang tidak ditemukan.');
+        }
+
+        $db->table('sys_settings')->replace([
+            'key'        => 'profil_bidang',
+            'value'      => json_encode($newBidangData),
+            'group'      => 'profil',
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
+
+        log_activity('HAPUS_BIDANG_CMS', $deletedBidang, [], 'sys_settings', 'profil_bidang');
+
+        return redirect()->to('admin/settings/bidang')->with('success', 'Bidang "' . $deletedBidang['title'] . '" berhasil dihapus.');
     }
 
     private function saveBase64Photo(string $base64Data, string $idPrefix): ?string
@@ -924,10 +1082,10 @@ class Admin extends BaseController
                 return redirect()->to('admin/settings/video')->with('error', 'Judul dan URL YouTube wajib diisi untuk Video Edukasi.');
             }
         } else {
-            // For dokumentasi, either youtube_id or image must be provided
+            // For dokumentasi, image must be provided (youtube URL & duration are removed)
             $hasImage = ($fileImage && $fileImage->isValid() && !$fileImage->hasMoved());
-            if (empty($title) || (empty($youtubeInput) && !$hasImage)) {
-                return redirect()->to('admin/settings/video')->with('error', 'Judul serta salah satu dari URL YouTube atau Foto Dokumentasi wajib diisi.');
+            if (empty($title) || !$hasImage) {
+                return redirect()->to('admin/settings/video')->with('error', 'Judul serta Foto Dokumentasi wajib diisi.');
             }
         }
 
@@ -961,7 +1119,7 @@ class Admin extends BaseController
         }
 
         $youtubeId = '';
-        if (!empty($youtubeInput)) {
+        if ($type === 'edukasi' && !empty($youtubeInput)) {
             if (strlen($youtubeInput) === 11 && preg_match('/^[a-zA-Z0-9_-]{11}$/', $youtubeInput)) {
                 $youtubeId = $youtubeInput;
             } else {
@@ -991,7 +1149,7 @@ class Admin extends BaseController
             'image_path'    => $imagePath ?: '',
             'image_gallery' => $galleryPaths,
             'category'      => $category,
-            'duration'      => $duration,
+            'duration'      => ($type === 'edukasi') ? $duration : '-',
             'source'        => $source,
             'description'   => $description
         ];
@@ -1059,15 +1217,15 @@ class Admin extends BaseController
                 return redirect()->to('admin/settings/video')->with('error', 'URL YouTube wajib diisi untuk Video Edukasi.');
             }
         } else {
-            // For dokumentasi, either youtube_id or image must be provided
+            // For dokumentasi, image must be provided (youtube URL & duration are removed)
             $hasExistingImage = !empty($existingVideo['image_path']);
-            if (empty($youtubeInput) && !$hasNewImage && !$hasExistingImage) {
-                return redirect()->to('admin/settings/video')->with('error', 'Judul serta salah satu dari URL YouTube atau Foto Dokumentasi wajib diisi.');
+            if (!$hasNewImage && !$hasExistingImage) {
+                return redirect()->to('admin/settings/video')->with('error', 'Judul serta Foto Dokumentasi wajib diisi.');
             }
         }
 
         $youtubeId = '';
-        if (!empty($youtubeInput)) {
+        if ($type === 'edukasi' && !empty($youtubeInput)) {
             if (strlen($youtubeInput) === 11 && preg_match('/^[a-zA-Z0-9_-]{11}$/', $youtubeInput)) {
                 $youtubeId = $youtubeInput;
             } else {
@@ -1165,7 +1323,7 @@ class Admin extends BaseController
             'image_path'    => $imagePath ?: '',
             'image_gallery' => $imageGallery,
             'category'      => $category,
-            'duration'      => $duration,
+            'duration'      => ($type === 'edukasi') ? $duration : '-',
             'source'        => $source,
             'description'   => $description
         ];
@@ -1479,63 +1637,6 @@ class Admin extends BaseController
         );
 
         return redirect()->to('admin')->with('success', 'Antrean ' . $antrean['nomor_antrean'] . ' dilewati.');
-    }
-
-    public function updateKunciSpj()
-    {
-        $db = \Config\Database::connect();
-        helper('app');
-
-        $action = $this->request->getPost('action');
-        $month = $this->request->getPost('month');
-
-        if (empty($month) || !preg_match('/^\d{4}-\d{2}$/', $month)) {
-            return redirect()->to('admin/settings/spj')->with('error', 'Format bulan tidak valid. Gunakan format YYYY-MM.');
-        }
-
-        // Ambil data locked_spj_months saat ini
-        $existingSetting = $db->table('sys_settings')->where('key', 'locked_spj_months')->get()->getRowArray();
-        $lockedMonths = $existingSetting ? json_decode($existingSetting['value'], true) : [];
-        if (!is_array($lockedMonths)) {
-            $lockedMonths = [];
-        }
-
-        $beforeData = ['locked_spj_months' => $lockedMonths];
-
-        if ($action === 'lock') {
-            if (!in_array($month, $lockedMonths)) {
-                $lockedMonths[] = $month;
-            }
-            $msg = 'Periode SPJ bulan ' . $month . ' berhasil dikunci.';
-        } elseif ($action === 'unlock') {
-            $lockedMonths = array_values(array_diff($lockedMonths, [$month]));
-            $msg = 'Kunci periode SPJ bulan ' . $month . ' berhasil dibuka.';
-        } else {
-            return redirect()->to('admin/settings/spj')->with('error', 'Aksi tidak valid.');
-        }
-
-        // Sort months descending to keep it tidy
-        rsort($lockedMonths);
-
-        $afterData = ['locked_spj_months' => $lockedMonths];
-
-        // Save
-        $db->table('sys_settings')->replace([
-            'key'        => 'locked_spj_months',
-            'value'      => json_encode($lockedMonths),
-            'group'      => 'spj',
-            'updated_at' => date('Y-m-d H:i:s')
-        ]);
-
-        log_activity(
-            'UPDATE_KUNCI_SPJ',
-            $beforeData,
-            $afterData,
-            'sys_settings',
-            'locked_spj_months'
-        );
-
-        return redirect()->to('admin/settings/spj')->with('success', $msg);
     }
 
     public function deletePendaftaran(string $id)
@@ -1919,6 +2020,72 @@ class Admin extends BaseController
         }
 
         return redirect()->to('admin')->with('error', 'Pengaduan tidak memiliki file bukti.');
+    }
+
+    public function updateProgress()
+    {
+        $json = $this->request->getJSON(true);
+        if (!$json) {
+            return $this->response->setJSON([
+                'status' => false,
+                'message' => 'Request data tidak valid.'
+            ]);
+        }
+
+        $id = $json['id'] ?? null;
+        $progress = isset($json['progress']) ? (int)$json['progress'] : null;
+
+        if (!$id || $progress === null) {
+            return $this->response->setJSON([
+                'status' => false,
+                'message' => 'Parameter tidak lengkap.'
+            ]);
+        }
+
+        $db = \Config\Database::connect();
+        $pendaftaran = $db->table('trn_pendaftaran')->where('id', $id)->get()->getRowArray();
+        
+        if (!$pendaftaran) {
+            return $this->response->setJSON([
+                'status' => false,
+                'message' => 'Data pendaftaran tidak ditemukan.'
+            ]);
+        }
+
+        // Determine status_verifikasi based on progress level
+        $statusVerifikasi = $pendaftaran['status_verifikasi'];
+        if ($progress == 25 || $progress == 50) {
+            $statusVerifikasi = 'Pending';
+        } elseif ($progress == 75 || $progress == 100) {
+            $statusVerifikasi = 'Approved';
+        } elseif ($progress == 0) {
+            $statusVerifikasi = 'Rejected';
+        }
+
+        $beforeData = $pendaftaran;
+        $updateData = [
+            'progress_percentage' => $progress,
+            'status_verifikasi' => $statusVerifikasi,
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+
+        $db->table('trn_pendaftaran')->where('id', $id)->update($updateData);
+
+        helper('app');
+        log_activity(
+            'UPDATE_PROGRESS_PENDAFTARAN_ORMAS_CHECKLIST',
+            $beforeData,
+            array_merge($beforeData, $updateData),
+            'trn_pendaftaran',
+            $id
+        );
+
+        return $this->response->setJSON([
+            'status' => true,
+            'message' => 'Progres pendaftaran berhasil diperbarui menjadi ' . $progress . '%',
+            'status_verifikasi' => $statusVerifikasi,
+            'csrf_hash' => csrf_hash()
+        ]);
     }
 }
 

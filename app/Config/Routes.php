@@ -48,6 +48,7 @@ $routes->group('admin', ['filter' => 'auth:admin'], function($routes) {
     $routes->post('antrean/selesai/(:any)', 'Admin::selesaiAntrean/$1');
     $routes->post('antrean/lewat/(:any)', 'Admin::lewatAntrean/$1');
     $routes->post('delete-pendaftaran/(:any)', 'Admin::deletePendaftaran/$1');
+    $routes->post('update-progress', 'Admin::updateProgress');
     $routes->post('delete-rekomendasi/(:any)', 'Admin::deleteRekomendasi/$1');
     $routes->post('delete-pengaduan/(:any)', 'Admin::deletePengaduan/$1');
     $routes->post('delete-file-pengaduan/(:any)', 'Admin::deleteFilePengaduan/$1');
@@ -58,9 +59,12 @@ $routes->group('admin', ['filter' => 'auth:admin'], function($routes) {
     $routes->post('settings/misi/tambah', 'Admin::tambahMisi');
     $routes->post('settings/misi/update', 'Admin::updateMisi');
     $routes->post('settings/misi/delete/(:num)', 'Admin::deleteMisi/$1');
+    $routes->post('settings/portal/update', 'Admin::updatePortalSettings');
 
     $routes->get('settings/bidang', 'Admin::settingsBidang');
+    $routes->post('settings/bidang/tambah', 'Admin::tambahBidang');
     $routes->post('settings/bidang/update', 'Admin::updateBidang');
+    $routes->post('settings/bidang/delete/(:any)', 'Admin::deleteBidang/$1');
 
     $routes->get('settings/struktur', 'Admin::settingsStruktur');
     $routes->post('settings/staf/tambah', 'Admin::tambahStaf');
@@ -73,12 +77,10 @@ $routes->group('admin', ['filter' => 'auth:admin'], function($routes) {
     $routes->post('settings/video/update', 'Admin::updateVideo');
     $routes->post('settings/video/delete/(:any)', 'Admin::deleteVideo/$1');
 
-    $routes->get('settings/spj', 'Admin::settingsSpj');
-    $routes->post('settings/spj/update', 'Admin::updateKunciSpj');
 });
 
-// Bidang Dashboard Routes (Protected by auth filter - role: pptk)
-$routes->group('bidang', ['filter' => 'auth:pptk'], function($routes) {
+// Bidang Dashboard Routes (Protected by auth filter - role: kabid)
+$routes->group('bidang', ['filter' => 'auth:kabid'], function($routes) {
     $routes->get('/', 'Bidang::index');
     $routes->post('lapor-kegiatan', 'Bidang::laporKegiatan');
 });

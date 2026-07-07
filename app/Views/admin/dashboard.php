@@ -474,381 +474,188 @@
             </div>
         </div>
     </div>
-
-    <!-- Tab 3: Tracking Berkas (Kanban Board) -->
+    <!-- Tab 3: Tracking Berkas (Table View Only) -->
     <div class="tab-pane fade" id="tab-tracking" role="tabpanel">
         <div class="glass-card p-4">
-            <h4 class="text-white mb-4"><i class="fa-solid fa-route text-info me-2"></i>Pelacakan Progres Dokumen Layanan</h4>
-
-            <?php
-            // Group pendaftaran & rekomendasi into columns
-            $col1_draft = [];
-            $col2_verifikasi = [];
-            $col3_validasi = [];
-            $col4_tte = [];
-
-            // Group pendaftaran (Ormas)
-            foreach ($pendaftaran as $p) {
-                if ($p['status_verifikasi'] === 'Draft' || $p['status_verifikasi'] === 'Rejected') {
-                    $col1_draft[] = ['type' => 'ormas', 'data' => $p];
-                } elseif ($p['status_verifikasi'] === 'Pending') {
-                    $col2_verifikasi[] = ['type' => 'ormas', 'data' => $p];
-                } elseif ($p['status_verifikasi'] === 'Approved' && $p['progress_percentage'] < 100) {
-                    $col3_validasi[] = ['type' => 'ormas', 'data' => $p];
-                } elseif ($p['status_verifikasi'] === 'Approved' && $p['progress_percentage'] == 100) {
-                    $col4_tte[] = ['type' => 'ormas', 'data' => $p];
-                }
-            }
-
-            // Group rekomendasi (Kegiatan)
-            foreach ($rekomendasi as $r) {
-                if ($r['status_rekomendasi'] === 'Rejected') {
-                    $col1_draft[] = ['type' => 'rekomendasi', 'data' => $r];
-                } elseif ($r['status_rekomendasi'] === 'Pending') {
-                    $col2_verifikasi[] = ['type' => 'rekomendasi', 'data' => $r];
-                } elseif ($r['status_rekomendasi'] === 'Approved' && empty($r['pdf_tte_path'])) {
-                    $col3_validasi[] = ['type' => 'rekomendasi', 'data' => $r];
-                } elseif ($r['status_rekomendasi'] === 'Approved' && !empty($r['pdf_tte_path'])) {
-                    $col4_tte[] = ['type' => 'rekomendasi', 'data' => $r];
-                }
-            }
-            ?>
-
-            <div class="row g-4">
-                <!-- Column 1: Draft/Ditolak -->
-                <div class="col-lg-3">
-                    <h5 class="text-white mb-3 small"><i class="fa-solid fa-circle text-secondary me-2"></i>1. DRAFT / DITOLAK</h5>
-                    <div class="kanban-col d-flex flex-column gap-3">
-                        <?php if (empty($col1_draft)): ?>
-                            <div class="text-muted small text-center my-auto">Tidak ada berkas</div>
-                        <?php else: ?>
-                            <?php foreach ($col1_draft as $item): ?>
-                                <div class="kanban-card">
-                                    <?php if ($item['type'] === 'ormas'): 
-                                        $d = $item['data']; ?>
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <span class="badge bg-secondary-subtle text-secondary small">Ormas</span>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <span class="small text-danger" style="font-size:0.75rem;">Prog: <?= $d['progress_percentage'] ?>%</span>
-                                                <button type="button" class="btn btn-link text-info p-0 btn-detail-tracking" 
-                                                        data-type="ormas"
-                                                        data-id="<?= esc($d['id']) ?>"
-                                                        data-registrasi="<?= esc($d['nomor_registrasi']) ?>"
-                                                        data-nama="<?= esc($d['nama_ormas']) ?>"
-                                                        data-alamat="<?= esc($d['alamat']) ?>"
-                                                        data-email="<?= esc($d['email']) ?>"
-                                                        data-telepon="<?= esc($d['telepon']) ?>"
-                                                        data-status="<?= esc($d['status_verifikasi']) ?>"
-                                                        data-progress="<?= esc($d['progress_percentage']) ?>"
-                                                        data-file="<?= esc($d['file_berkas'] ?? '') ?>" data-sk-kepengurusan="<?= !empty($d['tgl_sk_kepengurusan']) ? date('d F Y', strtotime($d['tgl_sk_kepengurusan'])) : '-' ?>" data-sk-kedaluwarsa="<?= !empty($d['tgl_sk_kedaluwarsa']) ? date('d F Y', strtotime($d['tgl_sk_kedaluwarsa'])) : '-' ?>"
-                                                        data-tanggal="<?= date('d F Y H:i:s', strtotime($d['created_at'])) ?>"
-                                                        title="Lihat Detail" style="font-size: 0.85rem; line-height: 1;">
-                                                    <i class="fa-solid fa-circle-info"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="fw-bold text-white mb-1"><?= esc($d['nama_ormas']) ?></div>
-                                        <p class="small text-muted mb-2"><?= esc($d['alamat']) ?></p>
-                                        <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top border-secondary border-opacity-25">
-                                            <div class="small text-danger"><i class="fa-solid fa-circle-xmark me-1"></i>Status: <?= esc($d['status_verifikasi']) ?></div>
-                                            <form action="<?= base_url('admin/delete-pendaftaran/' . $d['id']) ?>" method="POST" onsubmit="return confirm('Hapus berkas pendaftaran Ormas ini secara permanen?')">
-                                                <?= csrf_field() ?>
-                                                <button type="submit" class="btn btn-sm btn-outline-danger px-2 py-0.5" style="font-size: 0.75rem;"><i class="fa-solid fa-trash"></i> Hapus</button>
-                                            </form>
-                                        </div>
-                                    <?php else: 
-                                        $d = $item['data']; ?>
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <span class="badge bg-warning-subtle text-warning small">Rekomendasi</span>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <span class="small text-danger" style="font-size:0.75rem;">Ditolak</span>
-                                                <button type="button" class="btn btn-link text-info p-0 btn-detail-tracking" 
-                                                        data-type="rekomendasi"
-                                                        data-id="<?= esc($d['id']) ?>"
-                                                        data-nama="<?= esc($d['pemohon']) ?>"
-                                                        data-kegiatan="<?= esc($d['nama_kegiatan']) ?>"
-                                                        data-deskripsi="<?= esc($d['deskripsi'] ?? '-') ?>"
-                                                        data-status="<?= esc($d['status_rekomendasi']) ?>"
-                                                        data-file="<?= esc($d['file_proposal'] ?? '') ?>" data-mulai="<?= date('d F Y', strtotime($d['tgl_mulai'])) ?>" data-selesai="<?= date('d F Y', strtotime($d['tgl_selesai'])) ?>"
-                                                        data-tte="<?= esc($d['pdf_tte_path'] ?? '') ?>"
-                                                        data-tanggal="<?= date('d F Y H:i:s', strtotime($d['created_at'])) ?>"
-                                                        title="Lihat Detail" style="font-size: 0.85rem; line-height: 1;">
-                                                    <i class="fa-solid fa-circle-info"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="fw-bold text-white mb-1"><?= esc($d['pemohon']) ?></div>
-                                        <p class="small text-muted mb-2"><?= esc($d['nama_kegiatan']) ?></p>
-                                        <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top border-secondary border-opacity-25">
-                                            <div class="small text-danger"><i class="fa-solid fa-circle-xmark me-1"></i>Status: <?= esc($d['status_rekomendasi']) ?></div>
-                                            <form action="<?= base_url('admin/delete-rekomendasi/' . $d['id']) ?>" method="POST" onsubmit="return confirm('Hapus berkas rekomendasi kegiatan ini secara permanen?')">
-                                                <?= csrf_field() ?>
-                                                <button type="submit" class="btn btn-sm btn-outline-danger px-2 py-0.5" style="font-size: 0.75rem;"><i class="fa-solid fa-trash"></i> Hapus</button>
-                                            </form>
-                                        </div>
-                                    <?php endif; ?>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </div>
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                <div>
+                    <h4 class="text-white mb-1"><i class="fa-solid fa-route text-info me-2"></i>Pelacakan Progres Dokumen Layanan</h4>
+                    <p class="text-muted small mb-0">Kelola dan pantau seluruh ajuan dokumen layanan pendaftaran ormas, rekomendasi kegiatan, serta laporan aduan masyarakat.</p>
                 </div>
+                <!-- Filter Buttons -->
+                <div class="btn-group" role="group" aria-label="Filter Ajuan">
+                    <button type="button" class="btn btn-sm btn-outline-info active" id="btn-filter-all" onclick="filterTrackingTable('all', this)">
+                        Semua Ajuan
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-info" id="btn-filter-ormas" onclick="filterTrackingTable('ormas', this)">
+                        Pendaftaran Ormas
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-info" id="btn-filter-rekomendasi" onclick="filterTrackingTable('rekomendasi', this)">
+                        Rekomendasi Kegiatan
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-info" id="btn-filter-aduan" onclick="filterTrackingTable('aduan', this)">
+                        Aduan Masyarakat
+                    </button>
+                </div>
+            </div>
 
-                <!-- Column 2: Verifikasi Berkas -->
-                <div class="col-lg-3">
-                    <h5 class="text-white mb-3 small"><i class="fa-solid fa-circle text-warning me-2"></i>2. VERIFIKASI BERKAS</h5>
-                    <div class="kanban-col d-flex flex-column gap-3">
-                        <?php if (empty($col2_verifikasi)): ?>
-                            <div class="text-muted small text-center my-auto">Tidak ada berkas masuk</div>
+            <div class="table-responsive">
+                <table class="table table-custom rounded overflow-hidden" id="table-tracking-main" style="font-size: 0.85rem;">
+                    <thead>
+                        <tr>
+                            <th class="text-center" style="width: 5%;">#</th>
+                            <th style="width: 30%;">Pengaju / Lembaga / Pelapor</th>
+                            <th class="text-center" style="width: 20%;">Jenis Layanan</th>
+                            <th class="text-center" style="width: 15%;">Tanggal Masuk</th>
+                            <th class="text-center" style="width: 15%;">Status / Progres</th>
+                            <th class="text-center" style="width: 15%;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php 
+                        $allAjuan = [];
+                        
+                        // 1. Add Ormas Pendaftaran
+                        foreach ($pendaftaran as $p) {
+                            $allAjuan[] = [
+                                'type' => 'ormas',
+                                'id' => $p['id'],
+                                'title' => $p['nama_ormas'],
+                                'sub_title' => 'Reg: ' . $p['nomor_registrasi'],
+                                'created_at' => $p['created_at'],
+                                'status' => $p['status_verifikasi'],
+                                'progress' => $p['progress_percentage'],
+                                'data' => $p
+                            ];
+                        }
+                        
+                        // 2. Add Rekomendasi Kegiatan
+                        foreach ($rekomendasi as $r) {
+                            $allAjuan[] = [
+                                'type' => 'rekomendasi',
+                                'id' => $r['id'],
+                                'title' => $r['pemohon'],
+                                'sub_title' => 'Kegiatan: ' . $r['nama_kegiatan'],
+                                'created_at' => $r['created_at'],
+                                'status' => $r['status_rekomendasi'],
+                                'progress' => empty($r['pdf_tte_path']) ? 75 : 100,
+                                'data' => $r
+                            ];
+                        }
+                        
+                        // 3. Add Aduan Masyarakat
+                        foreach ($pengaduan as $ad) {
+                            $det = json_decode($ad['after_data'], true) ?? [];
+                            $allAjuan[] = [
+                                'type' => 'aduan',
+                                'id' => $ad['id'],
+                                'title' => $det['judul'] ?? 'Aduan Anonim',
+                                'sub_title' => 'Kategori: ' . ucfirst($det['kategori'] ?? 'Lainnya'),
+                                'created_at' => $ad['created_at'],
+                                'status' => 'Selesai',
+                                'progress' => 100,
+                                'data' => $ad
+                            ];
+                        }
+                        
+                        // Sort all by created_at DESC
+                        usort($allAjuan, function($a, $b) {
+                            return strcmp($b['created_at'], $a['created_at']);
+                        });
+                        ?>
+
+                        <?php if (empty($allAjuan)): ?>
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">Belum ada pengajuan masuk.</td>
+                            </tr>
                         <?php else: ?>
-                            <?php foreach ($col2_verifikasi as $item): ?>
-                                <div class="kanban-card">
-                                    <?php if ($item['type'] === 'ormas'): 
-                                        $d = $item['data']; ?>
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <span class="badge bg-secondary-subtle text-secondary small">Ormas</span>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <span class="small text-muted" style="font-size:0.75rem;">Prog: <?= $d['progress_percentage'] ?>%</span>
-                                                <button type="button" class="btn btn-link text-info p-0 btn-detail-tracking" 
-                                                        data-type="ormas"
-                                                        data-id="<?= esc($d['id']) ?>"
-                                                        data-registrasi="<?= esc($d['nomor_registrasi']) ?>"
-                                                        data-nama="<?= esc($d['nama_ormas']) ?>"
-                                                        data-alamat="<?= esc($d['alamat']) ?>"
-                                                        data-email="<?= esc($d['email']) ?>"
-                                                        data-telepon="<?= esc($d['telepon']) ?>"
-                                                        data-status="<?= esc($d['status_verifikasi']) ?>"
-                                                        data-progress="<?= esc($d['progress_percentage']) ?>"
-                                                        data-file="<?= esc($d['file_berkas'] ?? '') ?>" data-sk-kepengurusan="<?= !empty($d['tgl_sk_kepengurusan']) ? date('d F Y', strtotime($d['tgl_sk_kepengurusan'])) : '-' ?>" data-sk-kedaluwarsa="<?= !empty($d['tgl_sk_kedaluwarsa']) ? date('d F Y', strtotime($d['tgl_sk_kedaluwarsa'])) : '-' ?>"
-                                                        data-tanggal="<?= date('d F Y H:i:s', strtotime($d['created_at'])) ?>"
-                                                        title="Lihat Detail" style="font-size: 0.85rem; line-height: 1;">
-                                                    <i class="fa-solid fa-circle-info"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="fw-bold text-white mb-1"><?= esc($d['nama_ormas']) ?></div>
-                                        <p class="small text-muted mb-2"><?= esc($d['alamat']) ?></p>
-                                        
-                                        <?php if (!empty($d['file_berkas'])): ?>
-                                            <div class="mb-3">
-                                                <a href="<?= base_url('uploads/ormas/' . $d['file_berkas']) ?>" target="_blank" class="btn btn-sm btn-outline-info w-100 py-1"><i class="fa-solid fa-file-pdf me-1"></i> Buka Berkas</a>
-                                            </div>
+                            <?php foreach ($allAjuan as $idx => $aj): ?>
+                                <tr class="tracking-row" data-type="<?= $aj['type'] ?>">
+                                    <td class="text-center align-middle"><?= $idx + 1 ?></td>
+                                    <td class="align-middle">
+                                        <div class="fw-bold text-white"><?= esc($aj['title']) ?></div>
+                                        <div class="text-warning small" style="font-size:0.75rem;"><?= esc($aj['sub_title']) ?></div>
+                                    </td>
+                                    <td class="text-center align-middle">
+                                        <?php if ($aj['type'] === 'ormas'): ?>
+                                            <span class="badge bg-secondary-subtle text-secondary px-2.5 py-1">Pendaftaran Ormas</span>
+                                        <?php elseif ($aj['type'] === 'rekomendasi'): ?>
+                                            <span class="badge bg-warning-subtle text-warning px-2.5 py-1">Rekomendasi Kegiatan</span>
+                                        <?php else: ?>
+                                            <span class="badge bg-danger-subtle text-danger px-2.5 py-1">Aduan Masyarakat</span>
                                         <?php endif; ?>
-
-                                        <div class="d-flex gap-1">
-                                            <form action="<?= base_url('admin/proses-pendaftaran/' . $d['id'] . '/approve_bidang') ?>" method="POST" class="flex-grow-1" onsubmit="return confirm('Apakah berkas ormas ini sudah lengkap dan valid?')">
-                                                <?= csrf_field() ?>
-                                                <button type="submit" class="btn btn-sm btn-success w-100 py-1"><i class="fa-solid fa-check me-1"></i> Validasi</button>
-                                            </form>
-                                            <div class="flex-grow-1">
-                                                <button type="button" class="btn btn-sm btn-danger w-100 py-1 btn-tolak-pendaftaran" data-id="<?= $d['id'] ?>" data-nama="<?= esc($d['nama_ormas']) ?>">
-                                                    <i class="fa-solid fa-xmark me-1"></i> Tolak
-                                                </button>
+                                    </td>
+                                    <td class="text-center align-middle text-muted small">
+                                        <?= date('d M Y H:i', strtotime($aj['created_at'])) ?>
+                                    </td>
+                                    <td class="text-center align-middle">
+                                        <?php if ($aj['type'] === 'ormas'): ?>
+                                            <div class="d-flex flex-column align-items-center gap-1">
+                                                <span class="badge bg-light-subtle text-white border border-secondary border-opacity-25 px-2 py-0.5" style="font-size:0.7rem;">
+                                                    <?= esc($aj['status']) ?>
+                                                </span>
+                                                <span class="badge <?= ($aj['progress'] == 100) ? 'bg-success' : (($aj['progress'] >= 75) ? 'bg-primary' : (($aj['progress'] >= 50) ? 'bg-info' : 'bg-warning')) ?>" style="font-size:0.7rem;">
+                                                    Progres: <?= $aj['progress'] ?>%
+                                                </span>
                                             </div>
-                                        </div>
-                                    <?php else: 
-                                        $d = $item['data']; ?>
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <span class="badge bg-warning-subtle text-warning small">Rekomendasi</span>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <span class="small text-muted" style="font-size:0.75rem;">Pending</span>
-                                                <button type="button" class="btn btn-link text-info p-0 btn-detail-tracking" 
-                                                        data-type="rekomendasi"
-                                                        data-id="<?= esc($d['id']) ?>"
-                                                        data-nama="<?= esc($d['pemohon']) ?>"
-                                                        data-kegiatan="<?= esc($d['nama_kegiatan']) ?>"
-                                                        data-deskripsi="<?= esc($d['deskripsi'] ?? '-') ?>"
-                                                        data-status="<?= esc($d['status_rekomendasi']) ?>"
-                                                        data-file="<?= esc($d['file_proposal'] ?? '') ?>" data-mulai="<?= date('d F Y', strtotime($d['tgl_mulai'])) ?>" data-selesai="<?= date('d F Y', strtotime($d['tgl_selesai'])) ?>"
-                                                        data-tte="<?= esc($d['pdf_tte_path'] ?? '') ?>"
-                                                        data-tanggal="<?= date('d F Y H:i:s', strtotime($d['created_at'])) ?>"
-                                                        title="Lihat Detail" style="font-size: 0.85rem; line-height: 1;">
-                                                    <i class="fa-solid fa-circle-info"></i>
-                                                </button>
+                                        <?php elseif ($aj['type'] === 'rekomendasi'): ?>
+                                            <div class="d-flex flex-column align-items-center gap-1">
+                                                <span class="badge <?= ($aj['status'] === 'Approved') ? 'bg-success-subtle text-success' : (($aj['status'] === 'Rejected') ? 'bg-danger-subtle text-danger' : 'bg-warning-subtle text-warning') ?> border px-2 py-0.5" style="font-size:0.7rem;">
+                                                    <?= esc($aj['status']) ?>
+                                                </span>
                                             </div>
-                                        </div>
-                                        <div class="fw-bold text-white mb-1"><?= esc($d['pemohon']) ?></div>
-                                        <p class="small text-muted mb-2"><?= esc($d['nama_kegiatan']) ?></p>
-
-                                        <?php if (!empty($d['file_proposal'])): ?>
-                                            <div class="mb-3">
-                                                <a href="<?= base_url('uploads/rekomendasi/' . $d['file_proposal']) ?>" target="_blank" class="btn btn-sm btn-outline-info w-100 py-1"><i class="fa-solid fa-file-pdf me-1"></i> Buka Proposal</a>
-                                            </div>
+                                        <?php else: ?>
+                                            <span class="badge bg-success-subtle text-success px-2 py-0.5" style="font-size:0.7rem;">Diterima</span>
                                         <?php endif; ?>
-
-                                        <div class="d-flex gap-1">
-                                            <form action="<?= base_url('admin/proses-rekomendasi/' . $d['id'] . '/approve_bidang') ?>" method="POST" class="flex-grow-1" onsubmit="return confirm('Setujui pengajuan rekomendasi ini?')">
-                                                <?= csrf_field() ?>
-                                                <button type="submit" class="btn btn-sm btn-success w-100 py-1"><i class="fa-solid fa-check me-1"></i> Setujui</button>
-                                            </form>
-                                            <form action="<?= base_url('admin/proses-rekomendasi/' . $d['id'] . '/reject') ?>" method="POST" class="flex-grow-1" onsubmit="return confirm('Tolak pengajuan rekomendasi ini?')">
-                                                <?= csrf_field() ?>
-                                                <button type="submit" class="btn btn-sm btn-danger w-100 py-1"><i class="fa-solid fa-xmark me-1"></i> Tolak</button>
-                                            </form>
-                                        </div>
-                                    <?php endif; ?>
-                                </div>
+                                    </td>
+                                    <td class="text-center align-middle">
+                                        <button type="button" class="btn btn-sm btn-info text-white px-3 py-1 btn-detail-tracking" 
+                                                data-type="<?= $aj['type'] ?>"
+                                                data-id="<?= esc($aj['id']) ?>"
+                                                <?php if ($aj['type'] === 'ormas'): 
+                                                    $d = $aj['data']; ?>
+                                                    data-registrasi="<?= esc($d['nomor_registrasi']) ?>"
+                                                    data-nama="<?= esc($d['nama_ormas']) ?>"
+                                                    data-alamat="<?= esc($d['alamat']) ?>"
+                                                    data-email="<?= esc($d['email']) ?>"
+                                                    data-telepon="<?= esc($d['telepon']) ?>"
+                                                    data-status="<?= esc($d['status_verifikasi']) ?>"
+                                                    data-progress="<?= esc($d['progress_percentage']) ?>"
+                                                    data-file="<?= esc($d['file_berkas'] ?? '') ?>" 
+                                                    data-tipe-ormas="<?= esc($d['tipe_ormas'] ?? 'Lokal') ?>"
+                                                    data-sk-kepengurusan="<?= !empty($d['tgl_sk_kepengurusan']) ? date('d F Y', strtotime($d['tgl_sk_kepengurusan'])) : '-' ?>" 
+                                                    data-sk-kedaluwarsa="<?= !empty($d['tgl_sk_kedaluwarsa']) ? date('d F Y', strtotime($d['tgl_sk_kedaluwarsa'])) : '-' ?>"
+                                                    data-tanggal="<?= date('d F Y H:i:s', strtotime($d['created_at'])) ?>"
+                                                <?php elseif ($aj['type'] === 'rekomendasi'): 
+                                                    $d = $aj['data']; ?>
+                                                    data-nama="<?= esc($d['pemohon']) ?>"
+                                                    data-kegiatan="<?= esc($d['nama_kegiatan']) ?>"
+                                                    data-deskripsi="<?= esc($d['deskripsi'] ?? '-') ?>"
+                                                    data-status="<?= esc($d['status_rekomendasi']) ?>"
+                                                    data-file="<?= esc($d['file_proposal'] ?? '') ?>" 
+                                                    data-mulai="<?= date('d F Y', strtotime($d['tgl_mulai'])) ?>" 
+                                                    data-selesai="<?= date('d F Y', strtotime($d['tgl_selesai'])) ?>"
+                                                    data-tte="<?= esc($d['pdf_tte_path'] ?? '') ?>"
+                                                    data-tanggal="<?= date('d F Y H:i:s', strtotime($d['created_at'])) ?>"
+                                                <?php else: 
+                                                    $d = $aj['data']; 
+                                                    $det = json_decode($d['after_data'], true) ?? []; ?>
+                                                    data-nama="Anonim / Pelapor"
+                                                    data-judul="<?= esc($det['judul'] ?? 'Tanpa Judul') ?>"
+                                                    data-kategori="<?= esc($det['kategori'] ?? 'Lainnya') ?>"
+                                                    data-bidang="<?= esc($det['nama_bidang'] ?? 'Umum') ?>"
+                                                    data-deskripsi="<?= esc($det['deskripsi'] ?? '-') ?>"
+                                                    data-file="<?= esc($det['berkas'] ?? '') ?>"
+                                                    data-tanggal="<?= date('d F Y H:i:s', strtotime($d['created_at'])) ?>"
+                                                <?php endif; ?>>
+                                            <i class="fa-solid fa-list-check me-1"></i> Detail / Kelola
+                                        </button>
+                                    </td>
+                                </tr>
                             <?php endforeach; ?>
                         <?php endif; ?>
-                    </div>
-                </div>
-
-                <!-- Column 3: Validasi Bidang -->
-                <div class="col-lg-3">
-                    <h5 class="text-white mb-3 small"><i class="fa-solid fa-circle text-primary me-2"></i>3. VALIDASI BIDANG</h5>
-                    <div class="kanban-col d-flex flex-column gap-3">
-                        <?php if (empty($col3_validasi)): ?>
-                            <div class="text-muted small text-center my-auto">Tidak ada berkas di validasi</div>
-                        <?php else: ?>
-                            <?php foreach ($col3_validasi as $item): ?>
-                                <div class="kanban-card">
-                                    <?php if ($item['type'] === 'ormas'): 
-                                        $d = $item['data']; ?>
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <span class="badge bg-secondary-subtle text-secondary small">Ormas</span>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <span class="small text-success" style="font-size:0.75rem;">Valid</span>
-                                                <button type="button" class="btn btn-link text-info p-0 btn-detail-tracking" 
-                                                        data-type="ormas"
-                                                        data-id="<?= esc($d['id']) ?>"
-                                                        data-registrasi="<?= esc($d['nomor_registrasi']) ?>"
-                                                        data-nama="<?= esc($d['nama_ormas']) ?>"
-                                                        data-alamat="<?= esc($d['alamat']) ?>"
-                                                        data-email="<?= esc($d['email']) ?>"
-                                                        data-telepon="<?= esc($d['telepon']) ?>"
-                                                        data-status="<?= esc($d['status_verifikasi']) ?>"
-                                                        data-progress="<?= esc($d['progress_percentage']) ?>"
-                                                        data-file="<?= esc($d['file_berkas'] ?? '') ?>" data-sk-kepengurusan="<?= !empty($d['tgl_sk_kepengurusan']) ? date('d F Y', strtotime($d['tgl_sk_kepengurusan'])) : '-' ?>" data-sk-kedaluwarsa="<?= !empty($d['tgl_sk_kedaluwarsa']) ? date('d F Y', strtotime($d['tgl_sk_kedaluwarsa'])) : '-' ?>"
-                                                        data-tanggal="<?= date('d F Y H:i:s', strtotime($d['created_at'])) ?>"
-                                                        title="Lihat Detail" style="font-size: 0.85rem; line-height: 1;">
-                                                    <i class="fa-solid fa-circle-info"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="fw-bold text-white mb-1"><?= esc($d['nama_ormas']) ?></div>
-                                        <p class="small text-muted mb-2"><?= esc($d['alamat']) ?></p>
-                                        <div class="mb-3">
-                                            <button type="button" class="btn btn-sm btn-primary w-100 py-1.5 btn-terbitkan-surat" data-id="<?= $d['id'] ?>" data-nama="<?= esc($d['nama_ormas']) ?>">
-                                                <i class="fa-solid fa-file-arrow-up me-1"></i> Terbitkan Surat
-                                            </button>
-                                        </div>
-                                    <?php else: 
-                                        $d = $item['data']; ?>
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <span class="badge bg-warning-subtle text-warning small">Rekomendasi</span>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <span class="small text-success" style="font-size:0.75rem;">Approved</span>
-                                                <button type="button" class="btn btn-link text-info p-0 btn-detail-tracking" 
-                                                        data-type="rekomendasi"
-                                                        data-id="<?= esc($d['id']) ?>"
-                                                        data-nama="<?= esc($d['pemohon']) ?>"
-                                                        data-kegiatan="<?= esc($d['nama_kegiatan']) ?>"
-                                                        data-deskripsi="<?= esc($d['deskripsi'] ?? '-') ?>"
-                                                        data-status="<?= esc($d['status_rekomendasi']) ?>"
-                                                        data-file="<?= esc($d['file_proposal'] ?? '') ?>" data-mulai="<?= date('d F Y', strtotime($d['tgl_mulai'])) ?>" data-selesai="<?= date('d F Y', strtotime($d['tgl_selesai'])) ?>"
-                                                        data-tte="<?= esc($d['pdf_tte_path'] ?? '') ?>"
-                                                        data-tanggal="<?= date('d F Y H:i:s', strtotime($d['created_at'])) ?>"
-                                                        title="Lihat Detail" style="font-size: 0.85rem; line-height: 1;">
-                                                    <i class="fa-solid fa-circle-info"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="fw-bold text-white mb-1"><?= esc($d['pemohon']) ?></div>
-                                        <p class="small text-muted mb-2"><?= esc($d['nama_kegiatan']) ?></p>
-                                        <div class="mb-3">
-                                            <form action="<?= base_url('admin/proses-rekomendasi/' . $d['id'] . '/terbitkan_tte') ?>" method="POST" onsubmit="return confirm('Simulasikan penerbitan TTE untuk surat rekomendasi ini?')">
-                                                <?= csrf_field() ?>
-                                                <button type="submit" class="btn btn-sm btn-primary w-100 py-1.5"><i class="fa-solid fa-signature me-1"></i> Terbitkan TTE</button>
-                                            </form>
-                                        </div>
-                                    <?php endif; ?>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </div>
-                </div>
-
-                <!-- Column 4: Penerbitan Surat Rekomendasi -->
-                <div class="col-lg-3">
-                    <h5 class="text-white mb-3 small"><i class="fa-solid fa-circle text-success me-2"></i>4. PENERBITAN SURAT REKOMENDASI</h5>
-                    <div class="kanban-col d-flex flex-column gap-3">
-                        <?php if (empty($col4_tte)): ?>
-                            <div class="text-muted small text-center my-auto">Belum ada Surat terbit</div>
-                        <?php else: ?>
-                            <?php foreach ($col4_tte as $item): ?>
-                                <div class="kanban-card">
-                                    <?php if ($item['type'] === 'ormas'): 
-                                        $d = $item['data']; ?>
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <span class="badge bg-secondary-subtle text-secondary small">Ormas</span>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <span class="small text-success" style="font-size:0.75rem;"><i class="fa-solid fa-check-double"></i> Selesai</span>
-                                                <button type="button" class="btn btn-link text-info p-0 btn-detail-tracking" 
-                                                        data-type="ormas"
-                                                        data-id="<?= esc($d['id']) ?>"
-                                                        data-registrasi="<?= esc($d['nomor_registrasi']) ?>"
-                                                        data-nama="<?= esc($d['nama_ormas']) ?>"
-                                                        data-alamat="<?= esc($d['alamat']) ?>"
-                                                        data-email="<?= esc($d['email']) ?>"
-                                                        data-telepon="<?= esc($d['telepon']) ?>"
-                                                        data-status="<?= esc($d['status_verifikasi']) ?>"
-                                                        data-progress="<?= esc($d['progress_percentage']) ?>"
-                                                        data-file="<?= esc($d['file_berkas'] ?? '') ?>" data-sk-kepengurusan="<?= !empty($d['tgl_sk_kepengurusan']) ? date('d F Y', strtotime($d['tgl_sk_kepengurusan'])) : '-' ?>" data-sk-kedaluwarsa="<?= !empty($d['tgl_sk_kedaluwarsa']) ? date('d F Y', strtotime($d['tgl_sk_kedaluwarsa'])) : '-' ?>"
-                                                        data-tanggal="<?= date('d F Y H:i:s', strtotime($d['created_at'])) ?>"
-                                                        title="Lihat Detail" style="font-size: 0.85rem; line-height: 1;">
-                                                    <i class="fa-solid fa-circle-info"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="fw-bold text-white mb-1"><?= esc($d['nama_ormas']) ?></div>
-                                        <p class="small text-muted mb-2"><?= esc($d['alamat']) ?></p>
-                                        <div class="text-success small mb-2"><i class="fa-solid fa-circle-check me-1"></i> Registrasi Terverifikasi & Surat Terbit</div>
-                                        <?php if (!empty($d['pdf_tte_path'])): ?>
-                                             <a href="<?= base_url('uploads/rekomendasi_ormas/' . $d['pdf_tte_path']) ?>" target="_blank" class="btn btn-sm btn-outline-info w-100 py-1.5 mt-1 mb-2 text-center text-decoration-none d-block">
-                                                 <i class="fa-solid fa-download me-1"></i> Unduh Surat Rekomendasi
-                                             </a>
-                                        <?php endif; ?>
-                                        <div class="d-flex justify-content-end mt-2 pt-2 border-top border-secondary border-opacity-25">
-                                            <form action="<?= base_url('admin/delete-pendaftaran/' . $d['id']) ?>" method="POST" onsubmit="return confirm('Hapus berkas pendaftaran Ormas ini secara permanen?')">
-                                                <?= csrf_field() ?>
-                                                <button type="submit" class="btn btn-sm btn-outline-danger px-2 py-0.5" style="font-size: 0.75rem;"><i class="fa-solid fa-trash"></i> Hapus</button>
-                                            </form>
-                                        </div>
-                                    <?php else: 
-                                        $d = $item['data']; ?>
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <span class="badge bg-warning-subtle text-warning small">Rekomendasi</span>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <span class="small text-info" style="font-size:0.75rem;"><i class="fa-solid fa-signature"></i> BSrE</span>
-                                                <button type="button" class="btn btn-link text-info p-0 btn-detail-tracking" 
-                                                        data-type="rekomendasi"
-                                                        data-id="<?= esc($d['id']) ?>"
-                                                        data-nama="<?= esc($d['pemohon']) ?>"
-                                                        data-kegiatan="<?= esc($d['nama_kegiatan']) ?>"
-                                                        data-deskripsi="<?= esc($d['deskripsi'] ?? '-') ?>"
-                                                        data-status="<?= esc($d['status_rekomendasi']) ?>"
-                                                        data-file="<?= esc($d['file_proposal'] ?? '') ?>" data-mulai="<?= date('d F Y', strtotime($d['tgl_mulai'])) ?>" data-selesai="<?= date('d F Y', strtotime($d['tgl_selesai'])) ?>"
-                                                        data-tte="<?= esc($d['pdf_tte_path'] ?? '') ?>"
-                                                        data-tanggal="<?= date('d F Y H:i:s', strtotime($d['created_at'])) ?>"
-                                                        title="Lihat Detail" style="font-size: 0.85rem; line-height: 1;">
-                                                    <i class="fa-solid fa-circle-info"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="fw-bold text-white mb-1"><?= esc($d['pemohon']) ?></div>
-                                        <p class="small text-muted mb-2"><?= esc($d['nama_kegiatan']) ?></p>
-                                        <div class="d-flex gap-1 mt-2 pt-2 border-top border-secondary border-opacity-25">
-                                            <a href="<?= site_url('layanan/cetak-rekomendasi/' . $d['id']) ?>" target="_blank" class="btn btn-sm btn-success flex-grow-1 py-1" style="font-size: 0.75rem;"><i class="fa-solid fa-print me-1"></i> Cetak Surat TTE</a>
-                                            <form action="<?= base_url('admin/delete-rekomendasi/' . $d['id']) ?>" method="POST" onsubmit="return confirm('Hapus berkas rekomendasi kegiatan ini secara permanen?')" class="d-inline">
-                                                <?= csrf_field() ?>
-                                                <button type="submit" class="btn btn-sm btn-outline-danger px-2 py-1" style="font-size: 0.75rem;"><i class="fa-solid fa-trash"></i> Hapus</button>
-                                            </form>
-                                        </div>
-                                    <?php endif; ?>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </div>
-                </div>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -1597,6 +1404,56 @@
                         </tbody>
                     </table>
                 </div>
+                <!-- Detail Kelengkapan Berkas (Point-by-Point JSON Table) -->
+                <div id="container-dt-checklist-table" class="mt-4 d-none">
+                    <h6 class="text-white small fw-bold mb-3"><i class="fa-solid fa-list-check text-warning me-2"></i>Validasi Kelengkapan Dokumen</h6>
+                    <div class="table-responsive">
+                        <table class="table table-custom mb-0 text-white" style="font-size: 0.85rem;">
+                            <thead>
+                                <tr style="background: rgba(255, 255, 255, 0.02);">
+                                    <th class="text-center" style="width: 5%;">#</th>
+                                    <th style="width: 35%;">Jenis Dokumen</th>
+                                    <th class="text-center" style="width: 15%;">Status</th>
+                                    <th class="text-center" style="width: 15%;">Tanda Tangan</th>
+                                    <th class="text-center" style="width: 15%;">Keterangan</th>
+                                    <th class="text-center" style="width: 15%;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dt-checklist-table-body">
+                                <!-- Populated dynamically by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Interactive Progress Checklist (Only for Pendaftaran Ormas) -->
+                <div id="container-dt-progress-checklist" class="mt-4 d-none">
+                    <h6 class="text-white small fw-bold mb-3"><i class="fa-solid fa-route text-info me-2"></i>Update Progres Alur Layanan (Checklist)</h6>
+                    <div class="d-flex flex-column gap-2.5 p-3 rounded border border-secondary border-opacity-25" style="background: rgba(255, 255, 255, 0.02);">
+                        <div class="form-check mb-0">
+                            <input class="form-check-input progress-checkbox" type="checkbox" id="modal-step1" data-id="" data-value="25" onclick="updateTrackingProgress(this)">
+                            <label class="form-check-label text-white small" style="cursor:pointer;" for="modal-step1">1. Verifikasi Berkas (25%)</label>
+                        </div>
+                        <div class="form-check mb-0">
+                            <input class="form-check-input progress-checkbox" type="checkbox" id="modal-step2" data-id="" data-value="50" onclick="updateTrackingProgress(this)">
+                            <label class="form-check-label text-white small" style="cursor:pointer;" for="modal-step2">2. Ke Kemendagri (50%)</label>
+                        </div>
+                        <div class="form-check mb-0">
+                            <input class="form-check-input progress-checkbox" type="checkbox" id="modal-step3" data-id="" data-value="75" onclick="updateTrackingProgress(this)">
+                            <label class="form-check-label text-white small" style="cursor:pointer;" for="modal-step3">3. Validasi Bidang (75%)</label>
+                        </div>
+                        <div class="form-check mb-0">
+                            <input class="form-check-input progress-checkbox" type="checkbox" id="modal-step4" data-id="" data-value="100" onclick="updateTrackingProgress(this)">
+                            <label class="form-check-label text-white small" style="cursor:pointer;" for="modal-step4">4. Selesai / TTE (100%)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons Container -->
+                <div id="container-dt-actions" class="mt-4 pt-3 border-top border-secondary border-opacity-25 d-flex gap-2 flex-wrap justify-content-end">
+                    <!-- Dynamic action buttons populated by JS -->
+                </div>
+
                 <div class="d-flex justify-content-end mt-4">
                     <button type="button" class="btn btn-secondary text-white px-4" data-bs-dismiss="modal">Tutup</button>
                 </div>
@@ -2316,11 +2173,26 @@ document.addEventListener('DOMContentLoaded', function() {
     const modalDetailTrackingEl = document.getElementById('modalDetailTracking');
     const modalDetailTracking = new bootstrap.Modal(modalDetailTrackingEl);
     
+    // Refresh page when closing detail tracking modal to sync changes
+    let progressUpdated = false;
+    modalDetailTrackingEl.addEventListener('hidden.bs.modal', function () {
+        if (progressUpdated) {
+            location.reload();
+        }
+    });
+
     document.querySelectorAll('.btn-detail-tracking').forEach(btn => {
         btn.addEventListener('click', function() {
             const type = this.getAttribute('data-type');
+            const id = this.getAttribute('data-id');
+            const nama = this.getAttribute('data-nama') || '';
             
-            // Clean up rows
+            progressUpdated = false;
+
+            // Reset labels and clean up rows
+            document.querySelector('#row-dt-kegiatan th').innerText = 'Nama / Tema Kegiatan';
+            document.querySelector('#row-dt-deskripsi th').innerText = 'Deskripsi Kegiatan';
+
             document.getElementById('row-dt-registrasi').classList.remove('d-none');
             document.getElementById('row-dt-kegiatan').classList.remove('d-none');
             document.getElementById('row-dt-waktu').classList.remove('d-none');
@@ -2332,17 +2204,34 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('row-dt-progress').classList.remove('d-none');
             document.getElementById('row-dt-file').classList.remove('d-none');
             document.getElementById('row-dt-tte').classList.remove('d-none');
+            
+            // Hide containers by default
+            document.getElementById('container-dt-checklist-table').classList.add('d-none');
+            document.getElementById('container-dt-progress-checklist').classList.add('d-none');
+            
+            const actionsContainer = document.getElementById('container-dt-actions');
+            actionsContainer.innerHTML = '';
 
             if (type === 'ormas') {
+                const reg = this.getAttribute('data-registrasi');
+                const alamat = this.getAttribute('data-alamat');
+                const email = this.getAttribute('data-email');
+                const telepon = this.getAttribute('data-telepon');
+                const status = this.getAttribute('data-status');
+                const progress = parseInt(this.getAttribute('data-progress') || '0');
+                const tanggal = this.getAttribute('data-tanggal');
+                const tipeOrmas = this.getAttribute('data-tipe-ormas') || 'Lokal';
+                const file = this.getAttribute('data-file');
+
                 document.getElementById('dt-layanan').innerText = 'Pendaftaran Ormas / LSM';
-                document.getElementById('dt-registrasi').innerText = this.getAttribute('data-registrasi');
-                document.getElementById('dt-nama').innerText = this.getAttribute('data-nama');
-                document.getElementById('dt-alamat').innerText = this.getAttribute('data-alamat');
-                document.getElementById('dt-email').innerText = this.getAttribute('data-email');
-                document.getElementById('dt-telepon').innerText = this.getAttribute('data-telepon');
-                document.getElementById('dt-status').innerHTML = `<span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1 rounded-pill">${this.getAttribute('data-status')}</span>`;
-                document.getElementById('dt-progress').innerText = this.getAttribute('data-progress') + '%';
-                document.getElementById('dt-tanggal').innerText = this.getAttribute('data-tanggal');
+                document.getElementById('dt-registrasi').innerText = reg;
+                document.getElementById('dt-nama').innerText = nama;
+                document.getElementById('dt-alamat').innerText = alamat;
+                document.getElementById('dt-email').innerText = email;
+                document.getElementById('dt-telepon').innerText = telepon;
+                document.getElementById('dt-status').innerHTML = `<span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1 rounded-pill">${status}</span>`;
+                document.getElementById('dt-progress').innerText = progress + '%';
+                document.getElementById('dt-tanggal').innerText = tanggal;
                 
                 const skMulai = this.getAttribute('data-sk-kepengurusan') || '-';
                 const skExp = this.getAttribute('data-sk-kedaluwarsa') || '-';
@@ -2355,23 +2244,123 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('row-dt-tte').classList.add('d-none');
 
                 const fileName = this.getAttribute('data-file');
-                if (fileName) {
+                if (fileName && !fileName.trim().startsWith('{')) {
                     document.getElementById('dt-file').innerHTML = `<a href="<?= base_url('uploads/ormas/') ?>/${fileName}" target="_blank" class="btn btn-sm btn-outline-info"><i class="fa-solid fa-file-pdf me-1"></i> Buka Berkas Pendaftaran</a>`;
                 } else {
-                    document.getElementById('dt-file').innerText = 'Tidak ada berkas diunggah';
+                    document.getElementById('dt-file').innerText = 'Tidak ada berkas tunggal';
                 }
-            } else {
+
+                // Show dynamic checklist table
+                const checklistContainer = document.getElementById('container-dt-checklist-table');
+                checklistContainer.classList.remove('d-none');
+                
+                const checklistBody = document.getElementById('dt-checklist-table-body');
+                checklistBody.innerHTML = '';
+
+                const activeReqs = tipeOrmas === 'Lokal' ? globalRequirementsLokal : globalRequirementsBerjenjang;
+                
+                let filesList = {};
+                try {
+                    if (file && file.trim().startsWith('{')) {
+                        filesList = JSON.parse(file);
+                    }
+                } catch (e) {
+                    console.error("Gagal parse berkas JSON", e);
+                }
+
+                activeReqs.forEach((req, idx) => {
+                    const fileIdx = idx + 1;
+                    const exist = filesList[fileIdx] || null;
+
+                    let statusBadge = `<span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 small"><i class="fa-solid fa-circle-xmark me-1"></i> Belum Ada</span>`;
+                    let tteBadge = req.tte ? `<span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-0.5" style="font-size: 0.72rem;"><i class="fa-solid fa-signature me-1"></i> TTE</span>` : `<span class="badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25 px-2 py-0.5" style="font-size: 0.72rem;">Non TTE</span>`;
+                    let keterangan = exist ? `Size: ${exist.size}` : '-';
+                    let actionCol = exist ? `<a href="<?= base_url('uploads/ormas/') ?>/${exist.filename}" target="_blank" class="btn btn-sm btn-info text-white px-2 py-1"><i class="fa-solid fa-circle-info"></i></a>` : '-';
+
+                    if (exist) {
+                        statusBadge = `<span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 small"><i class="fa-solid fa-circle-check me-1"></i> Ada</span>`;
+                    }
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="text-center align-middle">${fileIdx}</td>
+                        <td class="align-middle">
+                            <div class="fw-bold text-white small">${req.name}</div>
+                            <div class="text-muted" style="font-size: 0.72rem;">${req.desc}</div>
+                        </td>
+                        <td class="text-center align-middle">${statusBadge}</td>
+                        <td class="text-center align-middle">${tteBadge}</td>
+                        <td class="text-center align-middle text-muted small">${keterangan}</td>
+                        <td class="text-center align-middle">${actionCol}</td>
+                    `;
+                    checklistBody.appendChild(tr);
+                });
+
+                // Show and update progress checklist checkboxes in modal
+                document.getElementById('container-dt-progress-checklist').classList.remove('d-none');
+                const mStep1 = document.getElementById('modal-step1');
+                const mStep2 = document.getElementById('modal-step2');
+                const mStep3 = document.getElementById('modal-step3');
+                const mStep4 = document.getElementById('modal-step4');
+
+                // Assign id
+                mStep1.setAttribute('data-id', id);
+                mStep2.setAttribute('data-id', id);
+                mStep3.setAttribute('data-id', id);
+                mStep4.setAttribute('data-id', id);
+
+                mStep1.checked = progress >= 25;
+                mStep2.checked = progress >= 50;
+                mStep3.checked = progress >= 75;
+                mStep4.checked = progress == 100;
+
+                // Action buttons for ormas
+                let actionHtml = '';
+                if (status === 'Pending') {
+                    actionHtml += `
+                        <button type="button" class="btn btn-warning text-dark fw-bold" onclick="triggerVerifikasiModal('${id}', '${nama.replace(/'/g, "\\'")}', '${tipeOrmas}', '${(file || '').replace(/'/g, "\\'")}')">
+                            <i class="fa-solid fa-list-check me-1"></i> Verifikasi Berkas
+                        </button>
+                        <button type="button" class="btn btn-danger text-white fw-bold" onclick="triggerTolakModal('${id}', '${nama.replace(/'/g, "\\'")}')">
+                            <i class="fa-solid fa-circle-xmark me-1"></i> Tolak Pendaftaran
+                        </button>
+                    `;
+                } else if (status === 'Approved' && progress < 100) {
+                    actionHtml += `
+                        <button type="button" class="btn btn-primary text-white fw-bold" onclick="triggerTerbitkanModal('${id}', '${nama.replace(/'/g, "\\'")}')">
+                            <i class="fa-solid fa-file-arrow-up me-1"></i> Terbitkan Surat
+                        </button>
+                    `;
+                }
+
+                // Delete button
+                actionHtml += `
+                    <form action="<?= base_url('admin/delete-pendaftaran') ?>/${id}" method="POST" onsubmit="return confirm('Hapus berkas pendaftaran Ormas ini secara permanen?')" class="d-inline">
+                        <?= csrf_field() ?>
+                        <button type="submit" class="btn btn-outline-danger"><i class="fa-solid fa-trash me-1"></i> Hapus Permanen</button>
+                    </form>
+                `;
+                actionsContainer.innerHTML = actionHtml;
+
+            } else if (type === 'rekomendasi') {
+                const kegiatan = this.getAttribute('data-kegiatan');
+                const deskripsi = this.getAttribute('data-deskripsi');
+                const status = this.getAttribute('data-status');
+                const tanggal = this.getAttribute('data-tanggal');
+                const proposalName = this.getAttribute('data-file');
+                const ttePath = this.getAttribute('data-tte');
+
                 document.getElementById('dt-layanan').innerText = 'Rekomendasi Kegiatan';
-                document.getElementById('dt-nama').innerText = this.getAttribute('data-nama');
-                document.getElementById('dt-kegiatan').innerText = this.getAttribute('data-kegiatan');
+                document.getElementById('dt-nama').innerText = nama;
+                document.getElementById('dt-kegiatan').innerText = kegiatan;
                 
                 const tglMulai = this.getAttribute('data-mulai') || '-';
                 const tglSelesai = this.getAttribute('data-selesai') || '-';
                 document.getElementById('dt-waktu').innerText = `${tglMulai} s/d ${tglSelesai}`;
 
-                document.getElementById('dt-deskripsi').innerText = this.getAttribute('data-deskripsi');
-                document.getElementById('dt-status').innerHTML = `<span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2.5 py-1 rounded-pill">${this.getAttribute('data-status')}</span>`;
-                document.getElementById('dt-tanggal').innerText = this.getAttribute('data-tanggal');
+                document.getElementById('dt-deskripsi').innerText = deskripsi;
+                document.getElementById('dt-status').innerHTML = `<span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2.5 py-1 rounded-pill">${status}</span>`;
+                document.getElementById('dt-tanggal').innerText = tanggal;
 
                 // Hide unused rows
                 document.getElementById('row-dt-registrasi').classList.add('d-none');
@@ -2381,38 +2370,260 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('row-dt-telepon').classList.add('d-none');
                 document.getElementById('row-dt-progress').classList.add('d-none');
 
-                const proposalName = this.getAttribute('data-file');
                 if (proposalName) {
                     document.getElementById('dt-file').innerHTML = `<a href="<?= base_url('uploads/rekomendasi/') ?>/${proposalName}" target="_blank" class="btn btn-sm btn-outline-info"><i class="fa-solid fa-file-pdf me-1"></i> Buka Proposal</a>`;
                 } else {
                     document.getElementById('dt-file').innerText = 'Tidak ada berkas diunggah';
                 }
 
-                const ttePath = this.getAttribute('data-tte');
                 if (ttePath) {
                     document.getElementById('dt-tte').innerHTML = `<a href="<?= base_url() ?>/${ttePath}" target="_blank" class="btn btn-sm btn-outline-success"><i class="fa-solid fa-print me-1"></i> Cetak Surat TTE Resmi</a>`;
                 } else {
                     document.getElementById('dt-tte').innerText = 'Belum diterbitkan TTE';
                 }
+
+                // Action buttons for Rekomendasi
+                let actionHtml = '';
+                if (status === 'Pending') {
+                    actionHtml += `
+                        <form action="<?= base_url('admin/proses-rekomendasi') ?>/${id}/approve_bidang" method="POST" onsubmit="return confirm('Setujui pengajuan rekomendasi ini?')" class="d-inline">
+                            <?= csrf_field() ?>
+                            <button type="submit" class="btn btn-success text-white fw-bold"><i class="fa-solid fa-check me-1"></i> Setujui Rekomendasi</button>
+                        </form>
+                        <form action="<?= base_url('admin/proses-rekomendasi') ?>/${id}/reject" method="POST" onsubmit="return confirm('Tolak pengajuan rekomendasi ini?')" class="d-inline">
+                            <?= csrf_field() ?>
+                            <button type="submit" class="btn btn-danger text-white fw-bold"><i class="fa-solid fa-xmark me-1"></i> Tolak</button>
+                        </form>
+                    `;
+                } else if (status === 'Approved' && !ttePath) {
+                    actionHtml += `
+                        <form action="<?= base_url('admin/proses-rekomendasi') ?>/${id}/terbitkan_tte" method="POST" onsubmit="return confirm('Simulasikan penerbitan TTE untuk surat rekomendasi ini?')" class="d-inline">
+                            <?= csrf_field() ?>
+                            <button type="submit" class="btn btn-primary text-white fw-bold"><i class="fa-solid fa-signature me-1"></i> Terbitkan TTE</button>
+                        </form>
+                    `;
+                }
+
+                // Delete button
+                actionHtml += `
+                    <form action="<?= base_url('admin/delete-rekomendasi') ?>/${id}" method="POST" onsubmit="return confirm('Hapus berkas rekomendasi kegiatan ini secara permanen?')" class="d-inline">
+                        <?= csrf_field() ?>
+                        <button type="submit" class="btn btn-outline-danger"><i class="fa-solid fa-trash me-1"></i> Hapus Permanen</button>
+                    </form>
+                `;
+                actionsContainer.innerHTML = actionHtml;
+
+            } else if (type === 'aduan') {
+                const judul = this.getAttribute('data-judul');
+                const kategori = this.getAttribute('data-kategori');
+                const bidang = this.getAttribute('data-bidang');
+                const deskripsi = this.getAttribute('data-deskripsi');
+                const file = this.getAttribute('data-file');
+                const tanggal = this.getAttribute('data-tanggal');
+
+                document.getElementById('dt-layanan').innerText = 'Aduan Masyarakat (Anonim)';
+                document.getElementById('dt-nama').innerText = nama;
+                document.getElementById('dt-kegiatan').innerText = judul;
+                
+                // Hide unused rows
+                document.getElementById('row-dt-registrasi').classList.add('d-none');
+                document.getElementById('row-dt-waktu').classList.add('d-none');
+                document.getElementById('row-dt-sk-periode').classList.add('d-none');
+                document.getElementById('row-dt-alamat').classList.add('d-none');
+                document.getElementById('row-dt-email').classList.add('d-none');
+                document.getElementById('row-dt-telepon').classList.add('d-none');
+                document.getElementById('row-dt-progress').classList.add('d-none');
+                document.getElementById('row-dt-tte').classList.add('d-none');
+
+                // Customize labels for complaints
+                document.querySelector('#row-dt-kegiatan th').innerText = 'Judul Aduan';
+                document.querySelector('#row-dt-deskripsi th').innerText = 'Isi Laporan / Deskripsi';
+
+                document.getElementById('dt-deskripsi').innerText = deskripsi;
+                document.getElementById('dt-status').innerHTML = `<span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2.5 py-1 rounded-pill">Diterima</span>`;
+                document.getElementById('dt-tanggal').innerText = tanggal;
+
+                if (file) {
+                    document.getElementById('dt-file').innerHTML = `<a href="<?= base_url('uploads/pengaduan/') ?>/${file}" target="_blank" class="btn btn-sm btn-outline-info"><i class="fa-solid fa-file-pdf me-1"></i> Buka File Bukti</a>`;
+                } else {
+                    document.getElementById('dt-file').innerText = 'Tidak ada file lampiran';
+                }
+
+                // Action buttons for Aduan
+                let actionHtml = '';
+                if (file) {
+                    actionHtml += `
+                        <form action="<?= base_url('admin/delete-file-pengaduan') ?>/${id}" method="POST" onsubmit="return confirm('Hapus file bukti pengaduan ini?')" class="d-inline">
+                            <?= csrf_field() ?>
+                            <button type="submit" class="btn btn-warning text-dark fw-bold"><i class="fa-solid fa-trash-can me-1"></i> Hapus File Bukti</button>
+                        </form>
+                    `;
+                }
+                actionHtml += `
+                    <form action="<?= base_url('admin/delete-pengaduan') ?>/${id}" method="POST" onsubmit="return confirm('Hapus laporan pengaduan ini secara permanen?')" class="d-inline">
+                        <?= csrf_field() ?>
+                        <button type="submit" class="btn btn-outline-danger"><i class="fa-solid fa-trash me-1"></i> Hapus Aduan</button>
+                    </form>
+                `;
+                actionsContainer.innerHTML = actionHtml;
             }
             
             modalDetailTracking.show();
         });
     });
 
+    // Helper functions to trigger verification/rejection/issuance modals from details modal
+    window.triggerVerifikasiModal = function(id, nama, tipe, file) {
+        modalDetailTracking.hide();
+        setTimeout(() => {
+            window.openVerifikasiModal({
+                getAttribute: function(attr) {
+                    if (attr === 'data-id') return id;
+                    if (attr === 'data-nama') return nama;
+                    if (attr === 'data-tipe-ormas') return tipe;
+                    if (attr === 'data-file') return file;
+                    return '';
+                }
+            });
+        }, 350);
+    };
+
+    window.triggerTolakModal = function(id, nama) {
+        modalDetailTracking.hide();
+        setTimeout(() => {
+            window.openTolakModal({
+                getAttribute: function(attr) {
+                    if (attr === 'data-id') return id;
+                    if (attr === 'data-nama') return nama;
+                    return '';
+                }
+            });
+        }, 350);
+    };
+
+    window.triggerTerbitkanModal = function(id, nama) {
+        modalDetailTracking.hide();
+        setTimeout(() => {
+            window.openTerbitkanModal({
+                getAttribute: function(attr) {
+                    if (attr === 'data-id') return id;
+                    if (attr === 'data-nama') return nama;
+                    return '';
+                }
+            });
+        }, 350);
+    };
+
+    // Filter function for unified tracking table
+    window.filterTrackingTable = function(type, btn) {
+        const filterButtons = document.querySelectorAll('[id^="btn-filter-"]');
+        filterButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const rows = document.querySelectorAll('.tracking-row');
+        let index = 1;
+        rows.forEach(row => {
+            const rowType = row.getAttribute('data-type');
+            if (type === 'all' || rowType === type) {
+                row.classList.remove('d-none');
+                row.querySelector('td:first-child').innerText = index++;
+            } else {
+                row.classList.add('d-none');
+            }
+        });
+    };
+
+    // Update progress through checkboxes
+    let currentCsrfHash = '<?= csrf_hash() ?>';
+    
+    window.updateTrackingProgress = function(checkbox) {
+        const id = checkbox.getAttribute('data-id');
+        const checked = checkbox.checked;
+        const clickedVal = parseInt(checkbox.getAttribute('data-value'));
+
+        let newVal = 0;
+        if (checked) {
+            newVal = clickedVal;
+        } else {
+            if (clickedVal === 100) newVal = 75;
+            else if (clickedVal === 75) newVal = 50;
+            else if (clickedVal === 50) newVal = 25;
+            else if (clickedVal === 25) newVal = 0;
+        }
+
+        // Optimistically update checkbox UI in modal
+        const chk1 = document.getElementById('modal-step1');
+        const chk2 = document.getElementById('modal-step2');
+        const chk3 = document.getElementById('modal-step3');
+        const chk4 = document.getElementById('modal-step4');
+
+        if (chk1) chk1.checked = newVal >= 25;
+        if (chk2) chk2.checked = newVal >= 50;
+        if (chk3) chk3.checked = newVal >= 75;
+        if (chk4) chk4.checked = newVal == 100;
+
+        // Disable modal elements during fetch
+        const checkboxes = [chk1, chk2, chk3, chk4];
+        checkboxes.forEach(c => { if(c) c.disabled = true; });
+
+        fetch('<?= base_url('admin/update-progress') ?>', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': currentCsrfHash
+            },
+            body: JSON.stringify({
+                id: id,
+                progress: newVal
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            checkboxes.forEach(c => { if(c) c.disabled = false; });
+            if (data.status) {
+                if (data.csrf_hash) {
+                    currentCsrfHash = data.csrf_hash;
+                }
+                
+                window.showToast(data.message, 'success');
+                progressUpdated = true;
+
+                // Update details progress text
+                const dtProgress = document.getElementById('dt-progress');
+                if (dtProgress) {
+                    dtProgress.innerText = newVal + '%';
+                }
+            } else {
+                window.showToast(data.message, 'error');
+                setTimeout(() => location.reload(), 1500);
+            }
+        })
+        .catch(error => {
+            checkboxes.forEach(c => { if(c) c.disabled = false; });
+            console.error('Error updating progress:', error);
+            window.showToast('Terjadi kesalahan koneksi.', 'danger');
+            setTimeout(() => location.reload(), 1500);
+        });
+    };
+
     // Rejection Modal JS Hook
     const btnTolakList = document.querySelectorAll('.btn-tolak-pendaftaran');
     const modalTolakEl = document.getElementById('modalTolakPendaftaran');
     if (modalTolakEl) {
         const modalTolak = new bootstrap.Modal(modalTolakEl);
+        
+        window.openTolakModal = function(btn) {
+            const id = btn.getAttribute('data-id');
+            const nama = btn.getAttribute('data-nama');
+            document.getElementById('tolak_pendaftaran_nama').innerText = nama;
+            document.getElementById('formTolakPendaftaran').action = `<?= base_url('admin/proses-pendaftaran') ?>/${id}/reject`;
+            document.getElementById('alasan_ditolak').value = '';
+            modalTolak.show();
+        };
+
         btnTolakList.forEach(btn => {
             btn.addEventListener('click', function() {
-                const id = this.getAttribute('data-id');
-                const nama = this.getAttribute('data-nama');
-                document.getElementById('tolak_pendaftaran_nama').innerText = nama;
-                document.getElementById('formTolakPendaftaran').action = `<?= base_url('admin/proses-pendaftaran') ?>/${id}/reject`;
-                document.getElementById('alasan_ditolak').value = '';
-                modalTolak.show();
+                window.openTolakModal(this);
             });
         });
     }
@@ -2422,14 +2633,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const modalTerbitkanEl = document.getElementById('modalTerbitkanSuratPendaftaran');
     if (modalTerbitkanEl) {
         const modalTerbitkan = new bootstrap.Modal(modalTerbitkanEl);
+
+        window.openTerbitkanModal = function(btn) {
+            const id = btn.getAttribute('data-id');
+            const nama = btn.getAttribute('data-nama');
+            document.getElementById('terbitkan_pendaftaran_nama').innerText = nama;
+            document.getElementById('formTerbitkanSuratPendaftaran').action = `<?= base_url('admin/proses-pendaftaran') ?>/${id}/terbitkan_tte`;
+            document.getElementById('berkas_rekomendasi').value = '';
+            modalTerbitkan.show();
+        };
+
         btnTerbitkanList.forEach(btn => {
             btn.addEventListener('click', function() {
-                const id = this.getAttribute('data-id');
-                const nama = this.getAttribute('data-nama');
-                document.getElementById('terbitkan_pendaftaran_nama').innerText = nama;
-                document.getElementById('formTerbitkanSuratPendaftaran').action = `<?= base_url('admin/proses-pendaftaran') ?>/${id}/terbitkan_tte`;
-                document.getElementById('berkas_rekomendasi').value = '';
-                modalTerbitkan.show();
+                window.openTerbitkanModal(this);
             });
         });
     }

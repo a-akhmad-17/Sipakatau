@@ -1,5 +1,44 @@
 # RELEASE NOTES - SIPAKATAU
 
+## [v2.9.3] - 2026-07-07
+### ✨ Added
+- **Tabel Pelacakan Terpadu & Filter Ajuan**: Mengganti tampilan Kanban board pada tab pelacakan progres berkas admin (`#tab-tracking`) menjadi sebuah tabel utama tunggal terpadu yang menampilkan seluruh pengajuan (Pendaftaran Ormas, Rekomendasi Kegiatan, dan Aduan Masyarakat) yang berurutan secara dinamis berdasarkan tanggal masuk. Ditambahkan pula tombol filter tipe ajuan di bagian atas tabel untuk menyaring data secara dinamis (Semua, Ormas, Rekomendasi, Aduan).
+- **Modal Detail & Checklist Alur Layanan Terpusat**: Memindahkan kontrol checklist alur progres interaktif (25% s/d 100%), verifikasi berkas persyaratan ormas, dan tombol aksi alur kerja (seperti Verifikasi Berkas, Setujui Rekomendasi, Terbitkan Surat/TTE, Tolak, serta Hapus Permanen) ke dalam modal detail terpusat yang menyesuaikan opsi kontrol berdasarkan tipe ajuan.
+- **Sinkronisasi Otomatis**: Menambahkan pendeteksi perubahan progres pada modal detail agar otomatis melakukan reload halaman ketika modal ditutup hanya jika admin telah melakukan pembaruan progres, menjaga agar data tabel utama tetap sinkron.
+
+---
+
+## [v2.9.2] - 2026-07-07
+### ✨ Added
+- **Tampilan Tabel & Checklist Progres Pelacakan**: Menambahkan toggle tampilan (Kanban vs Tabel & Checklist) pada tab pelacakan progres berkas admin (`#tab-tracking`).
+- **Pemeriksaan Dokumen Pengguna Terintegrasi**: Menyediakan tabel dropdown "Lihat Dokumen" pada setiap baris ormas untuk melihat daftar lengkap berkas yang dikirim pengguna beserta tombol untuk membuka langsung berkas PDF, serupa dengan halaman kelengkapan dokumen pengguna.
+- **Checklist Alur Progres Real-Time (AJAX)**: Menambahkan form checklist alur progres interaktif (Verifikasi Berkas 25%, Ke Kemendagri 50%, Validasi Bidang 75%, Selesai 100%). Menandai/mengubah status checklist otomatis mengirimkan request AJAX (Fetch API) yang memperbarui kolom `progress_percentage` dan `status_verifikasi` di database serta menyinkronkan data langsung ke halaman pengguna dengan proteksi CSRF.
+
+---
+
+## [v2.9.1] - 2026-07-06
+### 🔄 Changed
+- **Tampilan Board Kanban Tracking Berkas Rapi**: Merapikan tata letak tombol aksi di kolom Verifikasi Berkas (Column 2) menggunakan grid Bootstrap `row g-2` dan membagi ukuran tombol "Verifikasi" & "Tolak" secara merata (`col-6`) untuk mencegah wrap/tumpang tindih yang merusak fungsionalitas klik.
+- **Pembersihan Link Buka Berkas JSON**: Menyembunyikan tombol "Buka Berkas" pada kartu kanban ormas jika tipe file berupa JSON split-upload untuk menghindari broken link 404.
+
+### 🐛 Fixed
+- **Keamanan Script getCoordinates**: Mencegah script error yang dapat menghentikan eksekusi JS pada halaman dashboard admin dengan melakukan pengecekan null/undefined dan casting string pada parameter id di fungsi `getCoordinates`.
+
+---
+
+## [v2.9.0] - 2026-07-06
+### ✨ Added
+- **Konfigurasi Piket & TTE Srikandi**: Menambahkan panel konfigurasi nomor HP petugas piket aktif (WhatsApp) serta nama & NIP pejabat penandatangan TTE Srikandi di Pengaturan Visi, Misi & Portal. Perubahan nomor HP petugas piket langsung memengaruhi tautan WhatsApp secara dinamis pada footer halaman publik.
+- **CRUD Bidang & Unit Kerja Dinamis**: Mengubah pengaturan bidang struktural menjadi sistem CRUD lengkap. Admin kini dapat menambahkan bidang baru, mengedit nama/sub-judul/ikon/warna tema bidang, menghapus bidang, serta mengelola seksi/sub-unit kerja secara dinamis.
+- **Pembaruan Alur Verifikasi Berkas Ormas**: Menambahkan modal verifikasi kelayakan dokumen pendaftaran bagi Admin. Tombol persetujuan berkas ("Lolos Berkas") dikunci dan hanya aktif setelah Admin mencentang semua daftar persyaratan (14 item untuk Ormas Lokal, 8 item untuk Ormas Berjenjang). Menyetujui kelayakan akan menaikkan progres pengajuan menjadi 50% ("Sedang Diajukan ke Kemendagri").
+- **Leaflet Map Picker & Input Dewan Parpol**: Menambahkan Leaflet Map Picker interaktif pada modal Tambah/Edit Partai Politik beserta input data kepengurusan dewan (status kepemilikan kursi, periode dewan, dan level dewan).
+- **Pemetaan Role Kabid & Pembersihan SPJ**: Menghapus seluruh menu, rute, controller, dan view yang berhubungan dengan SPJ (kunci SPJ). Mengubah filter rute otorisasi dari `pptk` menjadi `kabid` serta memperbarui 4 akun kepala bidang di database melalui `UserSeeder`.
+
+### 🔄 Changed
+- **Pembersihan Form Video/Gallery**: Menghapus input "durasi konten" dan "url link youtube" untuk tipe konten Dokumentasi Kegiatan (Galeri), menyesuaikan validasi backend, serta memodifikasi JavaScript form agar otomatis menyembunyikan input tersebut saat tipe Dokumentasi dipilih.
+
+---
+
 ## [v2.8.0] - 2026-06-25
 ### ✨ Added
 - **Pemisahan Halaman Dasbor Eksekutif (Kaban)**: Membagi dasbor eksekutif tunggal menjadi 5 halaman/menu mandiri terpisah dengan visualisasi premium bertema dinamis dan adaptif.
