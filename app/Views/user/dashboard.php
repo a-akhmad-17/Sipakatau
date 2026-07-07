@@ -156,174 +156,293 @@
 
 <?php else: ?>
     <!-- Kasus: Sudah mengajukan ormas -->
+    <?php
+    $filesList = [];
+    if (!empty($pendaftaran['file_berkas'])) {
+        $filesList = json_decode($pendaftaran['file_berkas'], true) ?: [];
+    }
+    $tipe = $pendaftaran['tipe_ormas'] ?? 'Lokal';
+
+    $requirementsLokal = [
+        ["name" => "Surat Permohonan", "desc" => "Surat Permohonan ditujukan kepada Menteri (Cq. Kaban Kesbangpol)", "tte" => true, "template" => "https://drive.google.com/uc?export=download&id=1XqCYdQYp87AXN4RGMvJqJKslvA05nRNR"],
+        ["name" => "AD & ART", "desc" => "Anggaran Dasar (AD) & Anggaran Rumah Tangga (ART)", "tte" => true, "template" => ""],
+        ["name" => "Akta Notaris", "desc" => "Akta Pendirian Notaris (memuat Nama, Lambang, Asas, Tujuan, Pengurus, Hak, Keuangan, dll.)", "tte" => true, "template" => ""],
+        ["name" => "Surat Pernyataan Keabsahan", "desc" => "Surat Pernyataan Keabsahan Dokumen (Meterai Rp 10.000)", "tte" => true, "template" => "https://drive.google.com/uc?export=download&id=1XqCYdQYp87AXN4RGMvJqJKslvA05nRNR"],
+        ["name" => "Program & Struktur Kerja", "desc" => "Program Kerja Organisasi & Struktur Organisasi Resmi", "tte" => true, "template" => ""],
+        ["name" => "Domisili Kantor", "desc" => "Surat Keterangan Domisili Kantor Sekretariat", "tte" => true, "template" => ""],
+        ["name" => "NPWP Organisasi", "desc" => "NPWP atas nama Organisasi", "tte" => false, "template" => ""],
+        ["name" => "Formulir Isian Data Ormas", "desc" => "Formulir Isian Data Ormas (ditandatangani Ketua & Sekretaris)", "tte" => true, "template" => "https://drive.google.com/uc?export=download&id=1XqCYdQYp87AXN4RGMvJqJKslvA05nRNR"],
+        ["name" => "Rekomendasi Kementerian", "desc" => "Surat Rekomendasi Kementerian Agama (Ormas Agama) / Kebudayaan", "tte" => true, "template" => ""],
+        ["name" => "Biodata & KTP Pengurus", "desc" => "Biodata & KTP Pengurus (Ketua, Sekretaris, Bendahara)", "tte" => false, "template" => ""],
+        ["name" => "Pasfoto Pengurus", "desc" => "Pasfoto Pengurus 4x6 cm 2 Lembar (Latar Merah)", "tte" => false, "template" => ""],
+        ["name" => "SK & Foto Sekretariat", "desc" => "SK Pengurus & Foto Sekretariat (Tampak depan menampilkan Papan Nama)", "tte" => false, "template" => ""],
+        ["name" => "Kontrak/Izin Pakai Gedung", "desc" => "Surat Perjanjian Kontrak/Izin Pakai Gedung dari Pemilik Gedung", "tte" => true, "template" => ""],
+        ["name" => "Rekening & Logo Organisasi", "desc" => "Nomor Rekening Organisasi & File Logo Organisasi", "tte" => false, "template" => ""]
+    ];
+
+    $requirementsBerjenjang = [
+        ["name" => "Surat Permohonan", "desc" => "Surat Permohonan ditujukan kepada Kepala Badan Kesbangpol Kab. Sinjai", "tte" => true, "template" => "https://drive.google.com/uc?export=download&id=1UX2CJCfXpWZUix7o-j3jY9cld63dX7KS"],
+        ["name" => "Surat Pernyataan Resmi", "desc" => "Surat Pernyataan Resmi (Meterai Rp 10.000)", "tte" => true, "template" => "https://drive.google.com/uc?export=download&id=1UX2CJCfXpWZUix7o-j3jY9cld63dX7KS"],
+        ["name" => "Surat Keterangan Domisili", "desc" => "Surat Keterangan Domisili (Alamat domisili kop surat & sekretariat)", "tte" => true, "template" => ""],
+        ["name" => "Formulir Isian Data Ormas", "desc" => "Formulir Isian Data Ormas (ditandatangani Ketua & Sekretaris)", "tte" => true, "template" => "https://drive.google.com/uc?export=download&id=1UX2CJCfXpWZUix7o-j3jY9cld63dX7KS"],
+        ["name" => "Pasfoto Pengurus", "desc" => "Pasfoto Pengurus ukuran 4x6 cm sebanyak 2 lembar", "tte" => false, "template" => ""],
+        ["name" => "Fotokopi KTP Pengurus", "desc" => "Fotokopi KTP Pengurus (Ketua, Sekretaris, Bendahara)", "tte" => false, "template" => ""],
+        ["name" => "Surat Keputusan (SK) Pengurus", "desc" => "Surat Keputusan (SK) Pengurus Organisasi", "tte" => false, "template" => ""],
+        ["name" => "Foto Sekretariat", "desc" => "Foto Sekretariat (Tampak depan menampilkan Papan Nama resmi)", "tte" => false, "template" => ""]
+    ];
+
+    $activeReqs = ($tipe === 'Lokal') ? $requirementsLokal : $requirementsBerjenjang;
+    $progress = $pendaftaran['progress_percentage'];
+    $status = $pendaftaran['status_verifikasi'];
+    
+    $step1_class = 'completed'; // Berkas selalu terkirim/draft jika pendaftaran ada
+    $step2_class = '';
+    $step3_class = '';
+    $step4_class = '';
+    
+    if ($status === 'Pending') {
+        $step1_class = 'active';
+    } elseif ($status === 'Approved' && $progress == 50) {
+        $step1_class = 'completed';
+        $step2_class = 'active';
+    } elseif ($status === 'Approved' && $progress == 75) {
+        $step1_class = 'completed';
+        $step2_class = 'completed';
+        $step3_class = 'active';
+    } elseif ($status === 'Approved' && $progress == 100) {
+        $step1_class = 'completed';
+        $step2_class = 'completed';
+        $step3_class = 'completed';
+        $step4_class = 'completed';
+    } elseif ($status === 'Rejected') {
+        $step1_class = 'active';
+    }
+    ?>
+
     <div class="row g-4">
-        <!-- Status & Timeline Track -->
-        <div class="col-lg-8">
-            <div class="glass-card mb-4">
-                <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom border-secondary border-opacity-10">
-                    <h5 class="text-white mb-0"><i class="fa-solid fa-route text-primary me-2"></i>Status & Progres Pendaftaran</h5>
-                    <span class="text-muted small">No. Registrasi: <b class="text-warning"><?= esc($pendaftaran['nomor_registrasi']) ?></b></span>
+        <!-- Card 1: Informasi Berkas (Blue Header) -->
+        <div class="col-md-6">
+            <div class="card border-0 mb-4 h-100 animate-fade-in" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color) !important; border-radius: 12px; overflow: hidden;">
+                <div class="card-header py-3 px-4" style="background: #0d6efd; border-bottom: 1px solid var(--border-color);">
+                    <h5 class="mb-0 text-white fw-bold font-heading" style="font-size: 1.05rem;"><i class="fa-solid fa-folder me-2"></i>Informasi Berkas</h5>
                 </div>
-
-                <!-- Rejection Alert Callout -->
-                <?php if ($pendaftaran['status_verifikasi'] === 'Rejected'): ?>
-                    <div class="alert alert-danger bg-danger-subtle border-danger-subtle text-danger p-4 rounded mb-4" style="border-radius: 12px;">
-                        <div class="d-flex gap-3">
-                            <i class="fa-solid fa-triangle-exclamation fa-2x mt-1"></i>
-                            <div>
-                                <h6 class="fw-bold mb-1">Pengajuan Berkas Ditolak / Butuh Revisi</h6>
-                                <p class="small mb-3">Mohon maaf, berkas pendaftaran yang Anda ajukan belum memenuhi syarat. Anda dapat memperbaiki data dan mengunggah berkas baru melalui tombol revisi di bawah.</p>
-                                <div class="p-3 bg-black bg-opacity-25 rounded border border-danger border-opacity-25">
-                                    <span class="small text-muted d-block mb-1">Alasan Penolakan Resmi:</span>
-                                    <b class="text-white small italic">"<?= esc($pendaftaran['alasan_ditolak']) ?>"</b>
-                                </div>
-                                <div class="mt-3">
-                                    <a href="<?= base_url('user/pengajuan') ?>" class="btn btn-sm btn-danger text-white fw-bold"><i class="fa-solid fa-pencil me-1"></i> Revisi Berkas Pendaftaran</a>
-                                </div>
-                            </div>
+                <div class="card-body py-4 text-white">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="bg-secondary rounded-circle p-1 d-inline-flex align-items-center justify-content-center me-3" style="width: 70px; height: 70px; overflow: hidden; border: 3px solid rgba(255,255,255,0.08);">
+                            <?php 
+                            $logoPath = 'uploads/ormas/' . $pendaftaran['file_logo'];
+                            $isImage = (!empty($pendaftaran['file_logo']) && preg_match('/\.(webp|jpg|jpeg|png|gif)$/i', $pendaftaran['file_logo']) && file_exists(ROOTPATH . 'public/' . $logoPath));
+                            if ($isImage): ?>
+                                <img src="<?= base_url($logoPath) ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                            <?php else: ?>
+                                <i class="fa-solid fa-users fa-2x text-white"></i>
+                            <?php endif; ?>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-0 text-warning"><?= esc($pendaftaran['nama_ormas']) ?></h5>
+                            <span class="text-muted small">Registrasi Ormas (<?= ($tipe === 'Lokal') ? 'Lokal' : 'Berjenjang/Nasional' ?>)</span>
                         </div>
                     </div>
-                <?php endif; ?>
 
-                <?php
-                // Hitung state timeline berdasarkan progress
-                $progress = $pendaftaran['progress_percentage'];
-                $status = $pendaftaran['status_verifikasi'];
-                
-                $step1_class = 'completed'; // Berkas selalu terkirim/draft jika pendaftaran ada
-                $step2_class = '';
-                $step3_class = '';
-                
-                if ($status === 'Pending') {
-                    $step2_class = 'active';
-                } elseif ($status === 'Approved' && $progress == 75) {
-                    $step1_class = 'completed';
-                    $step2_class = 'completed';
-                    $step3_class = 'active';
-                } elseif ($status === 'Approved' && $progress == 100) {
-                    $step1_class = 'completed';
-                    $step2_class = 'completed';
-                    $step3_class = 'completed';
-                } elseif ($status === 'Rejected') {
-                    $step1_class = 'active';
-                }
-                ?>
-
-                <!-- Visual Timeline -->
-                <div class="timeline-steps">
-                    <!-- Progress line -->
-                    <div class="timeline-progress" style="width: <?= ($status === 'Rejected') ? '0' : (($progress == 45) ? '33' : (($progress == 75) ? '66' : '100')) ?>%;"></div>
-                    
-                    <!-- Step 1: Berkas Masuk -->
-                    <div class="timeline-step <?= $step1_class ?>">
-                        <div class="timeline-icon">
-                            <?php if ($step1_class === 'completed'): ?><i class="fa-solid fa-check"></i><?php else: ?>1<?php endif; ?>
-                        </div>
-                        <div class="timeline-label">Verifikasi Berkas<br><span class="text-muted font-normal small">(Admin Kesbangpol)</span></div>
-                    </div>
-                    
-                    <!-- Step 2: Validasi Bidang -->
-                    <div class="timeline-step <?= $step2_class ?>">
-                        <div class="timeline-icon">
-                            <?php if ($step2_class === 'completed'): ?><i class="fa-solid fa-check"></i><?php else: ?>2<?php endif; ?>
-                        </div>
-                        <div class="timeline-label">Validasi Bidang<br><span class="text-muted font-normal small">(Kasubag / Kabid)</span></div>
-                    </div>
-                    
-                    <!-- Step 3: Surat Rekomendasi Diterbitkan -->
-                    <div class="timeline-step <?= $step3_class ?>">
-                        <div class="timeline-icon">
-                            <?php if ($step3_class === 'completed'): ?><i class="fa-solid fa-check"></i><?php else: ?>3<?php endif; ?>
-                        </div>
-                        <div class="timeline-label">Penerbitan Surat Rekomendasi<br><span class="text-muted font-normal small">(Selesai)</span></div>
-                    </div>
-                </div>
-
-                <div class="p-3 rounded border border-secondary border-opacity-10 bg-black bg-opacity-10 mt-4">
-                    <span class="small text-muted d-block">Status Saat Ini:</span>
-                    <h6 class="text-white fw-bold mb-1 mt-1">
-                        <?php if ($status === 'Pending'): ?>
-                            <span class="badge bg-warning-subtle text-warning"><i class="fa-solid fa-spinner fa-spin me-1"></i> Sedang Ditinjau Admin</span>
-                        <?php elseif ($status === 'Approved' && $progress < 100): ?>
-                            <span class="badge bg-primary-subtle text-primary"><i class="fa-solid fa-check-double me-1"></i> Berkas Valid, Menunggu Penerbitan Surat</span>
-                        <?php elseif ($status === 'Approved' && $progress == 100): ?>
-                            <span class="badge bg-success-subtle text-success"><i class="fa-solid fa-circle-check me-1"></i> Surat Rekomendasi Diterbitkan (Selesai)</span>
-                        <?php elseif ($status === 'Rejected'): ?>
-                            <span class="badge bg-danger-subtle text-danger"><i class="fa-solid fa-circle-xmark me-1"></i> Butuh Perbaikan (Ditolak)</span>
-                        <?php endif; ?>
-                    </h6>
-                    <p class="small text-muted mb-0 mt-2">
-                        <?php if ($status === 'Pending'): ?>
-                            Dokumen pendaftaran Ormas Anda telah berhasil diunggah dan sedang dalam proses pencocokan dokumen fisik oleh tim verifikator kami.
-                        <?php elseif ($status === 'Approved' && $progress < 100): ?>
-                            Selamat! Berkas pendaftaran Anda dinyatakan lengkap dan valid. Saat ini sedang diproses untuk penerbitan Surat Rekomendasi/Keterangan resmi.
-                        <?php elseif ($status === 'Approved' && $progress == 100): ?>
-                            Proses pendaftaran selesai. Surat Rekomendasi/Keterangan resmi ormas Anda telah diterbitkan secara sah oleh Kesbangpol Kabupaten Sinjai.
-                        <?php elseif ($status === 'Rejected'): ?>
-                            Pendaftaran Anda ditolak. Klik tombol revisi untuk menyesuaikan kembali dokumen sesuai petunjuk verifikator.
-                        <?php endif; ?>
-                    </p>
-
-                    <?php if ($status === 'Approved' && $progress == 100 && !empty($pendaftaran['pdf_tte_path'])): ?>
-                        <div class="mt-3 pt-3 border-top border-secondary border-opacity-15">
-                            <a href="<?= base_url('uploads/rekomendasi_ormas/' . $pendaftaran['pdf_tte_path']) ?>" target="_blank" class="btn btn-success w-100 py-2.5 text-white fw-bold text-decoration-none d-block text-center">
-                                <i class="fa-solid fa-file-arrow-down me-2"></i> Unduh Surat Rekomendasi Resmi
-                            </a>
-                        </div>
-                    <?php endif; ?>
+                    <table class="table table-borderless text-white small mb-0">
+                        <tbody>
+                            <tr>
+                                <th class="text-muted ps-0 py-1.5" style="width: 35%;">Alamat Sekretariat</th>
+                                <td class="py-1.5">: <?= esc($pendaftaran['alamat']) ?></td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted ps-0 py-1.5">Kontak Email</th>
+                                <td class="py-1.5">: <?= esc($pendaftaran['email'] ?: '-') ?></td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted ps-0 py-1.5">Nomor Telepon</th>
+                                <td class="py-1.5">: <?= esc($pendaftaran['telepon'] ?: '-') ?></td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted ps-0 py-1.5">SK Kepengurusan</th>
+                                <td class="py-1.5">: 
+                                    <?= !empty($pendaftaran['tgl_sk_kepengurusan']) ? date('d F Y', strtotime($pendaftaran['tgl_sk_kepengurusan'])) : '-' ?>
+                                    s/d
+                                    <?= !empty($pendaftaran['tgl_sk_kedaluwarsa']) ? date('d F Y', strtotime($pendaftaran['tgl_sk_kedaluwarsa'])) : '-' ?>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
 
-        <!-- Ormas Profile Info Card -->
-        <div class="col-lg-4">
-            <div class="glass-card h-100">
-                <div class="text-center mb-4">
-                    <div class="bg-secondary rounded-circle p-1 d-inline-flex align-items-center justify-content-center mb-3" style="width: 90px; height: 90px; overflow: hidden; border: 3px solid rgba(255,255,255,0.08);">
-                        <?php 
-                        $logoPath = 'uploads/ormas/' . $pendaftaran['file_logo'];
-                        $isImage = (!empty($pendaftaran['file_logo']) && preg_match('/\.(webp|jpg|jpeg|png|gif)$/i', $pendaftaran['file_logo']) && file_exists(ROOTPATH . 'public/' . $logoPath));
-                        if ($isImage): ?>
-                            <img src="<?= base_url($logoPath) ?>" style="width: 100%; height: 100%; object-fit: cover;">
-                        <?php else: ?>
-                            <i class="fa-solid fa-users fa-3x text-white"></i>
-                        <?php endif; ?>
-                    </div>
-                    <h5 class="text-white fw-bold mb-1"><?= esc($pendaftaran['nama_ormas']) ?></h5>
-                    <span class="text-muted small">Registrasi Kesbangpol</span>
+        <!-- Card 2: Status & Timeline (Teal Header) -->
+        <div class="col-md-6">
+            <div class="card border-0 mb-4 h-100 animate-fade-in" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color) !important; border-radius: 12px; overflow: hidden;">
+                <div class="card-header py-3 px-4" style="background: #14b8a6; border-bottom: 1px solid var(--border-color);">
+                    <h5 class="mb-0 text-white fw-bold font-heading" style="font-size: 1.05rem;"><i class="fa-solid fa-timeline me-2"></i>Status & Timeline</h5>
                 </div>
+                <div class="card-body py-4 text-white">
+                    <table class="table table-borderless text-white small mb-3">
+                        <tbody>
+                            <tr>
+                                <th class="text-muted ps-0 py-1" style="width: 35%;">Status Saat Ini</th>
+                                <td class="py-1">: 
+                                    <?php if ($status === 'Pending'): ?>
+                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle">PENDING</span>
+                                    <?php elseif ($status === 'Approved' && $progress < 100): ?>
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle">APPROVED / PROSES</span>
+                                    <?php elseif ($status === 'Approved' && $progress == 100): ?>
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle">SUCCESS / SELESAI</span>
+                                    <?php elseif ($status === 'Rejected'): ?>
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle">REJECTED / REVISI</span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted ps-0 py-1">Tanggal Upload</th>
+                                <td class="py-1">: <?= date('d/m/Y H:i', strtotime($pendaftaran['created_at'])) ?></td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted ps-0 py-1">Lama Menunggu</th>
+                                <td class="py-1">: 
+                                    <?php
+                                    $diff = time() - strtotime($pendaftaran['created_at']);
+                                    $hours = round($diff / 3600);
+                                    echo $hours . " jam";
+                                    ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted ps-0 py-1">Diupload Oleh</th>
+                                <td class="py-1">: <?= esc(ucfirst(session()->get('username'))) ?></td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-                <div class="d-flex flex-column gap-3 small border-top border-secondary border-opacity-10 pt-3">
-                    <div>
-                        <span class="text-muted d-block">Alamat Sekretariat:</span>
-                        <b class="text-white"><?= esc($pendaftaran['alamat']) ?></b>
+                    <!-- Visual Timeline inside Card -->
+                    <div class="timeline-steps my-4">
+                        <div class="timeline-progress" style="width: <?= ($status === 'Rejected') ? '0' : (($progress == 25) ? '0' : (($progress == 50) ? '33' : (($progress == 75) ? '66' : '100'))) ?>%;"></div>
+                        <div class="timeline-step <?= $step1_class ?>">
+                            <div class="timeline-icon" style="width:30px; height:30px; font-size:0.75rem;">
+                                <?php if ($step1_class === 'completed'): ?><i class="fa-solid fa-check"></i><?php else: ?>1<?php endif; ?>
+                            </div>
+                            <div class="timeline-label" style="font-size:0.68rem; margin-top:5px; line-height:1.2;">Verifikasi Berkas</div>
+                        </div>
+                        <div class="timeline-step <?= ($progress >= 50) ? (($progress > 50) ? 'completed' : 'active') : '' ?>">
+                            <div class="timeline-icon" style="width:30px; height:30px; font-size:0.75rem;">
+                                <?php if ($progress > 50): ?><i class="fa-solid fa-check"></i><?php else: ?>2<?php endif; ?>
+                            </div>
+                            <div class="timeline-label" style="font-size:0.68rem; margin-top:5px; line-height:1.2;">Ke Kemendagri</div>
+                        </div>
+                        <div class="timeline-step <?= ($progress >= 75) ? (($progress > 75) ? 'completed' : 'active') : '' ?>">
+                            <div class="timeline-icon" style="width:30px; height:30px; font-size:0.75rem;">
+                                <?php if ($progress > 75): ?><i class="fa-solid fa-check"></i><?php else: ?>3<?php endif; ?>
+                            </div>
+                            <div class="timeline-label" style="font-size:0.68rem; margin-top:5px; line-height:1.2;">Validasi Bidang</div>
+                        </div>
+                        <div class="timeline-step <?= ($progress == 100) ? 'completed' : '' ?>">
+                            <div class="timeline-icon" style="width:30px; height:30px; font-size:0.75rem;">
+                                <?php if ($progress == 100): ?><i class="fa-solid fa-check"></i><?php else: ?>4<?php endif; ?>
+                            </div>
+                            <div class="timeline-label" style="font-size:0.68rem; margin-top:5px; line-height:1.2;">Selesai</div>
+                        </div>
                     </div>
-                    <div>
-                        <span class="text-muted d-block">Kontak Email:</span>
-                        <b class="text-white"><?= esc($pendaftaran['email'] ?: '-') ?></b>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rejection Alert Callout -->
+    <?php if ($status === 'Rejected'): ?>
+        <div class="alert alert-danger bg-danger-subtle border-danger-subtle text-danger p-4 rounded my-4" style="border-radius: 12px;">
+            <div class="d-flex gap-3">
+                <i class="fa-solid fa-triangle-exclamation fa-2x mt-1"></i>
+                <div>
+                    <h6 class="fw-bold mb-1">Pengajuan Berkas Ditolak / Butuh Revisi</h6>
+                    <p class="small mb-3">Mohon maaf, berkas pendaftaran yang Anda ajukan belum memenuhi syarat. Anda dapat memperbaiki data dan mengunggah berkas baru melalui tombol revisi di bawah.</p>
+                    <div class="p-3 bg-black bg-opacity-25 rounded border border-danger border-opacity-25">
+                        <span class="small text-muted d-block mb-1">Alasan Penolakan Resmi:</span>
+                        <b class="text-white small italic">"<?= esc($pendaftaran['alasan_ditolak']) ?>"</b>
                     </div>
-                    <div>
-                        <span class="text-muted d-block">Nomor Telepon:</span>
-                        <b class="text-white"><?= esc($pendaftaran['telepon'] ?: '-') ?></b>
+                    <div class="mt-3">
+                        <a href="<?= base_url('user/pengajuan') ?>" class="btn btn-sm btn-danger text-white fw-bold"><i class="fa-solid fa-pencil me-1"></i> Revisi Berkas Pendaftaran</a>
                     </div>
-                    <div>
-                        <span class="text-muted d-block">SK Kepengurusan:</span>
-                        <b class="text-white">
-                            <?= !empty($pendaftaran['tgl_sk_kepengurusan']) ? date('d M Y', strtotime($pendaftaran['tgl_sk_kepengurusan'])) : '-' ?>
-                            s/d
-                            <?= !empty($pendaftaran['tgl_sk_kedaluwarsa']) ? date('d M Y', strtotime($pendaftaran['tgl_sk_kedaluwarsa'])) : '-' ?>
-                        </b>
-                    </div>
-                    <div>
-                        <span class="text-muted d-block">Berkas diunggah:</span>
-                        <?php if (!empty($pendaftaran['file_berkas'])): ?>
-                            <a href="<?= base_url('uploads/ormas/' . $pendaftaran['file_berkas']) ?>" target="_blank" class="btn btn-sm btn-outline-info w-100 py-1.5 mt-1">
-                                <i class="fa-solid fa-file-pdf me-1"></i> Buka Berkas Terkirim
-                            </a>
-                        <?php else: ?>
-                            <span class="text-muted">Tidak ada berkas diunggah</span>
-                        <?php endif; ?>
-                    </div>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+
+    <!-- Card 3: Validasi Kelengkapan Dokumen (Yellow Header) -->
+    <div class="row g-4 mt-2">
+        <div class="col-12">
+            <div class="card border-0 mb-4 animate-fade-in" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color) !important; border-radius: 12px; overflow: hidden;">
+                <div class="card-header py-3 px-4" style="background: #eab308; border-bottom: 1px solid var(--border-color);">
+                    <h5 class="mb-0 text-dark fw-bold font-heading" style="font-size: 1.05rem;"><i class="fa-solid fa-clipboard-check me-2"></i>Validasi Kelengkapan Dokumen</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-custom mb-0" style="font-size: 0.85rem;">
+                        <thead>
+                            <tr style="background: rgba(255, 255, 255, 0.02);">
+                                <th class="text-center" style="width: 4%;">#</th>
+                                <th style="width: 35%;">Jenis Dokumen</th>
+                                <th class="text-center" style="width: 10%;">Status</th>
+                                <th class="text-center" style="width: 10%;">Tanda Tangan</th>
+                                <th class="text-center" style="width: 10%;">Keterangan</th>
+                                <th class="text-center" style="width: 12%;">File</th>
+                                <th class="text-center" style="width: 10%;">Format</th>
+                                <th class="text-center" style="width: 9%;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($activeReqs as $idx => $req): 
+                                $fileIdx = $idx + 1;
+                                $exist = $filesList[$fileIdx] ?? null;
+                                ?>
+                                <tr>
+                                    <td class="text-center align-middle"><?= $fileIdx ?></td>
+                                    <td class="align-middle">
+                                        <div class="fw-bold text-main"><?= esc($req['name']) ?></div>
+                                        <div class="text-muted small" style="font-size:0.75rem;"><?= esc($req['desc']) ?></div>
+                                    </td>
+                                    <td class="text-center align-middle">
+                                        <?php if ($exist): ?>
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 small"><i class="fa-solid fa-circle-check me-1"></i> Ada</span>
+                                        <?php else: ?>
+                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 small"><i class="fa-solid fa-circle-xmark me-1"></i> Belum Ada</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="text-center align-middle">
+                                        <?php if ($req['tte']): ?>
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-0.5" style="font-size: 0.72rem;"><i class="fa-solid fa-signature me-1"></i> TTE</span>
+                                        <?php else: ?>
+                                            <span class="badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25 px-2 py-0.5" style="font-size: 0.72rem;">Non TTE</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="text-center align-middle text-muted small">
+                                        <?= $exist ? esc($exist['size']) : '-' ?>
+                                    </td>
+                                    <td class="text-center align-middle text-truncate small" style="max-width: 150px;">
+                                        <?= $exist ? esc($exist['filename']) : '-' ?>
+                                    </td>
+                                    <td class="text-center align-middle">
+                                        <?php if (!empty($req['template'])): ?>
+                                            <a href="<?= $req['template'] ?>" target="_blank" class="btn btn-sm btn-outline-warning py-1 px-2" style="font-size: 0.7rem;" title="Download Format <?= esc($req['name']) ?>">
+                                                <i class="fa-solid fa-download me-1"></i> Format
+                                            </a>
+                                        <?php else: ?>
+                                            <span class="text-muted small">-</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="text-center align-middle">
+                                        <?php if ($exist): ?>
+                                            <a href="<?= base_url('uploads/ormas/' . $exist['filename']) ?>" target="_blank" class="btn btn-sm btn-info text-white rounded px-2" title="Lihat/Download Berkas">
+                                                <i class="fa-solid fa-circle-info"></i>
+                                            </a>
+                                        <?php else: ?>
+                                            -
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -384,7 +503,7 @@
                                     <td class="text-center">
                                         <div class="d-flex justify-content-center gap-1 flex-wrap">
                                             <?php if (!$isActive): ?>
-                                                <a href="<?= base_url('user?id=' . $item['id']) ?>" class="btn btn-sm btn-outline-primary py-1 px-2.5" title="Tampilkan Progres">
+                                                <a href="<?= base_url('user/pengajuan?id=' . $item['id']) ?>" class="btn btn-sm btn-outline-primary py-1 px-2.5" title="Tampilkan Progres">
                                                     <i class="fa-solid fa-eye me-1"></i> Tampilkan
                                                 </a>
                                             <?php endif; ?>

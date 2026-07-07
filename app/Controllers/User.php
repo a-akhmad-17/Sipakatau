@@ -57,6 +57,8 @@ class User extends BaseController
         $id = $this->request->getGet('id');
 
         $pendaftaran = null;
+        $activeStep = 1;
+
         if (!empty($id)) {
             $pendaftaran = $this->db->table('trn_pendaftaran')
                                     ->select('trn_pendaftaran.*, mst_ormas.nama_ormas, mst_ormas.alamat, mst_ormas.email, mst_ormas.telepon, mst_ormas.file_logo, mst_ormas.file_berkas, mst_ormas.tgl_sk_kepengurusan, mst_ormas.tgl_sk_kedaluwarsa, mst_ormas.latitude, mst_ormas.longitude')
@@ -70,14 +72,18 @@ class User extends BaseController
                 return redirect()->to('user')->with('error', 'Data pengajuan tidak ditemukan.');
             }
 
-            if (in_array($pendaftaran['status_verifikasi'], ['Pending', 'Approved'])) {
-                return redirect()->to('user')->with('error', 'Pengajuan ini sedang diproses atau sudah disetujui, tidak bisa direvisi.');
+            // Calculate active step
+            if ($pendaftaran['status_verifikasi'] === 'Draft' || $pendaftaran['status_verifikasi'] === 'Rejected') {
+                $activeStep = $this->request->getGet('step') ? (int)$this->request->getGet('step') : 2;
+            } else {
+                $activeStep = 3; // Pending or Approved goes to status page
             }
         }
 
         $data = [
             'title'       => ($pendaftaran) ? 'Revisi Pengajuan Ormas - SIPAKATAU' : 'Form Pengajuan Ormas - SIPAKATAU',
-            'pendaftaran' => $pendaftaran
+            'pendaftaran' => $pendaftaran,
+            'activeStep'  => $activeStep
         ];
 
         return view('user/form_pengajuan', $data);
@@ -97,10 +103,8 @@ class User extends BaseController
         $tglExp = $this->request->getPost('tgl_sk_kedaluwarsa') ?: null;
         $latitude = $this->request->getPost('latitude') ?: null;
         $longitude = $this->request->getPost('longitude') ?: null;
-
-        if (empty($namaOrmas) || empty($alamat)) {
-            return redirect()->back()->with('error', 'Nama Ormas dan Alamat wajib diisi.')->withInput();
-        }
+        
+        $currentStep = (int)$this->request->getPost('current_step') ?: 1;
 
         // Cek apakah ada pengajuan lama yang ingin direvisi
         $pendaftaran = null;
@@ -132,155 +136,152 @@ class User extends BaseController
             $logoFilename = convert_to_webp($fileLogo, $destination, 'ormas_logo_' . time());
         }
 
-        // Handle file_berkas upload
-        $fileBerkas = $this->request->getFile('file_berkas');
-        $berkasFilename = null;
+        $tipeOrmas = $this->request->getPost('tipe_ormas') ?? 'Lokal';
+        $maxFiles = ($tipeOrmas === 'Lokal') ? 14 : 8;
 
-        if ($fileBerkas && $fileBerkas->isValid() && !$fileBerkas->hasMoved()) {
-            // Delete old file if exist
-            if ($pendaftaran) {
-                $ormasOld = $this->db->table('mst_ormas')->where('id', $pendaftaran['ormas_id'])->get()->getRowArray();
-                if ($ormasOld && !empty($ormasOld['file_berkas'])) {
-                    @unlink($destination . '/' . $ormasOld['file_berkas']);
+        if ($currentStep === 1) {
+            // ========================================================
+            // STEP 1: SIMPAN/UPDATE INFORMASI DASAR (DRAFT)
+            // ========================================================
+            if (empty($namaOrmas) || empty($alamat)) {
+                return redirect()->back()->with('error', 'Nama Ormas dan Alamat wajib diisi.')->withInput();
+            }
+
+            if (!$pendaftaran) {
+                // INSERT NEW DRAFT
+                $ormasId = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x', 
+                    mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff), 
+                    mt_rand(0, 0x0fff) | 0x4000, mt_rand(0, 0x3fff) | 0x8000, 
+                    mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+                );
+                $newPendaftaranId = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x', 
+                    mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff), 
+                    mt_rand(0, 0x0fff) | 0x4000, mt_rand(0, 0x3fff) | 0x8000, 
+                    mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+                );
+                $nomorRegistrasi = 'REG-' . date('Ymd') . '-' . mt_rand(100, 999);
+
+                $this->db->table('mst_ormas')->insert([
+                    'id'                  => $ormasId,
+                    'nama_ormas'          => $namaOrmas,
+                    'alamat'              => $alamat,
+                    'email'               => $email,
+                    'telepon'             => $telepon,
+                    'status'              => 'Aktif',
+                    'tgl_sk_kepengurusan' => $tglSk,
+                    'tgl_sk_kedaluwarsa'  => $tglExp,
+                    'file_logo'           => $logoFilename ?? 'default_logo.webp',
+                    'file_berkas'         => null,
+                    'latitude'            => !empty($latitude) ? (double)$latitude : null,
+                    'longitude'           => !empty($longitude) ? (double)$longitude : null,
+                    'created_at'          => date('Y-m-d H:i:s')
+                ]);
+
+                $this->db->table('trn_pendaftaran')->insert([
+                    'id'                  => $newPendaftaranId,
+                    'ormas_id'            => $ormasId,
+                    'user_id'             => $userId,
+                    'nomor_registrasi'    => $nomorRegistrasi,
+                    'tipe_ormas'          => $tipeOrmas,
+                    'progress_percentage' => 25,
+                    'status_verifikasi'   => 'Draft',
+                    'alasan_ditolak'      => null,
+                    'delete_requested'    => 0,
+                    'created_at'          => date('Y-m-d H:i:s')
+                ]);
+
+                // Upgrading user role to 'ormas'
+                $this->db->table('sys_users')->where('id', $userId)->update(['role' => 'ormas']);
+                session()->set('role', 'ormas');
+
+                return redirect()->to("user/pengajuan?id={$newPendaftaranId}&step=2")->with('success', 'Informasi dasar ormas berhasil disimpan. Silakan lengkapi berkas persyaratan.');
+            } else {
+                // UPDATE EXISTING DRAFT / REJECTED
+                $ormasId = $pendaftaran['ormas_id'];
+                $updateDataOrmas = [
+                    'nama_ormas'          => $namaOrmas,
+                    'alamat'              => $alamat,
+                    'email'               => $email,
+                    'telepon'             => $telepon,
+                    'tgl_sk_kepengurusan' => $tglSk,
+                    'tgl_sk_kedaluwarsa'  => $tglExp,
+                    'latitude'            => !empty($latitude) ? (double)$latitude : null,
+                    'longitude'           => !empty($longitude) ? (double)$longitude : null,
+                    'updated_at'          => date('Y-m-d H:i:s')
+                ];
+                if ($logoFilename) {
+                    $updateDataOrmas['file_logo'] = $logoFilename;
+                }
+                $this->db->table('mst_ormas')->where('id', $ormasId)->update($updateDataOrmas);
+
+                // Update trn_pendaftaran
+                $this->db->table('trn_pendaftaran')->where('id', $pendaftaranId)->update([
+                    'tipe_ormas' => $tipeOrmas,
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+
+                return redirect()->to("user/pengajuan?id={$pendaftaranId}&step=2")->with('success', 'Informasi dasar ormas berhasil diperbarui. Silakan lengkapi berkas persyaratan.');
+            }
+        } elseif ($currentStep === 2) {
+            // ========================================================
+            // STEP 2: PROSES UNGGAH FILE PERSYARATAN & KIRIM
+            // ========================================================
+            if (!$pendaftaran) {
+                return redirect()->to('user/pengajuan')->with('error', 'Silakan isi informasi dasar ormas terlebih dahulu.');
+            }
+
+            $ormasId = $pendaftaran['ormas_id'];
+            $ormasOld = $this->db->table('mst_ormas')->where('id', $ormasId)->get()->getRowArray();
+            $berkasData = [];
+            if ($ormasOld && !empty($ormasOld['file_berkas'])) {
+                $berkasData = json_decode($ormasOld['file_berkas'], true) ?: [];
+            }
+
+            // Loop and upload each document point
+            for ($i = 1; $i <= $maxFiles; $i++) {
+                $fileObj = $this->request->getFile('file_berkas_' . $i);
+                if ($fileObj && $fileObj->isValid() && !$fileObj->hasMoved()) {
+                    // Delete old file for this index if existed
+                    if (isset($berkasData[$i]['filename'])) {
+                        @unlink($destination . '/' . $berkasData[$i]['filename']);
+                    }
+
+                    $newFilename = $fileObj->getRandomName();
+                    $fileObj->move($destination, $newFilename);
+
+                    $berkasData[$i] = [
+                        'filename' => $newFilename,
+                        'size' => round($fileObj->getSize() / 1024 / 1024, 2) . ' MB',
+                        'uploaded_at' => date('Y-m-d H:i:s')
+                    ];
                 }
             }
-            
-            $mime = $fileBerkas->getMimeType();
-            if (strpos($mime, 'image/') === 0) {
-                $berkasFilename = convert_to_webp($fileBerkas, $destination, 'ormas_berkas_' . time());
-            } else {
-                $berkasFilename = $fileBerkas->getRandomName();
-                $fileBerkas->move($destination, $berkasFilename);
-            }
-        }
 
-        if (!$pendaftaran) {
-            // ==========================================
-            // KASUS 1: Pengajuan Baru (User baru pertama kali atau tambah pengajuan baru)
-            // ==========================================
-            $ormasId = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x', 
-                mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff), 
-                mt_rand(0, 0x0fff) | 0x4000, mt_rand(0, 0x3fff) | 0x8000, 
-                mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
-            );
-            $newPendaftaranId = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x', 
-                mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff), 
-                mt_rand(0, 0x0fff) | 0x4000, mt_rand(0, 0x3fff) | 0x8000, 
-                mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
-            );
-
-            $nomorRegistrasi = 'REG-' . date('Ymd') . '-' . mt_rand(100, 999);
-
-            // 1. Insert ke mst_ormas
-            $this->db->table('mst_ormas')->insert([
-                'id'                  => $ormasId,
-                'nama_ormas'          => $namaOrmas,
-                'alamat'              => $alamat,
-                'email'               => $email,
-                'telepon'             => $telepon,
-                'status'              => 'Aktif',
-                'tgl_sk_kepengurusan' => $tglSk,
-                'tgl_sk_kedaluwarsa'  => $tglExp,
-                'file_logo'           => $logoFilename ?? 'default_logo.webp',
-                'file_berkas'         => $berkasFilename,
-                'latitude'            => !empty($latitude) ? (double)$latitude : null,
-                'longitude'           => !empty($longitude) ? (double)$longitude : null,
-                'created_at'          => date('Y-m-d H:i:s')
-            ]);
-
-            // 2. Insert ke trn_pendaftaran
-            $this->db->table('trn_pendaftaran')->insert([
-                'id'                  => $newPendaftaranId,
-                'ormas_id'            => $ormasId,
-                'user_id'             => $userId,
-                'nomor_registrasi'    => $nomorRegistrasi,
-                'progress_percentage' => 45, // Pend. verifikasi berkas
-                'status_verifikasi'   => 'Pending',
-                'alasan_ditolak'      => null,
-                'delete_requested'    => 0,
-                'created_at'          => date('Y-m-d H:i:s')
-            ]);
-
-            // Upgrading user role to 'ormas' immediately on submission
-            $this->db->table('sys_users')->where('id', $userId)->update(['role' => 'ormas']);
-            session()->set('role', 'ormas');
-
-            log_activity(
-                'PENGAJUAN_ORMAS_PUBLIK_LOGIN',
-                [],
-                ['id' => $ormasId, 'nama_ormas' => $namaOrmas, 'nomor_registrasi' => $nomorRegistrasi],
-                'trn_pendaftaran',
-                $newPendaftaranId
-            );
-
-            // Telegram Notification
-            telegram_send_transaction('Pendaftaran Ormas Baru (Logged In)', [
-                'Nama Ormas'       => $namaOrmas,
-                'No. Registrasi'   => $nomorRegistrasi,
-                'Username Akun'    => session()->get('username'),
-                'Alamat Secretariat'=> $alamat
-            ]);
-
-            return redirect()->to('user')->with('success', 'Pengajuan ormas Anda berhasil dikirim! Silakan pantau status verifikasi Anda di bawah ini.');
-        } else {
-            // ==========================================
-            // KASUS 2: Revisi Pengajuan (Draft / Rejected)
-            // ==========================================
-            $ormasId = $pendaftaran['ormas_id'];
-            $beforeDataOrmas = $this->db->table('mst_ormas')->where('id', $ormasId)->get()->getRowArray();
-
-            $updateDataOrmas = [
-                'nama_ormas'          => $namaOrmas,
-                'alamat'              => $alamat,
-                'email'               => $email,
-                'telepon'             => $telepon,
-                'tgl_sk_kepengurusan' => $tglSk,
-                'tgl_sk_kedaluwarsa'  => $tglExp,
-                'latitude'            => !empty($latitude) ? (double)$latitude : null,
-                'longitude'           => !empty($longitude) ? (double)$longitude : null,
-                'updated_at'          => date('Y-m-d H:i:s')
-            ];
-
-            if ($logoFilename) {
-                $updateDataOrmas['file_logo'] = $logoFilename;
-            }
-            if ($berkasFilename) {
-                $updateDataOrmas['file_berkas'] = $berkasFilename;
-            }
+            $berkasFilename = !empty($berkasData) ? json_encode($berkasData) : null;
 
             // Update mst_ormas
-            $this->db->table('mst_ormas')->where('id', $ormasId)->update($updateDataOrmas);
+            $this->db->table('mst_ormas')->where('id', $ormasId)->update([
+                'file_berkas' => $berkasFilename,
+                'updated_at'  => date('Y-m-d H:i:s')
+            ]);
 
-            // Update trn_pendaftaran (Re-submit back to Pending status, reset progress to 45%, clear reasons, reset delete requested)
-            $this->db->table('trn_pendaftaran')->where('id', $pendaftaran['id'])->update([
-                'progress_percentage' => 45,
+            // Submit pendaftaran: set status to Pending and progress percentage to 25
+            $this->db->table('trn_pendaftaran')->where('id', $pendaftaranId)->update([
+                'progress_percentage' => 25,
                 'status_verifikasi'   => 'Pending',
                 'alasan_ditolak'      => null,
-                'delete_requested'    => 0,
                 'updated_at'          => date('Y-m-d H:i:s')
             ]);
 
-            // Ensure role is upgraded (just in case)
-            $this->db->table('sys_users')->where('id', $userId)->update(['role' => 'ormas']);
-            session()->set('role', 'ormas');
-
-            log_activity(
-                'REVISI_ORMAS_PUBLIK_LOGIN',
-                $beforeDataOrmas,
-                array_merge($beforeDataOrmas, $updateDataOrmas),
-                'mst_ormas',
-                $ormasId
-            );
-
             // Telegram Notification
-            telegram_send_transaction('Revisi Berkas Ormas (Logged In)', [
-                'Nama Ormas'       => $namaOrmas,
+            telegram_send_transaction('Pendaftaran Ormas Diajukan (Logged In)', [
+                'Nama Ormas'       => $ormasOld['nama_ormas'],
                 'No. Registrasi'   => $pendaftaran['nomor_registrasi'],
                 'Username Akun'    => session()->get('username'),
-                'Status Berubah'   => 'Pending (Di-revisi)'
+                'Status'           => 'Pending (Menunggu Verifikasi)'
             ]);
 
-            return redirect()->to('user')->with('success', 'Revisi berkas pendaftaran Anda telah berhasil dikirim ulang.');
+            return redirect()->to("user/pengajuan?id={$pendaftaranId}&step=3")->with('success', 'Berkas persyaratan pendaftaran Anda berhasil dikirim! Silakan pantau status verifikasi Anda.');
         }
     }
 

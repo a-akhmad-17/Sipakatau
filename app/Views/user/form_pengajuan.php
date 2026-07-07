@@ -22,6 +22,117 @@
         text-decoration: underline !important;
         opacity: 0.85;
     }
+
+    /* Timeline Steps */
+    .timeline-steps {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+
+    .timeline-steps::before {
+        content: '';
+        position: absolute;
+        top: 20px;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--border-color);
+        z-index: 1;
+    }
+
+    .timeline-progress {
+        position: absolute;
+        top: 20px;
+        left: 0;
+        height: 4px;
+        background: var(--primary-grad);
+        z-index: 2;
+        transition: width 0.5s ease-in-out;
+    }
+
+    .timeline-step {
+        position: relative;
+        z-index: 3;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 120px;
+    }
+
+    .timeline-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: var(--bg-color);
+        border: 3px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-muted);
+        font-weight: bold;
+        transition: all 0.4s ease;
+    }
+
+    .timeline-step.active .timeline-icon {
+        border-color: #f43f5e;
+        color: #f43f5e;
+        box-shadow: 0 0 12px rgba(244, 63, 94, 0.4);
+    }
+
+    .timeline-step.completed .timeline-icon {
+        background: var(--primary-grad);
+        border-color: #f43f5e;
+        color: white;
+    }
+
+    .timeline-label {
+        margin-top: 10px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-align: center;
+        color: var(--text-muted);
+    }
+
+    .timeline-step.active .timeline-label,
+    .timeline-step.completed .timeline-label {
+        color: var(--text-main);
+    }
+
+    @media (max-width: 768px) {
+        .timeline-steps {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 24px;
+            padding-left: 20px;
+        }
+        .timeline-steps::before {
+            left: 40px;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            height: 100%;
+        }
+        .timeline-progress {
+            left: 40px;
+            top: 0;
+            width: 4px !important;
+            height: 0%;
+            transition: height 0.5s ease-in-out;
+        }
+        .timeline-step {
+            flex-direction: row;
+            width: 100%;
+            gap: 15px;
+        }
+        .timeline-label {
+            margin-top: 0;
+            text-align: left;
+        }
+    }
 </style>
 <?= $this->endSection() ?>
 
@@ -37,6 +148,41 @@ $tgl_sk = old('tgl_sk_kepengurusan') ?? ($pendaftaran['tgl_sk_kepengurusan'] ?? 
 $tgl_exp = old('tgl_sk_kedaluwarsa') ?? ($pendaftaran['tgl_sk_kedaluwarsa'] ?? '');
 $lat = old('latitude') ?? ($pendaftaran['latitude'] ?? '');
 $lng = old('longitude') ?? ($pendaftaran['longitude'] ?? '');
+
+$existingFiles = [];
+if ($is_edit && !empty($pendaftaran['file_berkas'])) {
+    $existingFiles = json_decode($pendaftaran['file_berkas'], true) ?: [];
+}
+
+$tipe = $pendaftaran['tipe_ormas'] ?? 'Lokal';
+
+$requirementsLokal = [
+    ["name" => "Surat Permohonan", "desc" => "Surat Permohonan ditujukan kepada Menteri (Cq. Kaban Kesbangpol)", "tte" => true, "template" => "https://drive.google.com/uc?export=download&id=1XqCYdQYp87AXN4RGMvJqJKslvA05nRNR"],
+    ["name" => "AD & ART", "desc" => "Anggaran Dasar (AD) & Anggaran Rumah Tangga (ART)", "tte" => true, "template" => ""],
+    ["name" => "Akta Notaris", "desc" => "Akta Pendirian Notaris (memuat Nama, Lambang, Asas, Tujuan, Pengurus, Hak, Keuangan, dll.)", "tte" => true, "template" => ""],
+    ["name" => "Surat Pernyataan Keabsahan", "desc" => "Surat Pernyataan Keabsahan Dokumen (Meterai Rp 10.000)", "tte" => true, "template" => "https://drive.google.com/uc?export=download&id=1XqCYdQYp87AXN4RGMvJqJKslvA05nRNR"],
+    ["name" => "Program & Struktur Kerja", "desc" => "Program Kerja Organisasi & Struktur Organisasi Resmi", "tte" => true, "template" => ""],
+    ["name" => "Domisili Kantor", "desc" => "Surat Keterangan Domisili Kantor Sekretariat", "tte" => true, "template" => ""],
+    ["name" => "NPWP Organisasi", "desc" => "NPWP atas nama Organisasi", "tte" => false, "template" => ""],
+    ["name" => "Formulir Isian Data Ormas", "desc" => "Formulir Isian Data Ormas (ditandatangani Ketua & Sekretaris)", "tte" => true, "template" => "https://drive.google.com/uc?export=download&id=1XqCYdQYp87AXN4RGMvJqJKslvA05nRNR"],
+    ["name" => "Rekomendasi Kementerian", "desc" => "Surat Rekomendasi Kementerian Agama (Ormas Agama) / Kebudayaan", "tte" => true, "template" => ""],
+    ["name" => "Biodata & KTP Pengurus", "desc" => "Biodata & KTP Pengurus (Ketua, Sekretaris, Bendahara)", "tte" => false, "template" => ""],
+    ["name" => "Pasfoto Pengurus", "desc" => "Pasfoto Pengurus 4x6 cm 2 Lembar (Latar Merah)", "tte" => false, "template" => ""],
+    ["name" => "SK & Foto Sekretariat", "desc" => "SK Pengurus & Foto Sekretariat (Tampak depan menampilkan Papan Nama)", "tte" => false, "template" => ""],
+    ["name" => "Kontrak/Izin Pakai Gedung", "desc" => "Surat Perjanjian Kontrak/Izin Pakai Gedung dari Pemilik Gedung", "tte" => true, "template" => ""],
+    ["name" => "Rekening & Logo Organisasi", "desc" => "Nomor Rekening Organisasi & File Logo Organisasi", "tte" => false, "template" => ""]
+];
+
+$requirementsBerjenjang = [
+    ["name" => "Surat Permohonan", "desc" => "Surat Permohonan ditujukan kepada Kepala Badan Kesbangpol Kab. Sinjai", "tte" => true, "template" => "https://drive.google.com/uc?export=download&id=1UX2CJCfXpWZUix7o-j3jY9cld63dX7KS"],
+    ["name" => "Surat Pernyataan Resmi", "desc" => "Surat Pernyataan Resmi (Meterai Rp 10.000)", "tte" => true, "template" => "https://drive.google.com/uc?export=download&id=1UX2CJCfXpWZUix7o-j3jY9cld63dX7KS"],
+    ["name" => "Surat Keterangan Domisili", "desc" => "Surat Keterangan Domisili (Alamat domisili kop surat & sekretariat)", "tte" => true, "template" => ""],
+    ["name" => "Formulir Isian Data Ormas", "desc" => "Formulir Isian Data Ormas (ditandatangani Ketua & Sekretaris)", "tte" => true, "template" => "https://drive.google.com/uc?export=download&id=1UX2CJCfXpWZUix7o-j3jY9cld63dX7KS"],
+    ["name" => "Pasfoto Pengurus", "desc" => "Pasfoto Pengurus ukuran 4x6 cm sebanyak 2 lembar", "tte" => false, "template" => ""],
+    ["name" => "Fotokopi KTP Pengurus", "desc" => "Fotokopi KTP Pengurus (Ketua, Sekretaris, Bendahara)", "tte" => false, "template" => ""],
+    ["name" => "Surat Keputusan (SK) Pengurus", "desc" => "Surat Keputusan (SK) Pengurus Organisasi", "tte" => false, "template" => ""],
+    ["name" => "Foto Sekretariat", "desc" => "Foto Sekretariat (Tampak depan menampilkan Papan Nama resmi)", "tte" => false, "template" => ""]
+];
 ?>
 
 <div class="row justify-content-center">
@@ -49,51 +195,46 @@ $lng = old('longitude') ?? ($pendaftaran['longitude'] ?? '');
                 </a>
                 <h3 class="text-white fw-bold mt-3 mb-0">
                     <i class="fa-solid fa-file-pen text-primary me-2"></i>
-                    <?= $is_edit ? 'Revisi Pengajuan Pendaftaran Ormas' : 'Form Pengajuan Pendaftaran Ormas Baru' ?>
+                    <?= $is_edit ? 'Alur Pendaftaran Ormas / LSM' : 'Form Pengajuan Pendaftaran Ormas Baru' ?>
                 </h3>
             </div>
         </div>
 
-        <?php if ($is_edit && $pendaftaran['status_verifikasi'] === 'Rejected'): ?>
-            <div class="alert alert-danger bg-danger-subtle border-danger-subtle text-danger p-3 rounded mb-4" role="alert" style="border-radius: 12px;">
-                <h6 class="fw-bold mb-1"><i class="fa-solid fa-circle-xmark me-2"></i>Catatan Penolakan Admin:</h6>
-                <p class="small mb-0 italic">"<?= esc($pendaftaran['alasan_ditolak']) ?>"</p>
+        <!-- Wizard Step Indicators -->
+        <div class="card p-3 mb-4 border-0" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color) !important; border-radius: 12px;">
+            <div class="row text-center font-heading">
+                <div class="col-4 step-indicator" id="step-ind-1">
+                    <div class="step-num bg-secondary text-white rounded-circle d-inline-flex align-items-center justify-content-center fw-bold mb-1" style="width: 32px; height: 32px; font-size: 0.9rem;">1</div>
+                    <div class="small fw-semibold d-block text-muted" id="step-lbl-1">Informasi Dasar & Peta</div>
+                </div>
+                <div class="col-4 step-indicator" id="step-ind-2">
+                    <div class="step-num bg-secondary text-white rounded-circle d-inline-flex align-items-center justify-content-center fw-bold mb-1" style="width: 32px; height: 32px; font-size: 0.9rem;">2</div>
+                    <div class="small fw-semibold d-block text-muted" id="step-lbl-2">Berkas Persyaratan</div>
+                </div>
+                <div class="col-4 step-indicator" id="step-ind-3">
+                    <div class="step-num bg-secondary text-white rounded-circle d-inline-flex align-items-center justify-content-center fw-bold mb-1" style="width: 32px; height: 32px; font-size: 0.9rem;">3</div>
+                    <div class="small fw-semibold d-block text-muted" id="step-lbl-3">Status Pengajuan & SKT</div>
+                </div>
             </div>
-        <?php endif; ?>
+        </div>
 
-        <div class="form-card glass-card">
+        <!-- ========================================== -->
+        <!-- STEP 1: INFORMASI UMUM & PETA LOKASI -->
+        <!-- ========================================== -->
+        <div class="form-card glass-card d-none" id="section-step-1">
             <form action="<?= base_url('user/pengajuan/simpan') ?>" method="POST" enctype="multipart/form-data">
                 <?= csrf_field() ?>
                 <?php if ($is_edit): ?>
                     <input type="hidden" name="pendaftaran_id" value="<?= esc($pendaftaran['id']) ?>">
                 <?php endif; ?>
+                <input type="hidden" name="current_step" value="1">
 
                 <!-- Notice Board -->
                 <div class="alert alert-info bg-primary-subtle border-primary-subtle text-primary-light p-4 mb-4" role="alert" style="border-radius: 12px; font-size: 0.95rem; line-height: 1.6;">
-                    <p class="mb-2">Hai, Selamat Datang di Pelayanan Registrasi Laporan Keberadaan Ormas/Yayasan/Perkumpulan Kabupaten Sinjai. Isi formulir dengan benar dan teliti.</p>
-                    <p class="mb-2">Silahkan unduh format dokumen pelaporan resmi: <a href="https://drive.google.com/uc?export=download&id=1XqCYdQYp87AXN4RGMvJqJKslvA05nRNR" id="download-template-link" class="text-primary fw-bold text-decoration-none" target="_blank"><i class="fa-solid fa-download ms-1"></i> Klik Disini untuk Mengunduh</a></p>
-                    <hr class="my-3 border-primary-subtle">
-                    <p class="mb-0 fw-semibold text-white">
-                        <i class="fa-solid fa-phone-volume me-2"></i>Silahkan konfirmasi melalui whatsapp apabila mengalami kendala: 
-                        <a href="https://wa.me/6281280799020?text=Halo%20Bapak%20Endang,%20saya%20mengalami%20kendala%20saat%20mengisi%20formulir%20registrasi%20ormas." target="_blank" class="text-success text-decoration-none fw-bold wa-link">
-                            Bapak Endang Saryono (0812 8079 9020) <i class="fa-brands fa-whatsapp ms-1"></i>
-                        </a>
-                    </p>
+                    <p class="mb-2">Hai, Selamat Datang di Pelayanan Registrasi Laporan Keberadaan Ormas/Yayasan/Perkumpulan Kabupaten Sinjai. Lengkapi informasi umum dan letak sekretariat Anda pada peta di bawah ini.</p>
                 </div>
 
-                <!-- Progress Bar Pengisian (Opsi E) -->
-                <div class="mb-4 p-3 rounded" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: 12px;">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="small fw-bold text-white"><i class="fa-solid fa-spinner fa-spin me-2 text-warning" id="progress-spinner"></i>Progres Pengisian Formulir</span>
-                        <span class="badge bg-danger text-white fw-bold" id="progress-percentage-label">0% Lengkap</span>
-                    </div>
-                    <div class="progress" style="height: 10px; background-color: var(--hr-border); border-radius: 6px; overflow: hidden;">
-                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-danger" id="progress-bar-fill" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <div class="form-text text-muted small mt-1.5" style="font-size:0.78rem;">Lengkapi seluruh bidang wajib dan dokumen persyaratan untuk mencapai 100%.</div>
-                </div>
-
-                <h5 class="text-white fw-bold mb-3 border-bottom border-secondary border-opacity-10 pb-2">1. Informasi Dasar Organisasi</h5>
+                <h5 class="text-main fw-bold mb-3 border-bottom border-secondary border-opacity-10 pb-2">1. Informasi Dasar Organisasi</h5>
                 <div class="row g-3 mb-4">
                     <div class="col-md-6">
                         <label for="nama_ormas" class="form-label small text-muted">Nama Ormas / Lembaga / Yayasan <span class="text-danger fw-bold">*</span></label>
@@ -102,8 +243,8 @@ $lng = old('longitude') ?? ($pendaftaran['longitude'] ?? '');
                     <div class="col-md-6">
                         <label for="tipe_ormas" class="form-label small text-muted">Tipe Organisasi <span class="text-danger fw-bold">*</span></label>
                         <select class="form-select form-control-custom" id="tipe_ormas" name="tipe_ormas" required onchange="toggleOrmasRequirements(this.value)">
-                            <option value="Lokal">Ormas Lokal (Penerbitan SKT)</option>
-                            <option value="Berjenjang">Ormas Berjenjang (Penerbitan Surat Keberadaan)</option>
+                            <option value="Lokal" <?= ($tipe === 'Lokal') ? 'selected' : '' ?>>Ormas Lokal (Penerbitan SKT)</option>
+                            <option value="Berjenjang" <?= ($tipe === 'Berjenjang') ? 'selected' : '' ?>>Ormas Berjenjang (Penerbitan Surat Keberadaan)</option>
                         </select>
                     </div>
                     <div class="col-md-6">
@@ -126,7 +267,7 @@ $lng = old('longitude') ?? ($pendaftaran['longitude'] ?? '');
                     </div>
                 </div>
 
-                <h5 class="text-white fw-bold mb-3 border-bottom border-secondary border-opacity-10 pb-2">2. Legalitas & Masa Kepengurusan</h5>
+                <h5 class="text-main fw-bold mb-3 border-bottom border-secondary border-opacity-10 pb-2">2. Legalitas & Masa Kepengurusan</h5>
                 <div class="row g-3 mb-4">
                     <div class="col-md-6">
                         <label for="tgl_sk_kepengurusan" class="form-label small text-muted">Tanggal Mulai SK Kepengurusan</label>
@@ -136,10 +277,19 @@ $lng = old('longitude') ?? ($pendaftaran['longitude'] ?? '');
                         <label for="tgl_sk_kedaluwarsa" class="form-label small text-muted">Tanggal Kedaluwarsa SK Kepengurusan</label>
                         <input type="date" name="tgl_sk_kedaluwarsa" id="tgl_sk_kedaluwarsa" class="form-control form-control-custom" value="<?= esc($tgl_exp) ?>">
                     </div>
+                    <div class="col-md-12">
+                        <label for="file_logo" class="form-label small text-muted mb-2">
+                            Logo Organisasi (Format Gambar)
+                            <?php if ($is_edit && !empty($pendaftaran['file_logo'])): ?>
+                                <span class="badge bg-secondary-subtle text-white font-normal ms-1">Sudah ada logo</span>
+                            <?php endif; ?>
+                        </label>
+                        <input type="file" name="file_logo" id="file_logo" class="form-control form-control-custom" accept="image/*">
+                    </div>
                 </div>
 
-                <h5 class="text-white fw-bold mb-3 border-bottom border-secondary border-opacity-10 pb-2">3. Lokasi Geografis Kantor Sekretariat</h5>
-                <p class="text-muted small mb-2"><i class="fa-solid fa-circle-info text-info me-1"></i>Tentukan titik koordinat sekretariat pada peta interaktif di bawah ini untuk memudahkan pemetaan database GIS Kesbangpol. Klik pada peta atau drag marker biru ke posisi yang tepat.</p>
+                <h5 class="text-main fw-bold mb-3 border-bottom border-secondary border-opacity-10 pb-2">3. Lokasi Geografis Kantor Sekretariat</h5>
+                <p class="text-muted small mb-2"><i class="fa-solid fa-circle-info text-info me-1"></i>Tentukan titik koordinat sekretariat pada peta interaktif. Klik pada peta atau drag marker biru ke posisi kantor Anda.</p>
                 
                 <div class="row g-3 mb-3">
                     <div class="col-sm-6">
@@ -153,82 +303,326 @@ $lng = old('longitude') ?? ($pendaftaran['longitude'] ?? '');
                 </div>
                 <div id="form-map" class="mb-4"></div>
 
-                <!-- Dynamic Requirements List -->
-                <div class="mb-4">
-                    <div class="p-4 rounded border" style="background: rgba(255, 255, 255, 0.02); border-color: var(--border-color) !important; border-radius: 12px;">
-                        <h6 class="text-white fw-bold mb-3"><i class="fa-solid fa-list-check text-warning me-2"></i>Daftar Berkas Persyaratan (Harap Gabung Menjadi 1 File PDF/ZIP):</h6>
-                        
-                        <div id="lokal-requirements" class="small text-muted">
-                            <ol class="mb-0 ps-3 d-flex flex-column gap-2" style="font-size: 0.88rem; list-style-type: decimal;">
-                                <li>Surat Permohonan ditujukan kepada Menteri (Cq. Kaban Kesbangpol)</li>
-                                <li>Anggaran Dasar (AD) & Anggaran Rumah Tangga (ART)</li>
-                                <li>Akta Pendirian Notaris (memuat Nama, Lambang, Asas, Tujuan, Pengurus, Hak, Keuangan, dll.)</li>
-                                <li>Surat Pernyataan Keabsahan Dokumen (Meterai Rp 10.000)</li>
-                                <li>Program Kerja Organisasi & Struktur Organisasi Resmi</li>
-                                <li>Surat Keterangan Domisili Kantor Sekretariat</li>
-                                <li>NPWP atas nama Organisasi</li>
-                                <li>Formulir Isian Data Ormas (ditandatangani Ketua & Sekretaris)</li>
-                                <li>Surat Rekomendasi Kementerian Agama (Ormas Agama) / Kebudayaan</li>
-                                <li>Biodata & KTP Pengurus (Ketua, Sekretaris, Bendahara)</li>
-                                <li>Pasfoto Pengurus 4x6 cm 2 Lembar (Latar Merah)</li>
-                                <li>SK Pengurus & Foto Sekretariat (Tampak depan menampilkan Papan Nama)</li>
-                                <li>Surat Perjanjian Kontrak/Izin Pakai Gedung dari Pemilik Gedung</li>
-                                <li>Nomor Rekening Organisasi & File Logo Organisasi</li>
-                            </ol>
-                        </div>
-
-                        <div id="berjenjang-requirements" class="small text-muted d-none">
-                            <ol class="mb-0 ps-3 d-flex flex-column gap-2" style="font-size: 0.88rem; list-style-type: decimal;">
-                                <li>Surat Permohonan ditujukan kepada Kepala Badan Kesbangpol Kab. Sinjai</li>
-                                <li>Surat Pernyataan Resmi (Meterai Rp 10.000)</li>
-                                <li>Surat Keterangan Domisili (Alamat domisili kop surat & sekretariat)</li>
-                                <li>Formulir Isian Data Ormas (ditandatangani Ketua & Sekretaris)</li>
-                                <li>Pasfoto Pengurus ukuran 4x6 cm sebanyak 2 lembar</li>
-                                <li>Fotokopi KTP Pengurus (Ketua, Sekretaris, Bendahara)</li>
-                                <li>Surat Keputusan (SK) Pengurus Organisasi</li>
-                                <li>Foto Sekretariat (Tampak depan menampilkan Papan Nama resmi)</li>
-                            </ol>
-                        </div>
-                    </div>
-                </div>
-
-                <h5 class="text-white fw-bold mb-3 border-bottom border-secondary border-opacity-10 pb-2">4. Unggah Lampiran Dokumen</h5>
-                <div class="row g-3 mb-4">
-                    <div class="col-md-6">
-                        <label for="file_logo" class="form-label small text-muted">
-                            Logo Organisasi (Format Gambar)
-                            <?php if ($is_edit): ?>
-                                <span class="badge bg-secondary-subtle text-white font-normal ms-1">Sudah ada berkas</span>
-                            <?php endif; ?>
-                        </label>
-                        <input type="file" name="file_logo" id="file_logo" class="form-control form-control-custom" accept="image/*">
-                        <?php if ($is_edit): ?>
-                            <span class="text-muted small d-block mt-1">Biarkan kosong jika tidak ingin mengubah logo yang sudah diunggah.</span>
-                        <?php endif; ?>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="file_berkas" class="form-label small text-muted">
-                            Berkas Legalitas / AD-ART / Surat Pengajuan (Format PDF/ZIP) 
-                            <?php if (!$is_edit): ?><span class="text-danger fw-bold">*</span><?php endif; ?>
-                            <?php if ($is_edit): ?>
-                                <span class="badge bg-secondary-subtle text-white font-normal ms-1">Sudah ada berkas</span>
-                            <?php endif; ?>
-                        </label>
-                        <input type="file" name="file_berkas" id="file_berkas" class="form-control form-control-custom" accept=".pdf,.zip" <?php if (!$is_edit) echo 'required'; ?>>
-                        <?php if ($is_edit): ?>
-                            <span class="text-muted small d-block mt-1">Biarkan kosong jika tidak ingin mengubah berkas legalitas.</span>
-                        <?php endif; ?>
-                    </div>
-                </div>
-
                 <div class="d-flex justify-content-end gap-2 border-top border-secondary border-opacity-10 pt-4 mt-4">
                     <a href="<?= base_url('user') ?>" class="btn btn-secondary text-white">Batal</a>
                     <button type="submit" class="btn btn-portal text-white fw-bold">
-                        <i class="fa-solid fa-paper-plane me-1"></i> Kirim Pengajuan
+                        Simpan & Lanjut ke Berkas <i class="fa-solid fa-arrow-right ms-1"></i>
                     </button>
                 </div>
             </form>
         </div>
+
+        <!-- ========================================== -->
+        <!-- STEP 2: UNGHAH BERKAS PERSYARATAN & TEMPLATE -->
+        <!-- ========================================== -->
+        <div class="form-card glass-card d-none" id="section-step-2">
+            <?php if ($is_edit && $pendaftaran['status_verifikasi'] === 'Rejected'): ?>
+                <div class="alert alert-danger bg-danger-subtle border-danger-subtle text-danger p-3 rounded mb-4" role="alert" style="border-radius: 12px;">
+                    <h6 class="fw-bold mb-1"><i class="fa-solid fa-circle-xmark me-2"></i>Catatan Penolakan Admin:</h6>
+                    <p class="small mb-0 italic">"<?= esc($pendaftaran['alasan_ditolak']) ?>"</p>
+                </div>
+            <?php endif; ?>
+
+            <form action="<?= base_url('user/pengajuan/simpan') ?>" method="POST" enctype="multipart/form-data">
+                <?= csrf_field() ?>
+                <?php if ($is_edit): ?>
+                    <input type="hidden" name="pendaftaran_id" value="<?= esc($pendaftaran['id']) ?>">
+                <?php endif; ?>
+                <input type="hidden" name="current_step" value="2">
+                <input type="hidden" name="tipe_ormas" value="<?= esc($pendaftaran['tipe_ormas'] ?? 'Lokal') ?>">
+
+                <!-- Info Board -->
+                <div class="alert alert-warning bg-warning-subtle border-warning-subtle text-warning-light p-4 mb-4" role="alert" style="border-radius: 12px; font-size: 0.95rem; line-height: 1.6;">
+                    <p class="mb-0 fw-semibold text-white">
+                        <i class="fa-solid fa-cloud-arrow-up me-2"></i>Silakan unggah dokumen persyaratan Anda satu-per-satu di bawah ini. Harap pastikan format file berupa <b>PDF</b> atau <b>ZIP</b>.
+                    </p>
+                </div>
+
+                <!-- Live Progress Bar inside Step 2 -->
+                <div class="mb-4 p-3 rounded" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: 12px;">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="small fw-bold text-white"><i class="fa-solid fa-spinner fa-spin me-2 text-warning" id="progress-spinner"></i>Kelengkapan Berkas Diunggah</span>
+                        <span class="badge bg-danger text-white fw-bold" id="progress-percentage-label">0% Lengkap</span>
+                    </div>
+                    <div class="progress" style="height: 10px; background-color: var(--hr-border); border-radius: 6px; overflow: hidden;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-danger" id="progress-bar-fill" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+
+                <!-- Validasi Kelengkapan Dokumen Table -->
+                <div class="card mb-4 border-0" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden;">
+                    <div class="card-header py-3 px-4" style="background: #eab308; border-bottom: 1px solid var(--border-color);">
+                        <h5 class="mb-0 text-dark fw-bold font-heading" style="font-size: 1.05rem;"><i class="fa-solid fa-clipboard-check me-2"></i>Unggah Persyaratan Dokumen</h5>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-custom mb-0 text-white" style="font-size: 0.85rem;">
+                            <thead>
+                                <tr style="background: rgba(255, 255, 255, 0.02);">
+                                    <th class="text-center" style="width: 4%;">#</th>
+                                    <th style="width: 32%;">Jenis Dokumen</th>
+                                    <th class="text-center" style="width: 10%;">Status</th>
+                                    <th class="text-center" style="width: 10%;">TTE</th>
+                                    <th class="text-center" style="width: 12%;">Ukuran</th>
+                                    <th class="text-center" style="width: 12%;">File Terunggah</th>
+                                    <th class="text-center" style="width: 10%;">Format</th>
+                                    <th style="width: 10%;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="validation-table-body">
+                                <!-- Populated dynamically by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between border-top border-secondary border-opacity-10 pt-4 mt-4">
+                    <button type="button" class="btn btn-outline-secondary text-white" onclick="goToStep(1)">
+                        <i class="fa-solid fa-arrow-left me-1"></i> Kembali ke Informasi Dasar
+                    </button>
+                    <div class="d-flex gap-2">
+                        <a href="<?= base_url('user') ?>" class="btn btn-secondary text-white">Batal</a>
+                        <button type="submit" class="btn btn-success text-white fw-bold">
+                            <i class="fa-solid fa-paper-plane me-1"></i> Kirim Pengajuan Berkas
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- STEP 3: STATUS VERIFIKASI & TTE -->
+        <!-- ========================================== -->
+        <?php if ($is_edit): ?>
+            <div class="form-card glass-card d-none" id="section-step-3">
+                <div class="row g-4 mb-4">
+                    <!-- Card 1: Informasi Berkas (Blue Header) -->
+                    <div class="col-md-6">
+                        <div class="card border-0 h-100" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color) !important; border-radius: 12px; overflow: hidden;">
+                            <div class="card-header py-3 px-4" style="background: #0d6efd; border-bottom: 1px solid var(--border-color);">
+                                <h5 class="mb-0 text-white fw-bold font-heading" style="font-size: 1.05rem;"><i class="fa-solid fa-folder me-2"></i>Informasi Berkas</h5>
+                            </div>
+                            <div class="card-body py-4 text-white">
+                                <div class="d-flex align-items-center mb-4">
+                                    <div class="bg-secondary rounded-circle p-1 d-inline-flex align-items-center justify-content-center me-3" style="width: 70px; height: 70px; overflow: hidden; border: 3px solid rgba(255,255,255,0.08);">
+                                        <?php 
+                                        $logoPath = 'uploads/ormas/' . $pendaftaran['file_logo'];
+                                        $isImage = (!empty($pendaftaran['file_logo']) && preg_match('/\.(webp|jpg|jpeg|png|gif)$/i', $pendaftaran['file_logo']) && file_exists(ROOTPATH . 'public/' . $logoPath));
+                                        if ($isImage): ?>
+                                            <img src="<?= base_url($logoPath) ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                                        <?php else: ?>
+                                            <i class="fa-solid fa-users fa-2x text-white"></i>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div>
+                                        <h5 class="fw-bold mb-0 text-warning"><?= esc($pendaftaran['nama_ormas']) ?></h5>
+                                        <span class="text-muted small">Registrasi Ormas (<?= ($tipe === 'Lokal') ? 'Lokal' : 'Berjenjang/Nasional' ?>)</span>
+                                    </div>
+                                </div>
+
+                                <table class="table table-borderless text-white small mb-0">
+                                    <tbody>
+                                        <tr>
+                                            <th class="text-muted ps-0 py-1.5" style="width: 35%;">Alamat Sekretariat</th>
+                                            <td class="py-1.5">: <?= esc($pendaftaran['alamat']) ?></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-muted ps-0 py-1.5">Kontak Email</th>
+                                            <td class="py-1.5">: <?= esc($pendaftaran['email'] ?: '-') ?></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-muted ps-0 py-1.5">Nomor Telepon</th>
+                                            <td class="py-1.5">: <?= esc($pendaftaran['telepon'] ?: '-') ?></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-muted ps-0 py-1.5">SK Kepengurusan</th>
+                                            <td class="py-1.5">: 
+                                                <?= !empty($pendaftaran['tgl_sk_kepengurusan']) ? date('d F Y', strtotime($pendaftaran['tgl_sk_kepengurusan'])) : '-' ?>
+                                                s/d
+                                                <?= !empty($pendaftaran['tgl_sk_kedaluwarsa']) ? date('d F Y', strtotime($pendaftaran['tgl_sk_kedaluwarsa'])) : '-' ?>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Status & Timeline (Teal Header) -->
+                    <div class="col-md-6">
+                        <div class="card border-0 h-100" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color) !important; border-radius: 12px; overflow: hidden;">
+                            <div class="card-header py-3 px-4" style="background: #14b8a6; border-bottom: 1px solid var(--border-color);">
+                                <h5 class="mb-0 text-white fw-bold font-heading" style="font-size: 1.05rem;"><i class="fa-solid fa-timeline me-2"></i>Status & Timeline</h5>
+                            </div>
+                            <div class="card-body py-4 text-white">
+                                <table class="table table-borderless text-white small mb-3">
+                                    <tbody>
+                                        <tr>
+                                            <th class="text-muted ps-0 py-1" style="width: 35%;">Status Saat Ini</th>
+                                            <td class="py-1">: 
+                                                <?php if ($pendaftaran['status_verifikasi'] === 'Pending'): ?>
+                                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle">PENDING / PROSES VERIFIKASI</span>
+                                                <?php elseif ($pendaftaran['status_verifikasi'] === 'Approved' && $pendaftaran['progress_percentage'] < 100): ?>
+                                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle">APPROVED / PROSES KEMENDAGRI</span>
+                                                <?php elseif ($pendaftaran['status_verifikasi'] === 'Approved' && $pendaftaran['progress_percentage'] == 100): ?>
+                                                    <span class="badge bg-success-subtle text-success border border-success-subtle">SUCCESS / TTE SELESAI</span>
+                                                <?php elseif ($pendaftaran['status_verifikasi'] === 'Rejected'): ?>
+                                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle">REJECTED / DITOLAK</span>
+                                                <?php endif; ?>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-muted ps-0 py-1">Tanggal Upload</th>
+                                            <td class="py-1">: <?= date('d/m/Y H:i', strtotime($pendaftaran['created_at'])) ?></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-muted ps-0 py-1">Progres Alur</th>
+                                            <td class="py-1 text-warning fw-bold">: <?= $pendaftaran['progress_percentage'] ?>% Selesai</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <!-- Progress Timeline Visual -->
+                                <?php
+                                $progress = $pendaftaran['progress_percentage'];
+                                $status = $pendaftaran['status_verifikasi'];
+                                $step1_class = 'completed';
+                                $step2_class = '';
+                                $step3_class = '';
+                                $step4_class = '';
+                                
+                                if ($status === 'Pending') {
+                                    $step1_class = 'active';
+                                } elseif ($status === 'Approved' && $progress == 50) {
+                                    $step1_class = 'completed';
+                                    $step2_class = 'active';
+                                } elseif ($status === 'Approved' && $progress == 75) {
+                                    $step1_class = 'completed';
+                                    $step2_class = 'completed';
+                                    $step3_class = 'active';
+                                } elseif ($status === 'Approved' && $progress == 100) {
+                                    $step1_class = 'completed';
+                                    $step2_class = 'completed';
+                                    $step3_class = 'completed';
+                                    $step4_class = 'completed';
+                                }
+                                ?>
+                                <div class="timeline-steps my-4">
+                                    <div class="timeline-progress" style="width: <?= ($progress == 25) ? '0' : (($progress == 50) ? '33' : (($progress == 75) ? '66' : '100')) ?>%;"></div>
+                                    <div class="timeline-step <?= $step1_class ?>">
+                                        <div class="timeline-icon" style="width:30px; height:30px; font-size:0.75rem;">
+                                            <?php if ($step1_class === 'completed'): ?><i class="fa-solid fa-check"></i><?php else: ?>1<?php endif; ?>
+                                        </div>
+                                        <div class="timeline-label" style="font-size:0.68rem; margin-top:5px; line-height:1.2;">Verifikasi Berkas</div>
+                                    </div>
+                                    <div class="timeline-step <?= $step2_class ?>">
+                                        <div class="timeline-icon" style="width:30px; height:30px; font-size:0.75rem;">
+                                            <?php if ($step2_class === 'completed'): ?><i class="fa-solid fa-check"></i><?php else: ?>2<?php endif; ?>
+                                        </div>
+                                        <div class="timeline-label" style="font-size:0.68rem; margin-top:5px; line-height:1.2;">Diajukan ke Kemendagri</div>
+                                    </div>
+                                    <div class="timeline-step <?= $step3_class ?>">
+                                        <div class="timeline-icon" style="width:30px; height:30px; font-size:0.75rem;">
+                                            <?php if ($step3_class === 'completed'): ?><i class="fa-solid fa-check"></i><?php else: ?>3<?php endif; ?>
+                                        </div>
+                                        <div class="timeline-label" style="font-size:0.68rem; margin-top:5px; line-height:1.2;">Validasi & TTE Kabid</div>
+                                    </div>
+                                    <div class="timeline-step <?= $step4_class ?>">
+                                        <div class="timeline-icon" style="width:30px; height:30px; font-size:0.75rem;">
+                                            <?php if ($step4_class === 'completed'): ?><i class="fa-solid fa-check"></i><?php else: ?>4<?php endif; ?>
+                                        </div>
+                                        <div class="timeline-label" style="font-size:0.68rem; margin-top:5px; line-height:1.2;">Selesai / SKT Terbit</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Box depending on progress percentage -->
+                <div class="p-4 rounded border mb-4 text-white" style="background: rgba(255,255,255,0.02); border-color: var(--border-color) !important;">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle bg-info-subtle p-3 text-info d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                            <?php if ($progress == 100): ?>
+                                <i class="fa-solid fa-circle-check fa-2x text-success animate-bounce"></i>
+                            <?php else: ?>
+                                <i class="fa-solid fa-hourglass-half fa-2x text-warning fa-spin"></i>
+                            <?php endif; ?>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-1 text-white">Status Layanan Saat Ini</h5>
+                            <p class="small mb-0 text-muted">
+                                <?php if ($progress == 25): ?>
+                                    Berkas pendaftaran sedang dalam proses verifikasi oleh admin Kesbangpol. Silakan menunggu...
+                                <?php elseif ($progress == 50): ?>
+                                    Dokumen yang telah diunggah telah diajukan ke kemendagri, silahkan menunggu...
+                                <?php elseif ($progress == 75): ?>
+                                    Validasi Bidang & TTE Kabid sedang diproses. Silakan menunggu...
+                                <?php elseif ($progress == 100): ?>
+                                    Pendaftaran selesai! SKT telah diterbitkan. Silakan unduh dokumen resmi Anda di bawah.
+                                <?php endif; ?>
+                            </p>
+                        </div>
+                    </div>
+
+                    <?php if ($progress == 100): ?>
+                        <div class="mt-4 pt-3 border-top border-secondary border-opacity-10 d-flex justify-content-center">
+                            <?php if (!empty($pendaftaran['pdf_tte_path'])): ?>
+                                <a href="<?= base_url($pendaftaran['pdf_tte_path']) ?>" target="_blank" class="btn btn-success fw-bold text-white px-4 py-2.5">
+                                    <i class="fa-solid fa-cloud-download me-1"></i> Unduh Surat Keterangan Terdaftar (SKT) Resmi (TTE)
+                                </a>
+                            <?php else: ?>
+                                <span class="badge bg-secondary text-white p-3"><i class="fa-solid fa-circle-info me-2"></i>SKT Sedang disinkronisasi oleh Admin.</span>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Read-only file attachments table -->
+                <div class="card mb-4 border-0 animate-fade-in" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color) !important; border-radius: 12px; overflow: hidden;">
+                    <div class="card-header py-3 px-4" style="background: var(--border-color); border-bottom: 1px solid var(--border-color);">
+                        <h5 class="mb-0 text-white fw-bold font-heading" style="font-size: 1.05rem;"><i class="fa-solid fa-paperclip me-2"></i>Berkas Persyaratan yang Telah Diunggah</h5>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-custom mb-0 text-white" style="font-size: 0.85rem;">
+                            <thead>
+                                <tr style="background: rgba(255, 255, 255, 0.02);">
+                                    <th class="text-center" style="width: 5%;">#</th>
+                                    <th style="width: 45%;">Jenis Dokumen</th>
+                                    <th class="text-center" style="width: 25%;">Ukuran File</th>
+                                    <th class="text-center" style="width: 25%;">Tautan Unduh</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php 
+                                $activeReqs = ($tipe === 'Lokal') ? $requirementsLokal : $requirementsBerjenjang;
+                                foreach ($activeReqs as $idx => $req):
+                                    $fileIdx = $idx + 1;
+                                    $exist = $existingFiles[$fileIdx] ?? null;
+                                ?>
+                                    <tr>
+                                        <td class="text-center align-middle"><?= $fileIdx ?></td>
+                                        <td class="align-middle">
+                                            <div class="fw-semibold text-main small"><?= $req['name'] ?></div>
+                                            <div class="text-muted" style="font-size: 0.75rem;"><?= $req['desc'] ?></div>
+                                        </td>
+                                        <td class="text-center align-middle text-muted small">
+                                            <?= $exist ? $exist['size'] : '-' ?>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <?php if ($exist): ?>
+                                                <a href="<?= base_url('uploads/ormas/' . $exist['filename']) ?>" target="_blank" class="btn btn-sm btn-outline-info"><i class="fa-solid fa-file-pdf me-1"></i> Buka File</a>
+                                            <?php else: ?>
+                                                <span class="text-danger small"><i class="fa-solid fa-circle-xmark me-1"></i> Belum Diunggah</span>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
     </div>
 </div>
 
@@ -237,20 +631,209 @@ $lng = old('longitude') ?? ($pendaftaran['longitude'] ?? '');
 <?= $this->section('scripts') ?>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script>
-// Toggle requirements list based on Ormas type (Global)
-function toggleOrmasRequirements(value) {
-    const lokalRequirements = document.getElementById('lokal-requirements');
-    const berjenjangRequirements = document.getElementById('berjenjang-requirements');
-    const downloadLink = document.getElementById('download-template-link');
-    
-    if (value === 'Lokal') {
-        if (lokalRequirements) lokalRequirements.classList.remove('d-none');
-        if (berjenjangRequirements) berjenjangRequirements.classList.add('d-none');
-        if (downloadLink) downloadLink.href = "https://drive.google.com/uc?export=download&id=1XqCYdQYp87AXN4RGMvJqJKslvA05nRNR";
+const existingFiles = <?= json_encode($existingFiles) ?>;
+
+const requirementsLokal = [
+    { name: "Surat Permohonan", desc: "Surat Permohonan ditujukan kepada Menteri (Cq. Kaban Kesbangpol)", tte: true, template: "https://drive.google.com/uc?export=download&id=1XqCYdQYp87AXN4RGMvJqJKslvA05nRNR" },
+    { name: "AD & ART", desc: "Anggaran Dasar (AD) & Anggaran Rumah Tangga (ART)", tte: true, template: "" },
+    { name: "Akta Notaris", desc: "Akta Pendirian Notaris (memuat Nama, Lambang, Asas, Tujuan, Pengurus, Hak, Keuangan, dll.)", tte: true, template: "" },
+    { name: "Surat Pernyataan Keabsahan", desc: "Surat Pernyataan Keabsahan Dokumen (Meterai Rp 10.000)", tte: true, template: "https://drive.google.com/uc?export=download&id=1XqCYdQYp87AXN4RGMvJqJKslvA05nRNR" },
+    { name: "Program & Struktur Kerja", desc: "Program Kerja Organisasi & Struktur Organisasi Resmi", tte: true, template: "" },
+    { name: "Domisili Kantor", desc: "Surat Keterangan Domisili Kantor Sekretariat", tte: true, template: "" },
+    { name: "NPWP Organisasi", desc: "NPWP atas nama Organisasi", tte: false, template: "" },
+    { name: "Formulir Isian Data Ormas", desc: "Formulir Isian Data Ormas (ditandatangani Ketua & Sekretaris)", tte: true, template: "https://drive.google.com/uc?export=download&id=1XqCYdQYp87AXN4RGMvJqJKslvA05nRNR" },
+    { name: "Rekomendasi Kementerian", desc: "Surat Rekomendasi Kementerian Agama (Ormas Agama) / Kebudayaan", tte: true, template: "" },
+    { name: "Biodata & KTP Pengurus", desc: "Biodata & KTP Pengurus (Ketua, Sekretaris, Bendahara)", tte: false, template: "" },
+    { name: "Pasfoto Pengurus", desc: "Pasfoto Pengurus 4x6 cm 2 Lembar (Latar Merah)", tte: false, template: "" },
+    { name: "SK & Foto Sekretariat", desc: "SK Pengurus & Foto Sekretariat (Tampak depan menampilkan Papan Nama)", tte: false, template: "" },
+    { name: "Kontrak/Izin Pakai Gedung", desc: "Surat Perjanjian Kontrak/Izin Pakai Gedung dari Pemilik Gedung", tte: true, template: "" },
+    { name: "Rekening & Logo Organisasi", desc: "Nomor Rekening Organisasi & File Logo Organisasi", tte: false, template: "" }
+];
+
+const requirementsBerjenjang = [
+    { name: "Surat Permohonan", desc: "Surat Permohonan ditujukan kepada Kepala Badan Kesbangpol Kab. Sinjai", tte: true, template: "https://drive.google.com/uc?export=download&id=1UX2CJCfXpWZUix7o-j3jY9cld63dX7KS" },
+    { name: "Surat Pernyataan Resmi", desc: "Surat Pernyataan Resmi (Meterai Rp 10.000)", tte: true, template: "https://drive.google.com/uc?export=download&id=1UX2CJCfXpWZUix7o-j3jY9cld63dX7KS" },
+    { name: "Surat Keterangan Domisili", desc: "Surat Keterangan Domisili (Alamat domisili kop surat & sekretariat)", tte: true, template: "" },
+    { name: "Formulir Isian Data Ormas", desc: "Formulir Isian Data Ormas (ditandatangani Ketua & Sekretaris)", tte: true, template: "https://drive.google.com/uc?export=download&id=1UX2CJCfXpWZUix7o-j3jY9cld63dX7KS" },
+    { name: "Pasfoto Pengurus", desc: "Pasfoto Pengurus ukuran 4x6 cm sebanyak 2 lembar", tte: false, template: "" },
+    { name: "Fotokopi KTP Pengurus", desc: "Fotokopi KTP Pengurus (Ketua, Sekretaris, Bendahara)", tte: false, template: "" },
+    { name: "Surat Keputusan (SK) Pengurus", desc: "Surat Keputusan (SK) Pengurus Organisasi", tte: false, template: "" },
+    { name: "Foto Sekretariat", desc: "Foto Sekretariat (Tampak depan menampilkan Papan Nama resmi)", tte: false, template: "" }
+];
+
+function handleFileInputChange(input, index) {
+    const fileChosenSpan = document.querySelector(`.file-chosen-name-${index}`);
+    if (input.files && input.files[0]) {
+        fileChosenSpan.innerText = input.files[0].name.substring(0, 15) + (input.files[0].name.length > 15 ? '...' : '');
+        fileChosenSpan.classList.remove('d-none');
     } else {
-        if (lokalRequirements) lokalRequirements.classList.add('d-none');
-        if (berjenjangRequirements) berjenjangRequirements.classList.remove('d-none');
-        if (downloadLink) downloadLink.href = "https://drive.google.com/uc?export=download&id=1UX2CJCfXpWZUix7o-j3jY9cld63dX7KS";
+        fileChosenSpan.innerText = '';
+        fileChosenSpan.classList.add('d-none');
+    }
+    updateFormProgress();
+}
+
+function renderValidationTable(tipe) {
+    const tableBody = document.getElementById('validation-table-body');
+    if (!tableBody) return;
+    tableBody.innerHTML = '';
+    const activeReqs = tipe === 'Lokal' ? requirementsLokal : requirementsBerjenjang;
+
+    activeReqs.forEach((req, idx) => {
+        const fileIdx = idx + 1;
+        const exist = existingFiles[fileIdx] || null;
+        
+        let statusBadge = `<span class="badge bg-danger-subtle text-danger border border-danger-subtle small"><i class="fa-solid fa-circle-xmark me-1"></i> Belum Ada</span>`;
+        let tteBadge = req.tte ? `<span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-0.5" style="font-size: 0.72rem;"><i class="fa-solid fa-signature me-1"></i> TTE</span>` : `<span class="badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25 px-2 py-0.5" style="font-size: 0.72rem;">Non TTE</span>`;
+        let keterangan = exist ? `Size: ${exist.size}` : '-';
+        let fileCol = exist ? `<a href="<?= base_url('uploads/ormas/') ?>/${exist.filename}" target="_blank" class="text-info text-decoration-none text-truncate d-inline-block" style="max-width:180px;" title="${exist.filename}"><i class="fa-solid fa-file-pdf me-1"></i> ${exist.filename.substring(0, 15)}...</a>` : '-';
+        
+        if (exist) {
+            statusBadge = `<span class="badge bg-success-subtle text-success border border-success-subtle small"><i class="fa-solid fa-check me-1"></i> Ada</span>`;
+        }
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td class="text-center align-middle">${fileIdx}</td>
+            <td class="align-middle">
+                <div class="fw-semibold text-main small">${req.name}</div>
+                <div class="text-muted" style="font-size: 0.75rem;">${req.desc}</div>
+            </td>
+            <td class="text-center align-middle">${statusBadge}</td>
+            <td class="text-center align-middle">${tteBadge}</td>
+            <td class="text-center align-middle text-muted small">${keterangan}</td>
+            <td class="text-center align-middle">${fileCol}</td>
+            <td class="text-center align-middle">
+                ${req.template ? `<a href="${req.template}" target="_blank" class="btn btn-sm btn-outline-warning py-1 px-2" style="font-size: 0.7rem;" title="Download Format ${req.name}"><i class="fa-solid fa-download me-1"></i> Format</a>` : `<span class="text-muted small">-</span>`}
+            </td>
+            <td class="align-middle">
+                <div class="d-flex align-items-center gap-2">
+                    <label class="btn btn-sm btn-outline-secondary mb-0 py-1 px-2.5" style="cursor: pointer; font-size: 0.72rem;">
+                        <i class="fa-solid fa-cloud-arrow-up me-1"></i> Pilih File
+                        <input type="file" name="file_berkas_${fileIdx}" class="d-none berkas-file-input" data-index="${fileIdx}" accept=".pdf,.zip" onchange="handleFileInputChange(this, ${fileIdx})">
+                    </label>
+                    <span class="file-chosen-name-${fileIdx} small text-success fw-bold text-truncate d-none" style="max-width: 120px;"></span>
+                </div>
+            </td>
+        `;
+        tableBody.appendChild(row);
+    });
+}
+
+function toggleOrmasRequirements(value) {
+    renderValidationTable(value);
+}
+
+function goToStep(step) {
+    // Hide all step sections
+    document.getElementById('section-step-1').classList.add('d-none');
+    document.getElementById('section-step-2').classList.add('d-none');
+    const step3 = document.getElementById('section-step-3');
+    if (step3) step3.classList.add('d-none');
+
+    // Reset step indicator styles
+    for (let i = 1; i <= 3; i++) {
+        const ind = document.getElementById(`step-ind-${i}`);
+        const num = ind.querySelector('.step-num');
+        const lbl = document.getElementById(`step-lbl-${i}`);
+        
+        num.className = 'step-num bg-secondary text-white rounded-circle d-inline-flex align-items-center justify-content-center fw-bold mb-1';
+        lbl.className = 'small fw-semibold d-block text-muted';
+    }
+
+    // Set active step
+    const activeSection = document.getElementById(`section-step-${step}`);
+    if (activeSection) {
+        activeSection.classList.remove('d-none');
+    }
+
+    // Highlight active and completed indicators
+    for (let i = 1; i <= step; i++) {
+        const ind = document.getElementById(`step-ind-${i}`);
+        const num = ind.querySelector('.step-num');
+        const lbl = document.getElementById(`step-lbl-${i}`);
+
+        if (i === step) {
+            num.className = 'step-num bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center fw-bold mb-1';
+            lbl.className = 'small fw-semibold d-block text-white';
+        } else {
+            num.className = 'step-num bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center fw-bold mb-1';
+            num.innerHTML = '<i class="fa-solid fa-check"></i>';
+            lbl.className = 'small fw-semibold d-block text-success';
+        }
+    }
+}
+
+// Live Progress Calculation
+function updateFormProgress() {
+    let progress = 0;
+
+    // --- SECTION 1: Pengisian Field Data (Maks 50%) ---
+    const namaOrmas = document.getElementById('nama_ormas')?.value || '';
+    if (namaOrmas.trim().length > 2) progress += 10;
+
+    const alamat = document.getElementById('alamat')?.value || '';
+    if (alamat.trim().length > 5) progress += 10;
+
+    const email = document.getElementById('email')?.value || '';
+    const telepon = document.getElementById('telepon')?.value || '';
+    if (email.trim().length > 4) progress += 5;
+    if (telepon.trim().length > 5) progress += 5;
+
+    const latVal = document.getElementById('latitude')?.value || '';
+    const lngVal = document.getElementById('longitude')?.value || '';
+    if (latVal !== '' && lngVal !== '') progress += 10;
+
+    const tglSk = document.getElementById('tgl_sk_kepengurusan')?.value || '';
+    const tglExp = document.getElementById('tgl_sk_kedaluwarsa')?.value || '';
+    if (tglSk !== '') progress += 5;
+    if (tglExp !== '') progress += 5;
+
+    // --- SECTION 2: Kelengkapan Berkas (Maks 50%) ---
+    const tipeOrmas = document.getElementById('tipe_ormas')?.value || 'Lokal';
+    const maxFiles = tipeOrmas === 'Lokal' ? 14 : 8;
+    let filesUploadedCount = 0;
+
+    for (let i = 1; i <= maxFiles; i++) {
+        const fileInput = document.querySelector(`input[name="file_berkas_${i}"]`);
+        const hasExist = existingFiles[i] !== undefined && existingFiles[i] !== null;
+        const hasChosen = fileInput && fileInput.files && fileInput.files.length > 0;
+        if (hasExist || hasChosen) {
+            filesUploadedCount++;
+        }
+    }
+
+    const documentProgress = Math.round((filesUploadedCount / maxFiles) * 50);
+    progress += documentProgress;
+
+    // Update UI Progress Bar
+    const progressBarFill = document.getElementById('progress-bar-fill');
+    const progressLabel = document.getElementById('progress-percentage-label');
+    const spinner = document.getElementById('progress-spinner');
+
+    if (progressBarFill && progressLabel) {
+        if (progress > 100) progress = 100;
+        progressBarFill.style.width = progress + '%';
+        progressBarFill.setAttribute('aria-valuenow', progress);
+        progressLabel.innerText = progress + '% Lengkap';
+
+        // Adjust color classes
+        progressBarFill.className = 'progress-bar progress-bar-striped progress-bar-animated';
+        progressLabel.className = 'badge fw-bold';
+
+        if (progress < 40) {
+            progressBarFill.classList.add('bg-danger');
+            progressLabel.classList.add('bg-danger', 'text-white');
+        } else if (progress < 80) {
+            progressBarFill.classList.add('bg-warning');
+            progressLabel.classList.add('bg-warning', 'text-dark');
+        } else {
+            progressBarFill.classList.add('bg-success');
+            progressLabel.classList.add('bg-success', 'text-white');
+            if (spinner) {
+                spinner.className = 'fa-solid fa-circle-check me-2 text-success animate-pulse';
+            }
+        }
     }
 }
 
@@ -383,12 +966,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     geocodeStatus.innerHTML = '<span class="text-success"><i class="fa-solid fa-circle-check"></i> Lokasi berhasil dideteksi!</span>';
                     updateFormProgress();
                 } else {
-                    geocodeStatus.innerHTML = '<span class="text-warning"><i class="fa-solid fa-triangle-exclamation"></i> Lokasi tidak ditemukan. Coba perjelas nama jalan/kecamatan.</span>';
+                    geocodeStatus.innerHTML = '<span class="text-danger"><i class="fa-solid fa-circle-xmark"></i> Lokasi tidak ditemukan. Silakan tentukan manual pada peta.</span>';
                 }
             })
-            .catch(err => {
-                console.error("Geocoding error:", err);
-                geocodeStatus.innerHTML = '<span class="text-danger"><i class="fa-solid fa-circle-xmark"></i> Gagal menghubungkan ke layanan pemetaan.</span>';
+            .catch(error => {
+                console.error('Error during geocoding:', error);
+                geocodeStatus.innerHTML = '<span class="text-danger"><i class="fa-solid fa-circle-xmark"></i> Gagal menghubungi layanan geocoding.</span>';
             })
             .finally(() => {
                 btnGeocode.disabled = false;
@@ -396,126 +979,25 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
 
-    alamatTextarea.addEventListener('input', function() {
-        clearTimeout(geocodeTimeout);
-        const query = this.value.trim();
-        if (query.length < 5) {
-            geocodeStatus.innerHTML = '';
-            return;
-        }
-        geocodeTimeout = setTimeout(function() {
-            performGeocoding(query, false);
-        }, 1500); // Debounce 1.5 detik saat mengetik agar tidak terlalu sering memanggil API
-    });
-
-    btnGeocode.addEventListener('click', function() {
-        clearTimeout(geocodeTimeout);
-        const query = alamatTextarea.value.trim();
-        performGeocoding(query, true);
-    });
-
-    // Live Progress Calculation
-    const isEdit = <?= $is_edit ? 'true' : 'false' ?>;
-
-    function updateFormProgress() {
-        let progress = 0;
-
-        // 1. Nama Ormas (15%)
-        const namaOrmas = document.getElementById('nama_ormas')?.value || '';
-        if (namaOrmas.trim().length > 2) {
-            progress += 15;
-        }
-
-        // 2. Tipe Ormas (10%)
-        const tipeOrmas = document.getElementById('tipe_ormas')?.value || '';
-        if (tipeOrmas !== '') {
-            progress += 10;
-        }
-
-        // 3. Telepon (15%)
-        const telepon = document.getElementById('telepon')?.value || '';
-        if (telepon.trim().length > 5) {
-            progress += 15;
-        }
-
-        // 4. Alamat (15%)
-        const alamat = document.getElementById('alamat')?.value || '';
-        if (alamat.trim().length > 5) {
-            progress += 15;
-        }
-
-        // 5. Latitude & Longitude (10%)
-        const latVal = document.getElementById('latitude')?.value || '';
-        const lngVal = document.getElementById('longitude')?.value || '';
-        if (latVal !== '' && lngVal !== '') {
-            progress += 10;
-        }
-
-        // 6. Tanggal SK Kepengurusan (5%) & Kedaluwarsa (5%)
-        const tglSk = document.getElementById('tgl_sk_kepengurusan')?.value || '';
-        const tglExp = document.getElementById('tgl_sk_kedaluwarsa')?.value || '';
-        if (tglSk !== '') {
-            progress += 5;
-        }
-        if (tglExp !== '') {
-            progress += 5;
-        }
-
-        // 7. File Berkas (25%)
-        const fileInput = document.getElementById('file_berkas');
-        if ((fileInput && fileInput.files && fileInput.files.length > 0) || isEdit) {
-            progress += 25;
-        }
-
-        // Update UI Progress Bar
-        const progressBarFill = document.getElementById('progress-bar-fill');
-        const progressLabel = document.getElementById('progress-percentage-label');
-        const spinner = document.getElementById('progress-spinner');
-
-        if (progressBarFill && progressLabel) {
-            progressBarFill.style.width = progress + '%';
-            progressBarFill.setAttribute('aria-valuenow', progress);
-            progressLabel.innerText = progress + '% Lengkap';
-
-            // Adjust color classes
-            progressBarFill.className = 'progress-bar progress-bar-striped progress-bar-animated';
-            progressLabel.className = 'badge fw-bold';
-
-            if (progress < 40) {
-                progressBarFill.classList.add('bg-danger');
-                progressLabel.classList.add('bg-danger', 'text-white');
-            } else if (progress < 80) {
-                progressBarFill.classList.add('bg-warning');
-                progressLabel.classList.add('bg-warning', 'text-dark');
-            } else {
-                progressBarFill.classList.add('bg-success');
-                progressLabel.classList.add('bg-success', 'text-white');
-                if (spinner) {
-                    spinner.className = 'fa-solid fa-circle-check me-2 text-success animate-pulse';
-                }
-            }
-        }
+    if (alamatTextarea) {
+        alamatTextarea.addEventListener('input', function() {
+            clearTimeout(geocodeTimeout);
+            geocodeTimeout = setTimeout(() => {
+                performGeocoding(alamatTextarea.value, false);
+            }, 1500); // Debounce 1.5 seconds
+        });
     }
 
-    // Bind events for progress tracking
-    const progressFields = [
-        'nama_ormas', 'tipe_ormas', 'telepon', 'alamat', 
-        'latitude', 'longitude', 'tgl_sk_kepengurusan', 'tgl_sk_kedaluwarsa'
-    ];
-    progressFields.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-            el.addEventListener('input', updateFormProgress);
-            el.addEventListener('change', updateFormProgress);
-        }
-    });
-
-    const fileEl = document.getElementById('file_berkas');
-    if (fileEl) {
-        fileEl.addEventListener('change', updateFormProgress);
+    if (btnGeocode) {
+        btnGeocode.addEventListener('click', function() {
+            performGeocoding(alamatTextarea.value || '', true);
+        });
     }
 
-    // Call toggle on load to show initial state
+    // Initialize Active Step
+    goToStep(<?= $activeStep ?>);
+
+    // Call toggle initial requirements
     const tipeOrmasEl = document.getElementById('tipe_ormas');
     if (tipeOrmasEl) {
         toggleOrmasRequirements(tipeOrmasEl.value);

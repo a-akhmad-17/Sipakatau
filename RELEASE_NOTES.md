@@ -1,5 +1,15 @@
 # RELEASE NOTES - SIPAKATAU
 
+## [v2.9.6] - 2026-07-07
+### ✨ Added
+- **Pembaruan Alur Wizard Pengajuan Ormas (Multi-Step Form)**: Memecah form pendaftaran ormas di `form_pengajuan.php` menjadi 3 langkah / visual wizard:
+  - **Langkah 1 (Informasi Dasar & Peta)**: Mengisi informasi nama, tipe, nomor HP, email, alamat, masa SK kepengurusan, letak geografis (peta Leaflet & auto-geocode), dan logo organisasi. Menekan lanjut akan menyimpan pengajuan sebagai status `'Draft'` (progress 25%) dan mendapatkan ID pendaftaran.
+  - **Langkah 2 (Berkas Persyaratan)**: Mengunggah berkas-berkas persyaratan secara individu (14 berkas untuk lokal, 8 berkas untuk berjenjang) yang dilengkapi tombol download format/template resmi. Pada halaman ini pula, user dapat langsung melihat komentar/alasan penolakan dari admin jika pendaftaran direvisi.
+  - **Langkah 3 (Status Pengajuan & SKT)**: Halaman read-only pasca-kirim berkas yang menampilkan status real-time, pesan keterkaitan alur ("Dokumen telah diajukan ke kemendagri, silahkan menunggu...", dll.), timeline, daftar dokumen terunggah, serta tombol cetak/unduh Surat Keterangan Terdaftar (SKT) resmi ber-TTE ketika progres mencapai 100%.
+- **Sinkronisasi Navigasi Dashboard**: Menghubungkan klik tombol "Tampilkan" dan "Revisi" di dasbor utama pengguna langsung ke wizard langkah yang sesuai di `user/pengajuan`.
+
+---
+
 ## [v2.9.5] - 2026-07-07
 ### ✨ Added
 - **Pendefinisian JavaScript Requirements List**: Menambahkan konstanta `globalRequirementsLokal` dan `globalRequirementsBerjenjang` ke dalam script block dashboard admin. Ini memecahkan bug ReferenceError yang menghentikan eksekusi JS dan menyebabkan tombol detail pendaftaran ormas tidak bisa diklik.
