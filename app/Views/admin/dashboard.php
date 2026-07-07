@@ -158,15 +158,15 @@
         transform: translateX(4px);
     }
     .btn-filter-custom {
-        background: rgba(255, 255, 255, 0.05);
-        color: rgba(255, 255, 255, 0.8) !important;
-        border: 1px solid var(--border-color);
+        background: var(--card-bg) !important;
+        color: var(--text-muted) !important;
+        border: 1px solid var(--border-color) !important;
         transition: all 0.3s ease;
         font-weight: 500;
     }
     .btn-filter-custom:hover {
-        background: rgba(255, 255, 255, 0.15);
-        color: #fff !important;
+        background: var(--border-color) !important;
+        color: var(--text-main) !important;
     }
     .btn-filter-custom.active {
         background: #0dcaf0 !important;
@@ -1441,9 +1441,9 @@
                 </div>
                 <!-- Detail Kelengkapan Berkas (Point-by-Point JSON Table) -->
                 <div id="container-dt-checklist-table" class="mt-4 d-none">
-                    <h6 class="text-white small fw-bold mb-3"><i class="fa-solid fa-list-check text-warning me-2"></i>Validasi Kelengkapan Dokumen</h6>
+                    <h6 class="small fw-bold mb-3" style="color: var(--text-main) !important;"><i class="fa-solid fa-list-check text-warning me-2"></i>Validasi Kelengkapan Dokumen</h6>
                     <div class="table-responsive">
-                        <table class="table table-custom mb-0 text-white" style="font-size: 0.85rem;">
+                        <table class="table table-custom mb-0" style="font-size: 0.85rem; color: var(--text-main) !important;">
                             <thead>
                                 <tr style="background: rgba(255, 255, 255, 0.02);">
                                     <th class="text-center" style="width: 5%;">#</th>
@@ -1463,23 +1463,23 @@
 
                 <!-- Interactive Progress Checklist (Only for Pendaftaran Ormas) -->
                 <div id="container-dt-progress-checklist" class="mt-4 d-none">
-                    <h6 class="text-white small fw-bold mb-3"><i class="fa-solid fa-route text-info me-2"></i>Update Progres Alur Layanan (Checklist)</h6>
+                    <h6 class="small fw-bold mb-3" style="color: var(--text-main) !important;"><i class="fa-solid fa-route text-info me-2"></i>Update Progres Alur Layanan (Checklist)</h6>
                     <div class="d-flex flex-column gap-2.5 p-3 rounded border border-secondary border-opacity-25" style="background: rgba(255, 255, 255, 0.02);">
                         <div class="form-check mb-0">
                             <input class="form-check-input progress-checkbox" type="checkbox" id="modal-step1" data-id="" data-value="25" onclick="updateTrackingProgress(this)">
-                            <label class="form-check-label text-white small" style="cursor:pointer;" for="modal-step1">1. Verifikasi Berkas (25%)</label>
+                            <label class="form-check-label small" style="cursor:pointer; color: var(--text-main) !important;" for="modal-step1">1. Verifikasi Berkas (25%)</label>
                         </div>
                         <div class="form-check mb-0">
                             <input class="form-check-input progress-checkbox" type="checkbox" id="modal-step2" data-id="" data-value="50" onclick="updateTrackingProgress(this)">
-                            <label class="form-check-label text-white small" style="cursor:pointer;" for="modal-step2">2. Ke Kemendagri (50%)</label>
+                            <label class="form-check-label small" style="cursor:pointer; color: var(--text-main) !important;" for="modal-step2">2. Ke Kemendagri (50%)</label>
                         </div>
                         <div class="form-check mb-0">
                             <input class="form-check-input progress-checkbox" type="checkbox" id="modal-step3" data-id="" data-value="75" onclick="updateTrackingProgress(this)">
-                            <label class="form-check-label text-white small" style="cursor:pointer;" for="modal-step3">3. Validasi Bidang (75%)</label>
+                            <label class="form-check-label small" style="cursor:pointer; color: var(--text-main) !important;" for="modal-step3">3. Validasi Bidang (75%)</label>
                         </div>
                         <div class="form-check mb-0">
                             <input class="form-check-input progress-checkbox" type="checkbox" id="modal-step4" data-id="" data-value="100" onclick="updateTrackingProgress(this)">
-                            <label class="form-check-label text-white small" style="cursor:pointer;" for="modal-step4">4. Selesai / TTE (100%)</label>
+                            <label class="form-check-label small" style="cursor:pointer; color: var(--text-main) !important;" for="modal-step4">4. Selesai / TTE (100%)</label>
                         </div>
                     </div>
                 </div>
@@ -2202,7 +2202,34 @@ document.addEventListener('DOMContentLoaded', function() {
             pickerMapParpol.removeLayer(pickerMarkerParpol);
             pickerMarkerParpol = null;
         }
-    });
+    // Global Requirements List
+    const globalRequirementsLokal = [
+        {"name": "Surat Permohonan", "desc": "Surat Permohonan ditujukan kepada Menteri (Cq. Kaban Kesbangpol)", "tte": true},
+        {"name": "AD & ART", "desc": "Anggaran Dasar (AD) & Anggaran Rumah Tangga (ART)", "tte": true},
+        {"name": "Akta Notaris", "desc": "Akta Pendirian Notaris (memuat Nama, Lambang, Asas, Tujuan, Pengurus, Hak, Keuangan, dll.)", "tte": true},
+        {"name": "Surat Pernyataan Keabsahan", "desc": "Surat Pernyataan Keabsahan Dokumen (Meterai Rp 10.000)", "tte": true},
+        {"name": "Program & Struktur Kerja", "desc": "Program Kerja Organisasi & Struktur Organisasi Resmi", "tte": true},
+        {"name": "Domisili Kantor", "desc": "Surat Keterangan Domisili Kantor Sekretariat", "tte": true},
+        {"name": "NPWP Organisasi", "desc": "NPWP atas nama Organisasi", "tte": false},
+        {"name": "Formulir Isian Data Ormas", "desc": "Formulir Isian Data Ormas (ditandatangani Ketua & Sekretaris)", "tte": true},
+        {"name": "Rekomendasi Kementerian", "desc": "Surat Rekomendasi Kementerian Agama (Ormas Agama) / Kebudayaan", "tte": true},
+        {"name": "Biodata & KTP Pengurus", "desc": "Biodata & KTP Pengurus (Ketua, Sekretaris, Bendahara)", "tte": false},
+        {"name": "Pasfoto Pengurus", "desc": "Pasfoto Pengurus 4x6 cm 2 Lembar (Latar Merah)", "tte": false},
+        {"name": "SK & Foto Sekretariat", "desc": "SK Pengurus & Foto Sekretariat (Tampak depan menampilkan Papan Nama)", "tte": false},
+        {"name": "Kontrak/Izin Pakai Gedung", "desc": "Surat Perjanjian Kontrak/Izin Pakai Gedung dari Pemilik Gedung", "tte": true},
+        {"name": "Rekening & Logo Organisasi", "desc": "Nomor Rekening Organisasi & File Logo Organisasi", "tte": false}
+    ];
+
+    const globalRequirementsBerjenjang = [
+        {"name": "Surat Permohonan", "desc": "Surat Permohonan ditujukan kepada Kepala Badan Kesbangpol Kab. Sinjai", "tte": true},
+        {"name": "Surat Pernyataan Resmi", "desc": "Surat Pernyataan Resmi (Meterai Rp 10.000)", "tte": true},
+        {"name": "Surat Keterangan Domisili", "desc": "Surat Keterangan Domisili (Alamat domisili kop surat & sekretariat)", "tte": true},
+        {"name": "Formulir Isian Data Ormas", "desc": "Formulir Isian Data Ormas (ditandatangani Ketua & Sekretaris)", "tte": true},
+        {"name": "Pasfoto Pengurus", "desc": "Pasfoto Pengurus ukuran 4x6 cm sebanyak 2 lembar", "tte": false},
+        {"name": "Fotokopi KTP Pengurus", "desc": "Fotokopi KTP Pengurus (Ketua, Sekretaris, Bendahara)", "tte": false},
+        {"name": "Surat Keputusan (SK) Pengurus", "desc": "Surat Keputusan (SK) Pengurus Organisasi", "tte": false},
+        {"name": "Foto Sekretariat", "desc": "Foto Sekretariat (Tampak depan menampilkan Papan Nama resmi)", "tte": false}
+    ];
 
     // Detail Tracking Modal populator
     const modalDetailTrackingEl = document.getElementById('modalDetailTracking');
@@ -2351,25 +2378,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Action buttons for ormas
                 if (status === 'Pending') {
-                    const verifBtn = document.createElement('button');
-                    verifBtn.type = 'button';
-                    verifBtn.className = 'btn btn-warning text-dark fw-bold me-2';
-                    verifBtn.innerHTML = '<i class="fa-solid fa-list-check me-1"></i> Verifikasi Berkas';
-                    verifBtn.addEventListener('click', () => {
-                        modalDetailTracking.hide();
-                        setTimeout(() => {
-                            window.openVerifikasiModal({
-                                getAttribute: function(attr) {
-                                    if (attr === 'data-id') return id;
-                                    if (attr === 'data-nama') return nama;
-                                    if (attr === 'data-tipe-ormas') return tipeOrmas;
-                                    if (attr === 'data-file') return file;
-                                    return '';
-                                }
-                            });
-                        }, 350);
-                    });
-                    actionsContainer.appendChild(verifBtn);
+                    const verifForm = document.createElement('form');
+                    verifForm.action = `<?= base_url('admin/proses-pendaftaran') ?>/${id}/approve_berkas`;
+                    verifForm.method = 'POST';
+                    verifForm.className = 'd-inline me-2';
+                    verifForm.onsubmit = () => confirm('Setujui kelayakan berkas persyaratan ormas ini?');
+                    verifForm.innerHTML = `
+                        <?= csrf_field() ?>
+                        <button type="submit" class="btn btn-warning text-dark fw-bold"><i class="fa-solid fa-check me-1"></i> Lolos Berkas (50%)</button>
+                    `;
+                    actionsContainer.appendChild(verifForm);
 
                     const rejectBtn = document.createElement('button');
                     rejectBtn.type = 'button';
@@ -2574,21 +2592,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Helper functions to trigger verification/rejection/issuance modals from details modal
-    window.triggerVerifikasiModal = function(id, nama, tipe, file) {
-        modalDetailTracking.hide();
-        setTimeout(() => {
-            window.openVerifikasiModal({
-                getAttribute: function(attr) {
-                    if (attr === 'data-id') return id;
-                    if (attr === 'data-nama') return nama;
-                    if (attr === 'data-tipe-ormas') return tipe;
-                    if (attr === 'data-file') return file;
-                    return '';
-                }
-            });
-        }, 350);
-    };
+
 
     window.triggerTolakModal = function(id, nama) {
         modalDetailTracking.hide();

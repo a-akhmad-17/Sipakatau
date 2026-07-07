@@ -1,5 +1,14 @@
 # RELEASE NOTES - SIPAKATAU
 
+## [v2.9.5] - 2026-07-07
+### ✨ Added
+- **Pendefinisian JavaScript Requirements List**: Menambahkan konstanta `globalRequirementsLokal` dan `globalRequirementsBerjenjang` ke dalam script block dashboard admin. Ini memecahkan bug ReferenceError yang menghentikan eksekusi JS dan menyebabkan tombol detail pendaftaran ormas tidak bisa diklik.
+- **Penyelarasan Desain Tombol Filter Tema Adaptif**: Mengubah warna statis tombol `.btn-filter-custom` agar berbasis CSS variables (`var(--card-bg)`, `var(--text-muted)`, `var(--text-main)`), sehingga teks dan background tombol tetap terbaca dengan jelas dan tidak tabrakan di Mode Terang maupun Mode Gelap.
+- **Dukungan Warna Teks Kontras Modal**: Menghapus kelas `text-white` keras pada elemen-elemen berkas persyaratan dan checklist alur progres dalam modal detail tracking, agar warna teks otomatis beradaptasi dengan warna tema (`var(--text-main)`) dan tidak menjadi putih di atas background putih di Mode Terang.
+- **Penyederhanaan Alur Verifikasi Berkas**: Mengintegrasikan tombol "Lolos Berkas (50%)" langsung sebagai form POST dinamis di dalam modal detail tracking (mengarah ke route `approve_berkas`), menggantikan helper pembuka modal verifikasi terpisah yang belum terdefinisi.
+
+---
+
 ## [v2.9.4] - 2026-07-07
 ### ✨ Added
 - **Peningkatan Event Listener Tindakan Modal**: Mengubah penanganan klik tindakan modal pelacakan dari string template inline `onclick` menjadi standard JavaScript `addEventListener` dan dynamic node creation (`document.createElement`). Ini memperbaiki bug tombol detail/kelola pendaftaran ormas yang tidak dapat diklik akibat konflik tanda kutip ganda pada file JSON berkas ormas yang memecah atribut HTML.
