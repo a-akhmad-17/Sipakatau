@@ -6,6 +6,7 @@
 - **Penyelarasan Desain Tombol Filter Tema Adaptif**: Mengubah warna statis tombol `.btn-filter-custom` agar berbasis CSS variables (`var(--card-bg)`, `var(--text-muted)`, `var(--text-main)`), sehingga teks dan background tombol tetap terbaca dengan jelas dan tidak tabrakan di Mode Terang maupun Mode Gelap.
 - **Dukungan Warna Teks Kontras Modal**: Menghapus kelas `text-white` keras pada elemen-elemen berkas persyaratan dan checklist alur progres dalam modal detail tracking, agar warna teks otomatis beradaptasi dengan warna tema (`var(--text-main)`) dan tidak menjadi putih di atas background putih di Mode Terang.
 - **Penyederhanaan Alur Verifikasi Berkas**: Mengintegrasikan tombol "Lolos Berkas (50%)" langsung sebagai form POST dinamis di dalam modal detail tracking (mengarah ke route `approve_berkas`), menggantikan helper pembuka modal verifikasi terpisah yang belum terdefinisi.
+- **Perbaikan Sintaksis Event Listener**: Memperbaiki kurung kurawal/tanda kurung penutup (`});`) yang tidak sengaja terhapus pada event listener reset koordinat peta parpol, memulihkan seluruh fungsi interaktif JavaScript dashboard.
 
 ---
 

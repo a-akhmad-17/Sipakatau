@@ -2202,6 +2202,8 @@ document.addEventListener('DOMContentLoaded', function() {
             pickerMapParpol.removeLayer(pickerMarkerParpol);
             pickerMarkerParpol = null;
         }
+    });
+
     // Global Requirements List
     const globalRequirementsLokal = [
         {"name": "Surat Permohonan", "desc": "Surat Permohonan ditujukan kepada Menteri (Cq. Kaban Kesbangpol)", "tte": true},
