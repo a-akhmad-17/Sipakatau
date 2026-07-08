@@ -780,23 +780,32 @@
 
                     // Render Timeline HTML
                     const timelineContainer = document.getElementById('m-ormas-timeline-container');
-                    timelineContainer.className = "d-flex justify-content-between align-items-center w-100 flex-wrap gap-2 text-center mt-3";
+                    timelineContainer.className = "timeline-steps my-4 w-100";
                     timelineContainer.innerHTML = `
-                        <div class="d-flex flex-column align-items-center flex-fill position-relative">
-                            <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold ${step1 === 'completed' ? 'bg-success text-white' : (step1 === 'active' ? 'bg-warning text-dark animate-pulse' : 'bg-secondary text-white-50')}" style="width:36px; height:36px; font-size:13px; z-index: 2;">1</div>
-                            <span class="small fw-semibold mt-2 ${step1 !== '' ? '' : 'text-muted'}">1. Verifikasi Berkas</span>
+                        <div class="timeline-progress" style="width: ${progress == 25 ? '0' : (progress == 50 ? '33' : (progress == 75 ? '66' : (progress == 100 ? '100' : '0')))}%;"></div>
+                        <div class="timeline-step ${step1}">
+                            <div class="timeline-icon" style="width:30px; height:30px; font-size:0.75rem;">
+                                ${step1 === 'completed' ? '<i class="fa-solid fa-check"></i>' : '1'}
+                            </div>
+                            <div class="timeline-label" style="font-size:0.68rem; margin-top:5px; line-height:1.2;">Verifikasi Berkas</div>
                         </div>
-                        <div class="d-flex flex-column align-items-center flex-fill position-relative">
-                            <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold ${step2 === 'completed' ? 'bg-success text-white' : (step2 === 'active' ? 'bg-warning text-dark animate-pulse' : 'bg-secondary text-white-50')}" style="width:36px; height:36px; font-size:13px; z-index: 2;">2</div>
-                            <span class="small fw-semibold mt-2 ${step2 !== '' ? '' : 'text-muted'}">2. Ke Kemendagri</span>
+                        <div class="timeline-step ${step2}">
+                            <div class="timeline-icon" style="width:30px; height:30px; font-size:0.75rem;">
+                                ${step2 === 'completed' ? '<i class="fa-solid fa-check"></i>' : '2'}
+                            </div>
+                            <div class="timeline-label" style="font-size:0.68rem; margin-top:5px; line-height:1.2;">Ke Kemendagri</div>
                         </div>
-                        <div class="d-flex flex-column align-items-center flex-fill position-relative">
-                            <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold ${step3 === 'completed' ? 'bg-success text-white' : (step3 === 'active' ? 'bg-warning text-dark animate-pulse' : 'bg-secondary text-white-50')}" style="width:36px; height:36px; font-size:13px; z-index: 2;">3</div>
-                            <span class="small fw-semibold mt-2 ${step3 !== '' ? '' : 'text-muted'}">3. Validasi Bidang</span>
+                        <div class="timeline-step ${step3}">
+                            <div class="timeline-icon" style="width:30px; height:30px; font-size:0.75rem;">
+                                ${step3 === 'completed' ? '<i class="fa-solid fa-check"></i>' : '3'}
+                            </div>
+                            <div class="timeline-label" style="font-size:0.68rem; margin-top:5px; line-height:1.2;">Validasi Bidang</div>
                         </div>
-                        <div class="d-flex flex-column align-items-center flex-fill position-relative">
-                            <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold ${step4 === 'completed' ? 'bg-success text-white' : (step4 === 'active' ? 'bg-warning text-dark animate-pulse' : 'bg-secondary text-white-50')}" style="width:36px; height:36px; font-size:13px; z-index: 2;">4</div>
-                            <span class="small fw-semibold mt-2 ${step4 !== '' ? '' : 'text-muted'}">4. TTE Selesai</span>
+                        <div class="timeline-step ${step4}">
+                            <div class="timeline-icon" style="width:30px; height:30px; font-size:0.75rem;">
+                                ${step4 === 'completed' ? '<i class="fa-solid fa-check"></i>' : '4'}
+                            </div>
+                            <div class="timeline-label" style="font-size:0.68rem; margin-top:5px; line-height:1.2;">Selesai</div>
                         </div>
                     `;
 

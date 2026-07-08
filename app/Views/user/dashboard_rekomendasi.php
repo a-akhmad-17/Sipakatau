@@ -1,5 +1,87 @@
 <?= $this->extend('layouts/admin') ?>
 
+<?= $this->section('styles') ?>
+<style>
+    .timeline-steps {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+
+    .timeline-steps::before {
+        content: '';
+        position: absolute;
+        top: 20px;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--border-color);
+        z-index: 1;
+    }
+
+    .timeline-progress {
+        position: absolute;
+        top: 20px;
+        left: 0;
+        height: 4px;
+        background: var(--primary-grad);
+        z-index: 2;
+        transition: width 0.5s ease-in-out;
+    }
+
+    .timeline-step {
+        position: relative;
+        z-index: 3;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 120px;
+    }
+
+    .timeline-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: var(--bg-color);
+        border: 3px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-muted);
+        font-weight: bold;
+        transition: all 0.4s ease;
+    }
+
+    .timeline-step.active .timeline-icon {
+        border-color: #f43f5e;
+        color: #f43f5e;
+        box-shadow: 0 0 12px rgba(244, 63, 94, 0.4);
+    }
+
+    .timeline-step.completed .timeline-icon {
+        background: var(--primary-grad);
+        border-color: #f43f5e;
+        color: white;
+    }
+
+    .timeline-label {
+        margin-top: 10px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-align: center;
+        color: var(--text-muted);
+    }
+
+    .timeline-step.active .timeline-label,
+    .timeline-step.completed .timeline-label {
+        color: var(--text-main);
+    }
+</style>
+<?= $this->endSection() ?>
+
 <?= $this->section('content') ?>
 <div class="container-fluid px-0">
     <!-- Header / Breadcrumbs -->
@@ -361,15 +443,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Render Timeline HTML
                 const timelineContainer = document.getElementById('m-rek-timeline-container');
-                timelineContainer.className = "d-flex justify-content-between align-items-center w-100 flex-wrap gap-2 text-center mt-3";
+                timelineContainer.className = "timeline-steps my-4 w-100";
                 timelineContainer.innerHTML = `
-                    <div class="d-flex flex-column align-items-center flex-fill position-relative">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold ${step1 === 'completed' ? 'bg-success text-white' : (step1 === 'active' ? 'bg-warning text-dark animate-pulse' : 'bg-secondary text-white-50')}" style="width:36px; height:36px; font-size:13px; z-index: 2;">1</div>
-                        <span class="small fw-semibold mt-2 ${step1 !== '' ? '' : 'text-muted'}">1. Verifikasi Berkas (75%)</span>
+                    <div class="timeline-progress" style="width: ${progress == 75 ? '50' : (progress == 100 ? '100' : '0')}%;"></div>
+                    <div class="timeline-step ${step1}">
+                        <div class="timeline-icon" style="width:30px; height:30px; font-size:0.75rem;">
+                            ${step1 === 'completed' ? '<i class="fa-solid fa-check"></i>' : '1'}
+                        </div>
+                        <div class="timeline-label" style="font-size:0.68rem; margin-top:5px; line-height:1.2;">Verifikasi Berkas (75%)</div>
                     </div>
-                    <div class="d-flex flex-column align-items-center flex-fill position-relative">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold ${step2 === 'completed' ? 'bg-success text-white' : (step2 === 'active' ? 'bg-warning text-dark animate-pulse' : 'bg-secondary text-white-50')}" style="width:36px; height:36px; font-size:13px; z-index: 2;">2</div>
-                        <span class="small fw-semibold mt-2 ${step2 !== '' ? '' : 'text-muted'}">2. TTE Surat Selesai (100%)</span>
+                    <div class="timeline-step ${step2}">
+                        <div class="timeline-icon" style="width:30px; height:30px; font-size:0.75rem;">
+                            ${step2 === 'completed' ? '<i class="fa-solid fa-check"></i>' : '2'}
+                        </div>
+                        <div class="timeline-label" style="font-size:0.68rem; margin-top:5px; line-height:1.2;">TTE Surat Selesai (100%)</div>
                     </div>
                 `;
 
