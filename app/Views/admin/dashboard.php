@@ -1481,11 +1481,11 @@
                                         <table class="table table-sm table-bordered border-secondary border-opacity-10 text-white mb-0" style="font-size: 0.85rem; background: rgba(255,255,255,0.02);">
                                             <thead>
                                                 <tr style="background: rgba(255, 255, 255, 0.03);">
-                                                    <th>Jabatan</th>
-                                                    <th>Nama Lengkap</th>
-                                                    <th>Kontak HP</th>
-                                                    <th class="text-center">Berkas KTP</th>
-                                                    <th class="text-center">Pasfoto 4x6</th>
+                                                    <th style="width: 15%;">Jabatan</th>
+                                                    <th style="width: 25%;">Nama / NIK</th>
+                                                    <th style="width: 30%;">TTL & Alamat KTP</th>
+                                                    <th class="text-center" style="width: 15%;">Berkas KTP</th>
+                                                    <th class="text-center" style="width: 15%;">Pasfoto 4x6</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="dt-pengurus-body">
@@ -2454,28 +2454,38 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 const pBody = document.getElementById('dt-pengurus-body');
                 pBody.innerHTML = '';
-                if (pengurusList.length > 0) {
-                     pengurusList.forEach(p => {
-                         const tr = document.createElement('tr');
-                         let ktpLink = p.file_ktp 
-                             ? `<a href="<?= base_url('uploads/ormas/') ?>/${p.file_ktp}" target="_blank" class="btn btn-xs btn-outline-info py-0.5 px-2" style="font-size: 10px; border-radius: 4px;"><i class="fa-solid fa-file-arrow-down me-1"></i>KTP</a>` 
-                             : `<span class="text-muted small">Kosong</span>`;
-                         let pasfotoLink = p.file_pasfoto 
-                             ? `<a href="<?= base_url('uploads/ormas/') ?>/${p.file_pasfoto}" target="_blank" class="btn btn-xs btn-outline-info py-0.5 px-2" style="font-size: 10px; border-radius: 4px;"><i class="fa-solid fa-image me-1"></i>Foto</a>` 
-                             : `<span class="text-muted small">Kosong</span>`;
+                  if (pengurusList.length > 0) {
+                      pengurusList.forEach(p => {
+                          const tr = document.createElement('tr');
+                          let ktpLink = p.file_ktp 
+                              ? `<a href="<?= base_url('uploads/ormas/') ?>/${p.file_ktp}" target="_blank" class="btn btn-xs btn-outline-info py-0.5 px-2" style="font-size: 10px; border-radius: 4px;"><i class="fa-solid fa-file-arrow-down me-1"></i>KTP</a>` 
+                              : `<span class="text-muted small">Kosong</span>`;
+                          let pasfotoLink = p.file_pasfoto 
+                              ? `<a href="<?= base_url('uploads/ormas/') ?>/${p.file_pasfoto}" target="_blank" class="btn btn-xs btn-outline-info py-0.5 px-2" style="font-size: 10px; border-radius: 4px;"><i class="fa-solid fa-image me-1"></i>Foto</a>` 
+                              : `<span class="text-muted small">Kosong</span>`;
 
-                         tr.innerHTML = `
-                             <td class="text-white">${p.jabatan}</td>
-                             <td class="text-white">${p.nama}</td>
-                             <td class="text-white">${p.no_hp || '-'}</td>
-                             <td class="text-center">${ktpLink}</td>
-                             <td class="text-center">${pasfotoLink}</td>
-                         `;
-                         pBody.appendChild(tr);
-                     });
-                 } else {
-                     pBody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">Belum ada pengurus diisi</td></tr>`;
-                 }
+                          let ttl = (p.tempat_lahir || '-') + ', ' + (p.tanggal_lahir ? p.tanggal_lahir : '-');
+                          let alamat = p.alamat_ktp || '-';
+
+                          tr.innerHTML = `
+                              <td class="text-white align-top fw-semibold text-warning">${p.jabatan}</td>
+                              <td class="text-white align-top">
+                                  <div class="fw-bold">${p.nama}</div>
+                                  <div class="text-muted" style="font-size: 11px;">NIK: ${p.nik || '-'}</div>
+                                  <div class="text-muted" style="font-size: 11px;">WA: ${p.no_hp || '-'}</div>
+                              </td>
+                              <td class="text-white align-top small">
+                                  <div><strong>TTL:</strong> ${ttl}</div>
+                                  <div class="text-muted mt-1" style="font-size: 11px; white-space: normal; word-break: break-word;"><strong>Alamat:</strong> ${alamat}</div>
+                              </td>
+                              <td class="text-center align-top">${ktpLink}</td>
+                              <td class="text-center align-top">${pasfotoLink}</td>
+                          `;
+                          pBody.appendChild(tr);
+                      });
+                  } else {
+                      pBody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">Belum ada pengurus diisi</td></tr>`;
+                  }
 
                 // Hide unused rows
                 document.getElementById('row-dt-kegiatan').classList.add('d-none');

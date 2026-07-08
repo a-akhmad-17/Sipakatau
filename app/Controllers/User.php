@@ -383,10 +383,15 @@ class User extends BaseController
                 'updated_at'  => date('Y-m-d H:i:s')
             ]);
 
-            // Process Pengurus file uploads (KTP & Pasfoto)
+            // Process Pengurus file uploads (KTP & Pasfoto) and Biodata (NIK, WA, TTL, Alamat)
             $pengurusIds = $this->request->getPost('pengurus_id') ?: [];
             $pengurusOldKtp = $this->request->getPost('pengurus_old_ktp') ?: [];
             $pengurusOldPasfoto = $this->request->getPost('pengurus_old_pasfoto') ?: [];
+            $pengurusNiks = $this->request->getPost('pengurus_nik') ?: [];
+            $pengurusHps = $this->request->getPost('pengurus_no_hp') ?: [];
+            $pengurusTempatLahir = $this->request->getPost('pengurus_tempat_lahir') ?: [];
+            $pengurusTanggalLahir = $this->request->getPost('pengurus_tanggal_lahir') ?: [];
+            $pengurusAlamatKtp = $this->request->getPost('pengurus_alamat_ktp') ?: [];
 
             foreach ($pengurusIds as $index => $pengurusId) {
                 $ktpFilename = $pengurusOldKtp[$index] ?? null;
@@ -413,9 +418,14 @@ class User extends BaseController
                          ->where('id', $pengurusId)
                          ->where('ormas_id', $ormasId)
                          ->update([
-                             'file_ktp'     => $ktpFilename,
-                             'file_pasfoto' => $pasfotoFilename,
-                             'updated_at'   => date('Y-m-d H:i:s')
+                             'nik'           => $pengurusNiks[$index] ?? '',
+                             'no_hp'         => $pengurusHps[$index] ?? '',
+                             'tempat_lahir'  => $pengurusTempatLahir[$index] ?? '',
+                             'tanggal_lahir' => !empty($pengurusTanggalLahir[$index]) ? $pengurusTanggalLahir[$index] : null,
+                             'alamat_ktp'    => $pengurusAlamatKtp[$index] ?? '',
+                             'file_ktp'      => $ktpFilename,
+                             'file_pasfoto'  => $pasfotoFilename,
+                             'updated_at'    => date('Y-m-d H:i:s')
                          ]);
             }
 

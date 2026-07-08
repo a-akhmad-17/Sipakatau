@@ -333,6 +333,9 @@ $requirementsBerjenjang = [
                             ?>
                             <tr class="pengurus-row">
                                 <td>
+                                    <input type="hidden" name="pengurus_id[]" value="<?= esc($p['id'] ?? '') ?>">
+                                    <input type="hidden" name="pengurus_old_ktp[]" value="<?= esc($p['file_ktp'] ?? '') ?>">
+                                    <input type="hidden" name="pengurus_old_pasfoto[]" value="<?= esc($p['file_pasfoto'] ?? '') ?>">
                                     <input type="text" name="pengurus_jabatan[]" class="form-control form-control-custom form-control-sm" placeholder="Contoh: Ketua" value="<?= esc($p['jabatan']) ?>" required>
                                 </td>
                                 <td>
@@ -885,12 +888,38 @@ function handlePengurusFileChange(input, type, index) {
     }
 }
 
+function handlePasfotoChange(input, index) {
+    const preview = document.getElementById(`avatar-preview-${index}`);
+    const placeholder = document.getElementById(`avatar-placeholder-${index}`);
+    const span = document.querySelector(`.file-name-pasfoto-${index}`);
+
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            if (preview) {
+                preview.src = e.target.result;
+                preview.classList.remove('d-none');
+            }
+            if (placeholder) {
+                placeholder.classList.add('d-none');
+            }
+        };
+        reader.readAsDataURL(input.files[0]);
+        if (span) {
+            span.innerHTML = `<span class="text-success fw-bold"><i class="fa-solid fa-check"></i> ${input.files[0].name.substring(0, 8)}${input.files[0].name.length > 8 ? '...' : ''}</span>`;
+        }
+    }
+}
+
 function addPengurusRow() {
     const container = document.getElementById('pengurus-container');
     const tr = document.createElement('tr');
     tr.className = 'pengurus-row';
     tr.innerHTML = `
         <td>
+            <input type="hidden" name="pengurus_id[]" value="">
+            <input type="hidden" name="pengurus_old_ktp[]" value="">
+            <input type="hidden" name="pengurus_old_pasfoto[]" value="">
             <input type="text" name="pengurus_jabatan[]" class="form-control form-control-custom form-control-sm" placeholder="Contoh: Anggota" required>
         </td>
         <td>
