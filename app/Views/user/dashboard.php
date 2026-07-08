@@ -139,6 +139,83 @@
     </div>
 </div>
 
+<!-- ===== LAYANAN CEPAT ===== -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="glass-card p-3 d-flex align-items-center gap-3 hotspot-item h-100" style="border-left: 4px solid var(--bs-primary) !important; cursor: pointer; transition: all 0.2s;" onclick="window.location.href='<?= base_url('user/pengajuan') ?>'">
+            <div class="rounded bg-primary-subtle text-primary p-2.5 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                <i class="fa-solid fa-file-signature fa-lg"></i>
+            </div>
+            <div>
+                <h6 class="text-white fw-bold mb-0.5" style="font-size: 0.9rem;">Pendaftaran Ormas</h6>
+                <p class="text-muted small mb-0" style="font-size: 0.75rem;">Ajukan keberadaan Ormas Baru</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="glass-card p-3 d-flex align-items-center gap-3 hotspot-item h-100" style="border-left: 4px solid var(--bs-success) !important; cursor: pointer; transition: all 0.2s;" onclick="window.location.href='<?= base_url('user/rekomendasi/baru') ?>'">
+            <div class="rounded bg-success-subtle text-success p-2.5 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                <i class="fa-solid fa-calendar-check fa-lg"></i>
+            </div>
+            <div>
+                <h6 class="text-white fw-bold mb-0.5" style="font-size: 0.9rem;">Rekomendasi Kegiatan</h6>
+                <p class="text-muted small mb-0" style="font-size: 0.75rem;">Ajukan rekomendasi kegiatan Ormas</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="glass-card p-3 d-flex align-items-center gap-3 hotspot-item h-100" style="border-left: 4px solid var(--bs-danger) !important; cursor: pointer; transition: all 0.2s;" onclick="window.location.href='<?= base_url('user/pengaduan/baru') ?>'">
+            <div class="rounded bg-danger-subtle text-danger p-2.5 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                <i class="fa-solid fa-bullhorn fa-lg"></i>
+            </div>
+            <div>
+                <h6 class="text-white fw-bold mb-0.5" style="font-size: 0.9rem;">Portal Pengaduan</h6>
+                <p class="text-muted small mb-0" style="font-size: 0.75rem;">Laporkan aduan / konflik sosial</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== DOKUMEN PERSYARATAN & PANDUAN ORMAS ===== -->
+<div class="glass-card mb-4 p-4 animate-fade-in">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2 pb-2 border-bottom" style="border-color: rgba(255,255,255,.05) !important;">
+        <h5 class="text-white mb-0"><i class="fa-solid fa-list-check text-warning me-2"></i>Panduan & Dokumen Persyaratan Pendaftaran Ormas</h5>
+        <div class="d-flex gap-2">
+            <a href="https://drive.google.com/uc?export=download&id=1XqCYdQYp87AXN4RGMvJqJKslvA05nRNR" class="btn btn-sm btn-outline-warning text-white py-1.5 px-3" style="font-size:0.78rem; border-radius:8px;">
+                <i class="fa-solid fa-file-word me-1.5"></i>Format Ormas Lokal (.docx)
+            </a>
+            <a href="https://drive.google.com/uc?export=download&id=1UX2CJCfXpWZUix7o-j3jY9cld63dX7KS" class="btn btn-sm btn-outline-warning text-white py-1.5 px-3" style="font-size:0.78rem; border-radius:8px;">
+                <i class="fa-solid fa-file-word me-1.5"></i>Format Ormas Berjenjang (.docx)
+            </a>
+        </div>
+    </div>
+    <div class="row g-3">
+        <div class="col-md-6">
+            <h6 class="text-white small mb-2 fw-bold"><i class="fa-solid fa-house-user text-primary me-2"></i>Persyaratan Ormas Lokal:</h6>
+            <div class="text-muted small" style="font-size: 12px; line-height: 1.6;">
+                1. Surat Permohonan ditujukan kepada Menteri (Cq. Kaban Kesbangpol)<br>
+                2. Anggaran Dasar (AD) & Anggaran Rumah Tangga (ART) (satu PDF)<br>
+                3. Akta Pendirian Notaris memuat Anggaran Dasar<br>
+                4. Surat Pernyataan Keabsahan Dokumen (Meterai Rp 10.000)<br>
+                5. Program Kerja & Struktur Organisasi Resmi<br>
+                6. Surat Keterangan Domisili Kantor Sekretariat & NPWP Ormas<br>
+                7. Biodata, Fotokopi KTP, dan Pasfoto 4x6 Pengurus (Ketua, Sekretaris, Bendahara)
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h6 class="text-white small mb-2 fw-bold"><i class="fa-solid fa-network-wired text-primary me-2"></i>Persyaratan Ormas Berjenjang:</h6>
+            <div class="text-muted small" style="font-size: 12px; line-height: 1.6;">
+                1. Surat Permohonan ditujukan kepada Kepala Badan Kesbangpol Kab. Sinjai<br>
+                2. Surat Pernyataan Resmi (Meterai Rp 10.000)<br>
+                3. Surat Keterangan Domisili kantor sekretariat<br>
+                4. Formulir Isian Data Ormas (ditandatangani Ketua & Sekretaris)<br>
+                5. SK Pengurus dari Dewan Pimpinan Pusat/Wilayah<br>
+                6. Foto Kantor Sekretariat (Tampak depan menampilkan Papan Nama resmi)
+            </div>
+        </div>
+    </div>
+</div>
+
 <?php if (empty($pendaftaranList)): ?>
     <!-- Kasus: Belum mengajukan ormas -->
     <div class="glass-card text-center py-5">
@@ -514,6 +591,12 @@
                                                 </a>
                                             <?php endif; ?>
                                             
+                                            <?php if ($item['status_verifikasi'] !== 'Draft'): ?>
+                                                <a href="<?= base_url('layanan/cetak-permohonan/' . $item['id']) ?>" target="_blank" class="btn btn-sm btn-outline-info py-1 px-2.5" title="Cetak Surat Permohonan Kemendagri">
+                                                    <i class="fa-solid fa-print me-1"></i> Permohonan
+                                                </a>
+                                            <?php endif; ?>
+
                                             <?php if ($item['status_verifikasi'] === 'Approved' && $item['progress_percentage'] == 100 && !empty($item['pdf_tte_path'])): ?>
                                                 <a href="<?= base_url('uploads/rekomendasi_ormas/' . $item['pdf_tte_path']) ?>" target="_blank" class="btn btn-sm btn-outline-success py-1 px-2.5 text-decoration-none" title="Unduh Surat Rekomendasi Resmi">
                                                     <i class="fa-solid fa-download me-1"></i> Unduh

@@ -65,9 +65,6 @@
             <div class="glass-card mb-4">
                 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
                     <h3 class="text-white mb-0"><i class="fa-solid fa-list-check text-warning me-2"></i>Daftar Berkas Persyaratan Ormas Lokal</h3>
-                    <a href="https://drive.google.com/uc?export=download&id=1XqCYdQYp87AXN4RGMvJqJKslvA05nRNR" class="btn btn-outline-warning text-white border-warning py-2 px-3">
-                        <i class="fa-solid fa-file-word me-2"></i>Unduh Panduan & Lampiran (.docx)
-                    </a>
                 </div>
                 <div class="row g-3">
                     <div class="col-md-6">
@@ -161,9 +158,6 @@
             <div class="glass-card">
                 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
                     <h3 class="text-white mb-0"><i class="fa-solid fa-list-check text-warning me-2"></i>Berkas Persyaratan Ormas Berjenjang</h3>
-                    <a href="https://drive.google.com/uc?export=download&id=1UX2CJCfXpWZUix7o-j3jY9cld63dX7KS" class="btn btn-outline-warning text-white border-warning py-2 px-3">
-                        <i class="fa-solid fa-file-word me-2"></i>Unduh Panduan & Lampiran (.docx)
-                    </a>
                 </div>
                 <div class="row g-3">
                     <div class="col-md-6">

@@ -215,12 +215,15 @@ class Home extends BaseController
         return redirect()->to(base_url('layanan/lacak?nomor=' . $nomorRegistrasi))
                           ->with('success', 'Registrasi Ormas berhasil dikirim! Simpan Nomor Registrasi Anda: ' . $nomorRegistrasi);
     }
-    public function daftarRekomendasi(): string
+    public function daftarRekomendasi()
     {
-        $data = [
-            'title' => 'Rekomendasi Kegiatan'
-        ];
-        return view('layanan/form_rekomendasi', $data);
+        // Guard: harus login
+        if (!session()->get('logged_in')) {
+            session()->set('intended_url', base_url('user/rekomendasi'));
+            return redirect()->to('login')->with('info', 'Silakan masuk terlebih dahulu untuk mengajukan rekomendasi kegiatan.');
+        }
+        
+        return redirect()->to(base_url('user/rekomendasi'));
     }
 
     public function simpanRekomendasi()
@@ -232,26 +235,33 @@ class Home extends BaseController
         $tglSelesai = $this->request->getPost('tgl_selesai');
         $deskripsi = $this->request->getPost('deskripsi');
 
-        // Handle file_proposal upload
-        $fileProposal = $this->request->getFile('file_proposal');
-        $proposalFilename = null;
+        // Handle multiple file uploads for the 6 requirements
+        $berkasData = [];
+        $destination = ROOTPATH . 'public/uploads/rekomendasi';
+        if (!is_dir($destination)) {
+            mkdir($destination, 0755, true);
+        }
 
-        if ($fileProposal && $fileProposal->isValid() && !$fileProposal->hasMoved()) {
-            $mime = $fileProposal->getMimeType();
-            $destination = ROOTPATH . 'public/uploads/rekomendasi';
-            if (!is_dir($destination)) {
-                mkdir($destination, 0755, true);
-            }
+        for ($i = 1; $i <= 6; $i++) {
+            $fileObj = $this->request->getFile('file_proposal_' . $i);
+            if ($fileObj && $fileObj->isValid() && !$fileObj->hasMoved()) {
+                $mime = $fileObj->getMimeType();
+                if (strpos($mime, 'image/') === 0) {
+                    $newFilename = convert_to_webp($fileObj, $destination, 'proposal_file_' . $i . '_' . time());
+                } else {
+                    $newFilename = $fileObj->getRandomName();
+                    $fileObj->move($destination, $newFilename);
+                }
 
-            if (strpos($mime, 'image/') === 0) {
-                // Auto WebP conversion for images
-                $proposalFilename = convert_to_webp($fileProposal, $destination, 'proposal_' . time());
-            } else {
-                // PDF/ZIP etc.
-                $proposalFilename = $fileProposal->getRandomName();
-                $fileProposal->move($destination, $proposalFilename);
+                $berkasData[$i] = [
+                    'filename' => $newFilename,
+                    'size' => round($fileObj->getSize() / 1024 / 1024, 2) . ' MB',
+                    'uploaded_at' => date('Y-m-d H:i:s')
+                ];
             }
         }
+
+        $proposalFilename = !empty($berkasData) ? json_encode($berkasData) : null;
 
         $rekomendasiId = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x', 
             mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff), 
@@ -260,15 +270,16 @@ class Home extends BaseController
         );
 
         $this->db->table('trn_rekomendasi')->insert([
-            'id' => $rekomendasiId,
-            'nama_kegiatan' => $namaKegiatan,
-            'pemohon' => $pemohon,
-            'tgl_mulai' => $tglMulai,
-            'tgl_selesai' => $tglSelesai,
-            'deskripsi' => $deskripsi,
-            'status_rekomendasi' => 'Pending',
-            'file_proposal' => $proposalFilename,
-            'created_at' => date('Y-m-d H:i:s')
+            'id'                  => $rekomendasiId,
+            'user_id'             => session()->get('user_id') ?: null,
+            'nama_kegiatan'       => $namaKegiatan,
+            'pemohon'             => $pemohon,
+            'tgl_mulai'           => $tglMulai,
+            'tgl_selesai'         => $tglSelesai,
+            'deskripsi'           => $deskripsi,
+            'status_rekomendasi'  => 'Pending',
+            'file_proposal'       => $proposalFilename,
+            'created_at'          => date('Y-m-d H:i:s')
         ]);
 
         // Activity log
@@ -296,6 +307,10 @@ class Home extends BaseController
             'Keterangan'       => strlen($deskripsi) > 150 ? substr($deskripsi, 0, 150) . '...' : $deskripsi,
             'Berkas Proposal'  => $proposalFilename ? 'Ada (Unduh di panel admin)' : 'Tidak ada'
         ]);
+
+        if (session()->get('user_id')) {
+            return redirect()->to(base_url('user'))->with('success', 'Pengajuan rekomendasi kegiatan berhasil dikirim! Silakan pantau status persetujuan di dasbor.');
+        }
 
         return redirect()->to(base_url())->with('success', 'Pengajuan rekomendasi kegiatan berhasil dikirim untuk verifikasi!');
     }
@@ -446,14 +461,15 @@ class Home extends BaseController
         return view('informasi/dokumentasi', $data);
     }
 
-    public function pengaduan(): string
+    public function pengaduan()
     {
-        $bidang = $this->db->table('mst_bidang')->orderBy('nama_bidang', 'ASC')->get()->getResultArray();
-        $data = [
-            'title'  => 'Portal Pengaduan Masyarakat',
-            'bidang' => $bidang
-        ];
-        return view('informasi/pengaduan', $data);
+        // Guard: harus login sebelum mengisi form pengaduan
+        if (!session()->get('logged_in')) {
+            session()->set('intended_url', base_url('user/pengaduan'));
+            return redirect()->to('login')->with('info', 'Silakan masuk terlebih dahulu untuk mengirim pengaduan.');
+        }
+        
+        return redirect()->to(base_url('user/pengaduan'));
     }
 
     public function simpanPengaduan()
@@ -500,7 +516,25 @@ class Home extends BaseController
             mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
         );
 
-        // Log as anonymous activity
+        $userId = session()->get('user_id') ?: null;
+
+        // Insert into trn_pengaduan table
+        $this->db->table('trn_pengaduan')->insert([
+            'id'               => $aduanId,
+            'user_id'          => $userId,
+            'judul'            => $judul,
+            'kategori'         => $kategori,
+            'bidang_id'        => $bidangId ?: null,
+            'deskripsi'        => $deskripsi,
+            'berkas'           => $berkasFilename,
+            'lokasi_pengaduan' => $this->request->getPost('lokasi_pengaduan') ?: null,
+            'status'           => 'Pending',
+            'alasan_ditolak'   => null,
+            'created_at'       => date('Y-m-d H:i:s'),
+            'updated_at'       => date('Y-m-d H:i:s')
+        ]);
+
+        // Log as anonymous/registered activity
         log_activity(
             'DAFTAR_PENGADUAN_ANONIM',
             [],
@@ -527,13 +561,17 @@ class Home extends BaseController
         ];
         $katText = $katLabels[$kategori] ?? ucfirst($kategori);
 
-        telegram_send_transaction('Aduan Masyarakat Baru (Anonim)', [
+        telegram_send_transaction('Aduan Masyarakat Baru', [
             'Judul'     => $judul,
             'Kategori'  => $katText,
             'Tujuan'    => $namaBidang,
             'Detail'    => strlen($deskripsi) > 150 ? substr($deskripsi, 0, 150) . '...' : $deskripsi,
             'Lampiran'  => $berkasFilename ? 'Ada (Unduh di panel admin)' : 'Tidak ada'
         ]);
+
+        if ($userId) {
+            return redirect()->to(base_url('user'))->with('success', 'Aduan Anda berhasil terkirim! Silakan pantau status aduan Anda di dasbor.');
+        }
 
         return redirect()->to(base_url())->with('success', 'Aduan Anda berhasil terkirim secara anonim dan aman. Terima kasih atas partisipasi Anda.');
     }
@@ -766,6 +804,35 @@ class Home extends BaseController
         }
 
         return redirect()->back()->with('error', 'Tipe berkas tidak valid.');
+    }
+
+    public function cetakPermohonan(string $id)
+    {
+        $pendaftaran = $this->db->table('trn_pendaftaran')
+                                ->select('trn_pendaftaran.*, mst_ormas.nama_ormas, mst_ormas.alamat, mst_ormas.email, mst_ormas.telepon, mst_ormas.file_logo, mst_ormas.tgl_sk_kepengurusan, mst_ormas.tgl_sk_kedaluwarsa, mst_ormas.latitude, mst_ormas.longitude')
+                                ->join('mst_ormas', 'mst_ormas.id = trn_pendaftaran.ormas_id', 'left')
+                                ->where('trn_pendaftaran.id', $id)
+                                ->get()
+                                ->getRowArray();
+
+        if (!$pendaftaran) {
+            return redirect()->to(base_url())->with('error', 'Data pendaftaran tidak ditemukan.');
+        }
+
+        // Fetch pengurus
+        $pengurus = $this->db->table('mst_ormas_pengurus')
+                             ->where('ormas_id', $pendaftaran['ormas_id'])
+                             ->get()
+                             ->getResultArray();
+
+        $data = [
+            'title'       => 'Surat Permohonan Pendaftaran - ' . esc($pendaftaran['nama_ormas']),
+            'pendaftaran' => $pendaftaran,
+            'pengurus'    => $pengurus,
+            'today'       => date('Y-m-d')
+        ];
+
+        return view('layanan/cetak_permohonan', $data);
     }
 }
 

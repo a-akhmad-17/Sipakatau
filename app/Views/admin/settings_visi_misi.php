@@ -80,6 +80,43 @@
             </div>
         </div>
     </div>
+
+    <!-- Portal & TTE Settings -->
+    <div class="row g-4 mt-2">
+        <div class="col-lg-12">
+            <div class="glass-card p-4">
+                <h4 class="mb-3" style="color: var(--text-main); font-size: 1.2rem;"><i class="fa-solid fa-sliders text-primary me-2"></i>Pengaturan Umum Portal & TTE Srikandi</h4>
+                <p class="small text-muted mb-4">Kelola kontak petugas piket dan variabel nama/NIP penandatangan TTE Srikandi.</p>
+                
+                <form action="<?= base_url('admin/settings/portal/update') ?>" method="POST">
+                    <?= csrf_field() ?>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label for="piket_phone" class="form-label small" style="color: var(--text-muted);">No. HP Petugas Piket (WhatsApp) *</label>
+                            <input type="text" name="piket_phone" id="piket_phone" class="form-control form-control-custom" value="<?= esc($piket_phone) ?>" required placeholder="Contoh: 0811-7671-545">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="tte_nama_1" class="form-label small" style="color: var(--text-muted);">Nama Penandatangan Srikandi 1 *</label>
+                            <input type="text" name="tte_nama_1" id="tte_nama_1" class="form-control form-control-custom" value="<?= esc($tte_nama_1) ?>" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="tte_nip_1" class="form-label small" style="color: var(--text-muted);">NIP Penandatangan Srikandi 1 *</label>
+                            <input type="text" name="tte_nip_1" id="tte_nip_1" class="form-control form-control-custom" value="<?= esc($tte_nip_1) ?>" required>
+                        </div>
+                        <div class="col-md-4 offset-md-4">
+                            <label for="tte_nama_2" class="form-label small" style="color: var(--text-muted);">Nama Penandatangan Srikandi 2 *</label>
+                            <input type="text" name="tte_nama_2" id="tte_nama_2" class="form-control form-control-custom" value="<?= esc($tte_nama_2) ?>" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="tte_nip_2" class="form-label small" style="color: var(--text-muted);">NIP Penandatangan Srikandi 2 *</label>
+                            <input type="text" name="tte_nip_2" id="tte_nip_2" class="form-control form-control-custom" value="<?= esc($tte_nip_2) ?>" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-portal px-4 py-2"><i class="fa-solid fa-floppy-disk me-2"></i> Simpan Pengaturan Portal</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Modal Tambah Misi -->

@@ -1146,7 +1146,7 @@
                         if ($role === 'admin') {
                             $dashUrl = 'admin';
                             $dashLabel = 'Dasbor Admin';
-                        } elseif ($role === 'pptk') {
+                        } elseif ($role === 'kabid') {
                             $dashUrl = 'bidang';
                             $dashLabel = 'Dasbor Bidang';
                         } elseif ($role === 'kaban') {
@@ -1258,8 +1258,17 @@
                         <div class="d-flex flex-column gap-3" style="font-size: 0.9rem;">
                             <div>
                                 <div class="footer-label fw-bold mb-1">TELP / WHATSAPP</div>
-                                <a href="https://wa.me/628117671545" target="_blank" class="footer-link">
-                                    WhatsApp (Chat Only) : <span class="footer-wa-num fw-semibold">0811-7671-545</span>
+                                <?php
+                                $db = \Config\Database::connect();
+                                $piketSetting = $db->table('sys_settings')->where('key', 'piket_phone')->get()->getRowArray();
+                                $piketPhoneVal = $piketSetting ? $piketSetting['value'] : '0811-7671-545';
+                                $cleanPhone = preg_replace('/[^0-9]/', '', $piketPhoneVal);
+                                if (strpos($cleanPhone, '0') === 0) {
+                                    $cleanPhone = '62' . substr($cleanPhone, 1);
+                                }
+                                ?>
+                                <a href="https://wa.me/<?= $cleanPhone ?>" target="_blank" class="footer-link">
+                                    WhatsApp (Chat Only) : <span class="footer-wa-num fw-semibold"><?= esc($piketPhoneVal) ?></span>
                                 </a>
                             </div>
                             <div>

@@ -166,11 +166,11 @@
                                 </select>
                             </div>
                             <div class="row g-2 mb-3">
-                                <div class="col-sm-6">
+                                <div class="col-sm-6" id="add_duration_group">
                                     <label for="add_vid_dur" class="form-label small" style="color: var(--text-muted);">Durasi Konten</label>
                                     <input type="text" name="duration" id="add_vid_dur" class="form-control form-control-custom" placeholder="Contoh: 10:25 atau -">
                                 </div>
-                                <div class="col-sm-6">
+                                <div class="col-sm-6" id="add_source_group">
                                     <label for="add_vid_src" class="form-label small" style="color: var(--text-muted);">Kreator / Sumber</label>
                                     <input type="text" name="source" id="add_vid_src" class="form-control form-control-custom" value="Kesbangpol Sinjai">
                                 </div>
@@ -252,11 +252,11 @@
                                 </select>
                             </div>
                             <div class="row g-2 mb-3">
-                                <div class="col-sm-6">
+                                <div class="col-sm-6" id="edit_duration_group">
                                     <label for="edit_vid_dur" class="form-label small" style="color: var(--text-muted);">Durasi Konten</label>
                                     <input type="text" name="duration" id="edit_vid_dur" class="form-control form-control-custom">
                                 </div>
-                                <div class="col-sm-6">
+                                <div class="col-sm-6" id="edit_source_group">
                                     <label for="edit_vid_src" class="form-label small" style="color: var(--text-muted);">Kreator / Sumber</label>
                                     <input type="text" name="source" id="edit_vid_src" class="form-control form-control-custom">
                                 </div>
@@ -328,6 +328,9 @@
         // Helper to toggle inputs based on content type
         const handleTypeChange = (typeSelect, youtubeGroup, youtubeInput, youtubeReq, imageGroup, imageInput, imageReq, isEditMode = false, imagePath = '') => {
             const val = typeSelect.value;
+            const durationGroup = isEditMode ? document.getElementById('edit_duration_group') : document.getElementById('add_duration_group');
+            const sourceCol = isEditMode ? document.getElementById('edit_source_group') : document.getElementById('add_source_group');
+
             if (val === 'edukasi') {
                 youtubeGroup.classList.remove('d-none');
                 youtubeInput.setAttribute('required', 'required');
@@ -336,11 +339,17 @@
                 imageGroup.classList.add('d-none');
                 imageInput.removeAttribute('required');
                 imageReq.classList.add('d-none');
-                document.getElementById('edit_gallery_preview_container').style.display = 'none';
+                if (isEditMode) document.getElementById('edit_gallery_preview_container').style.display = 'none';
+
+                if (durationGroup) durationGroup.classList.remove('d-none');
+                if (sourceCol) {
+                    sourceCol.classList.remove('col-sm-12');
+                    sourceCol.classList.add('col-sm-6');
+                }
             } else { // type === 'dokumentasi'
-                youtubeGroup.classList.remove('d-none');
+                youtubeGroup.classList.add('d-none');
                 youtubeInput.removeAttribute('required');
-                youtubeReq.classList.add('d-none'); // Optional for dokumentasi
+                youtubeReq.classList.add('d-none');
                 
                 imageGroup.classList.remove('d-none');
                 
@@ -359,6 +368,12 @@
                     if (isEditMode) {
                         document.getElementById('edit_image_preview_container').style.display = 'none';
                     }
+                }
+
+                if (durationGroup) durationGroup.classList.add('d-none');
+                if (sourceCol) {
+                    sourceCol.classList.remove('col-sm-6');
+                    sourceCol.classList.add('col-sm-12');
                 }
             }
         };

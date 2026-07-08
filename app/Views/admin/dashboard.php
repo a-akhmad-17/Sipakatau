@@ -644,6 +644,7 @@
                                                         data-sk-kepengurusan="<?= !empty($d['tgl_sk_kepengurusan']) ? date('d F Y', strtotime($d['tgl_sk_kepengurusan'])) : '-' ?>" 
                                                         data-sk-kedaluwarsa="<?= !empty($d['tgl_sk_kedaluwarsa']) ? date('d F Y', strtotime($d['tgl_sk_kedaluwarsa'])) : '-' ?>"
                                                         data-tanggal="<?= date('d F Y H:i:s', strtotime($d['created_at'])) ?>"
+                                                        data-pengurus="<?= esc($d['pengurus_list'] ?? '[]') ?>"
                                                     <?php elseif ($aj['type'] === 'rekomendasi'): 
                                                         $d = $aj['data']; ?>
                                                         data-nama="<?= esc($d['pemohon']) ?>"
@@ -803,7 +804,6 @@
                             </tr>
                         <?php else: ?>
                             <?php foreach ($pengaduan as $p): 
-                                $detail = json_decode($p['after_data'], true) ?? [];
                                 $katLabels = [
                                     'konflik' => ['label' => 'Konflik Sosial SARA', 'class' => 'bg-danger-subtle text-danger border border-danger-subtle'],
                                     'ormas' => ['label' => 'Ketertiban Ormas/LSM', 'class' => 'bg-warning-subtle text-warning border border-warning-subtle'],
@@ -811,8 +811,20 @@
                                     'layanan' => ['label' => 'Keluhan Layanan', 'class' => 'bg-info-subtle text-info border border-info-subtle'],
                                     'lainnya' => ['label' => 'Lainnya', 'class' => 'bg-secondary-subtle text-secondary border border-secondary-subtle'],
                                 ];
-                                $kat = $detail['kategori'] ?? 'lainnya';
+                                $kat = $p['kategori'] ?? 'lainnya';
                                 $badge = $katLabels[$kat] ?? $katLabels['lainnya'];
+
+                                $adStatus = $p['status'] ?? 'Pending';
+                                $adStatusBadge = match($adStatus) {
+                                    'Processed' => 'bg-success-subtle text-success border border-success-subtle',
+                                    'Rejected' => 'bg-danger-subtle text-danger border border-danger-subtle',
+                                    default => 'bg-warning-subtle text-warning border border-warning-subtle',
+                                };
+                                $adStatusLabel = match($adStatus) {
+                                    'Processed' => 'Diproses',
+                                    'Rejected' => 'Ditolak',
+                                    default => 'Menunggu',
+                                };
                             ?>
                                 <tr>
                                     <td>
@@ -821,20 +833,29 @@
                                     </td>
                                     <td>
                                         <span class="badge <?= $badge['class'] ?> mb-1" style="font-size:0.75rem;"><?= $badge['label'] ?></span>
-                                        <div class="fw-bold text-main"><?= esc($detail['judul'] ?? 'Tanpa Judul') ?></div>
+                                        <div class="fw-bold text-main"><?= esc($p['judul'] ?? 'Tanpa Judul') ?></div>
+                                        <?php if (!empty($p['pengaju_username'])): ?>
+                                            <span class="badge bg-secondary-subtle text-white border border-secondary border-opacity-25 mt-1" style="font-size: 0.65rem;">
+                                                <i class="fa-solid fa-user me-1"></i><?= esc($p['pengaju_username']) ?>
+                                            </span>
+                                        <?php else: ?>
+                                            <span class="badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25 mt-1" style="font-size: 0.65rem;">
+                                                <i class="fa-solid fa-user-secret me-1"></i>Anonim
+                                            </span>
+                                        <?php endif; ?>
                                     </td>
                                     <td>
-                                        <div class="text-main small"><i class="fa-solid fa-building me-1 text-muted"></i><?= esc($detail['nama_bidang'] ?? 'Umum / Seluruhnya') ?></div>
+                                        <div class="text-main small"><i class="fa-solid fa-building me-1 text-muted"></i><?= esc($p['nama_bidang'] ?? 'Umum / Seluruhnya') ?></div>
                                     </td>
                                     <td>
                                         <p class="small text-muted mb-0" style="white-space: pre-line; line-height: 1.5; max-height: 100px; overflow-y: auto;">
-                                            <?= esc($detail['deskripsi'] ?? '-') ?>
+                                            <?= esc($p['deskripsi'] ?? '-') ?>
                                         </p>
                                     </td>
                                     <td class="text-center">
-                                        <?php if (!empty($detail['berkas'])): ?>
+                                        <?php if (!empty($p['berkas'])): ?>
                                             <div class="d-flex flex-column gap-2 align-items-center">
-                                                <a href="<?= base_url('uploads/pengaduan/' . $detail['berkas']) ?>" target="_blank" class="btn btn-sm btn-outline-info px-2 py-1 rounded d-inline-block text-nowrap" style="font-size:0.75rem;">
+                                                <a href="<?= base_url('uploads/pengaduan/' . $p['berkas']) ?>" target="_blank" class="btn btn-sm btn-outline-info px-2 py-1 rounded d-inline-block text-nowrap" style="font-size:0.75rem;">
                                                     <i class="fa-solid fa-file-pdf me-1"></i> Buka Bukti
                                                 </a>
                                                 <form action="<?= base_url('admin/delete-file-pengaduan/' . $p['id']) ?>" method="POST" onsubmit="return confirm('Hapus berkas bukti lampiran aduan ini?')">
@@ -848,11 +869,35 @@
                                             <span class="text-muted small">Tidak ada</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td class="text-center">
-                                        <form action="<?= base_url('admin/delete-pengaduan/' . $p['id']) ?>" method="POST" onsubmit="return confirm('Hapus seluruh laporan aduan ini secara permanen?')">
-                                            <?= csrf_field() ?>
-                                            <button type="submit" class="btn btn-sm btn-outline-danger px-2.5 py-1.5 rounded"><i class="fa-solid fa-trash"></i> Hapus</button>
-                                        </form>
+                                    <td>
+                                        <div class="d-flex flex-column gap-1.5 align-items-stretch">
+                                            <div class="text-center">
+                                                <span class="badge <?= $adStatusBadge ?> px-2 py-1 rounded small mb-2 d-inline-block" style="font-size: 0.75rem;">
+                                                    <?= $adStatusLabel ?>
+                                                </span>
+                                            </div>
+                                            
+                                            <?php if ($adStatus === 'Pending'): ?>
+                                                <form action="<?= base_url('admin/proses-pengaduan/' . $p['id'] . '/process') ?>" method="POST" class="d-inline" onsubmit="return confirm('Tandai pengaduan ini sebagai diproses?')">
+                                                    <?= csrf_field() ?>
+                                                    <button type="submit" class="btn btn-sm btn-success text-white w-100 py-1 mb-1" style="font-size: 0.72rem;">
+                                                        <i class="fa-solid fa-check me-1"></i> Proses
+                                                    </button>
+                                                </form>
+                                                <button type="button" class="btn btn-sm btn-warning text-dark w-100 py-1 mb-1" style="font-size: 0.72rem;" onclick="openTolakAduanModal('<?= $p['id'] ?>', '<?= esc(addslashes($p['judul'])) ?>')">
+                                                    <i class="fa-solid fa-xmark me-1"></i> Tolak
+                                                </button>
+                                            <?php elseif ($adStatus === 'Rejected' && !empty($p['alasan_ditolak'])): ?>
+                                                <div class="text-danger small text-center" style="font-size: 0.7rem; line-height: 1.3;" title="<?= esc($p['alasan_ditolak']) ?>">
+                                                    Ket: <?= strlen($p['alasan_ditolak']) > 40 ? substr(esc($p['alasan_ditolak']), 0, 40) . '...' : esc($p['alasan_ditolak']) ?>
+                                                </div>
+                                            <?php endif; ?>
+
+                                            <form action="<?= base_url('admin/delete-pengaduan/' . $p['id']) ?>" method="POST" onsubmit="return confirm('Hapus seluruh laporan aduan ini secara permanen?')" class="mt-1">
+                                                <?= csrf_field() ?>
+                                                <button type="submit" class="btn btn-sm btn-outline-danger w-100 py-1" style="font-size: 0.72rem;"><i class="fa-solid fa-trash me-1"></i> Hapus</button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -1412,6 +1457,25 @@
                                 <th style="background: rgba(255,255,255,0.03);" class="text-muted">Nomor Telepon</th>
                                 <td id="dt-telepon" class="text-main">-</td>
                             </tr>
+                            <tr id="row-dt-pengurus">
+                                <th style="background: rgba(255,255,255,0.03);" class="text-muted">Susunan Kepengurusan</th>
+                                <td id="dt-pengurus" class="text-main">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-bordered border-secondary border-opacity-10 text-white mb-0" style="font-size: 0.85rem; background: rgba(255,255,255,0.02);">
+                                            <thead>
+                                                <tr style="background: rgba(255, 255, 255, 0.03);">
+                                                    <th>Jabatan</th>
+                                                    <th>Nama Lengkap</th>
+                                                    <th>Kontak HP</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="dt-pengurus-body">
+                                                <!-- Dyn populate -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
                             <tr id="row-dt-deskripsi">
                                 <th style="background: rgba(255,255,255,0.03);" class="text-muted">Deskripsi Kegiatan</th>
                                 <td id="dt-deskripsi" class="text-main">-</td>
@@ -1516,6 +1580,59 @@
                     <div class="modal-footer border-0 px-0 pb-0 mt-4">
                         <button type="button" class="btn btn-secondary text-white" data-bs-dismiss="modal">Batal</button>
                         <button type="submit" class="btn btn-danger text-white fw-bold"><i class="fa-solid fa-paper-plane me-1"></i> Kirim Penolakan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Tolak Aduan -->
+<div class="modal fade" id="modalTolakAduan" tabindex="-1" aria-labelledby="modalTolakAduanLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-card-modal animate-fade-in" style="background: var(--bg-color) !important; border: 1px solid var(--border-color) !important; color: var(--text-main) !important; border-radius: 16px;">
+            <div class="modal-header border-secondary border-opacity-25" style="border-bottom: 1px solid var(--border-color) !important;">
+                <h5 class="modal-title font-heading" id="modalTolakAduanLabel"><i class="fa-solid fa-circle-xmark text-danger me-2"></i>Tolak Laporan Pengaduan</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="" method="POST" id="formTolakAduan">
+                    <?= csrf_field() ?>
+                    <p class="text-white small mb-3">Anda akan menolak laporan pengaduan: <b id="tolak_aduan_judul" class="text-warning"></b></p>
+                    <div class="mb-3">
+                        <label for="tolak_aduan_alasan" class="form-label small text-muted">Alasan Penolakan <span class="text-danger fw-bold">*</span></label>
+                        <textarea name="alasan_ditolak" id="tolak_aduan_alasan" class="form-control form-control-custom" rows="4" placeholder="Tulis alasan penolakan secara jelas (misal: isi aduan tidak relevan / menggunakan bahasa tidak pantas)..." required></textarea>
+                    </div>
+                    <div class="modal-footer border-0 px-0 pb-0 mt-4">
+                        <button type="button" class="btn btn-secondary text-white" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-danger text-white fw-bold"><i class="fa-solid fa-paper-plane me-1"></i> Kirim Penolakan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Terbitkan Surat Rekomendasi -->
+<div class="modal fade" id="modalTerbitkanSuratRekomendasi" tabindex="-1" aria-labelledby="modalTerbitkanSuratRekomendasiLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-card-modal animate-fade-in" style="background: var(--bg-color) !important; border: 1px solid var(--border-color) !important; color: var(--text-main) !important; border-radius: 16px;">
+            <div class="modal-header border-secondary border-opacity-25" style="border-bottom: 1px solid var(--border-color) !important;">
+                <h5 class="modal-title font-heading" id="modalTerbitkanSuratRekomendasiLabel"><i class="fa-solid fa-signature text-primary me-2"></i>Terbitkan Surat Rekomendasi</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="" method="POST" id="formTerbitkanSuratRekomendasi" enctype="multipart/form-data">
+                    <?= csrf_field() ?>
+                    <p class="text-white small mb-3">Unggah berkas Surat Rekomendasi resmi untuk kegiatan: <b id="terbitkan_rekomendasi_nama" class="text-warning"></b></p>
+                    <div class="mb-3">
+                        <label for="berkas_rekomendasi_file" class="form-label small text-muted">Unggah File Surat Rekomendasi (PDF) <span class="text-danger fw-bold">*</span></label>
+                        <input type="file" name="berkas_rekomendasi" id="berkas_rekomendasi_file" class="form-control form-control-custom" accept=".pdf" required>
+                        <div class="form-text text-muted small">Ukuran file maksimal 10MB.</div>
+                    </div>
+                    <div class="modal-footer border-0 px-0 pb-0 mt-4">
+                        <button type="button" class="btn btn-secondary text-white" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary text-white fw-bold"><i class="fa-solid fa-cloud-arrow-up me-1"></i> Unggah & Selesaikan</button>
                     </div>
                 </form>
             </div>
@@ -1687,19 +1804,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const pengaduan = <?= json_encode($pengaduan ?? []) ?>;
     pengaduan.forEach(p => {
         try {
-            let detail = JSON.parse(p.after_data);
-            if (detail) {
-                let coords = getCoordinates(p.id, 'pengaduan');
-                let marker = L.marker(coords, {icon: pengaduanIcon}).addTo(pengaduanGroup)
-                    .bindPopup(`<b>Aduan: ${detail.judul || 'Tanpa Judul'}</b><br>Kategori: ${detail.kategori || 'Lainnya'}<br>Tujuan: ${detail.nama_bidang || 'Umum'}`);
-                
-                marker.on('click', function(e) {
-                    map.flyTo(e.latlng, 15, {
-                        animate: true,
-                        duration: 1.2
-                    });
+            let coords = getCoordinates(p.id, 'pengaduan');
+            let marker = L.marker(coords, {icon: pengaduanIcon}).addTo(pengaduanGroup)
+                .bindPopup(`<b>Aduan: ${p.judul || 'Tanpa Judul'}</b><br>Kategori: ${p.kategori || 'Lainnya'}<br>Tujuan: ${p.nama_bidang || 'Umum'}`);
+            
+            marker.on('click', function(e) {
+                map.flyTo(e.latlng, 15, {
+                    animate: true,
+                    duration: 1.2
                 });
-            }
+            });
         } catch(e) {}
     });
 
@@ -2268,6 +2382,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('row-dt-progress').classList.remove('d-none');
             document.getElementById('row-dt-file').classList.remove('d-none');
             document.getElementById('row-dt-tte').classList.remove('d-none');
+            document.getElementById('row-dt-pengurus').classList.add('d-none');
             
             // Hide containers by default
             document.getElementById('container-dt-checklist-table').classList.add('d-none');
@@ -2300,6 +2415,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 const skMulai = this.getAttribute('data-sk-kepengurusan') || '-';
                 const skExp = this.getAttribute('data-sk-kedaluwarsa') || '-';
                 document.getElementById('dt-sk-periode').innerText = `${skMulai} s/d ${skExp}`;
+
+                // Show pengurus row and populate it
+                document.getElementById('row-dt-pengurus').classList.remove('d-none');
+                const pengurusAttr = this.getAttribute('data-pengurus') || '[]';
+                let pengurusList = [];
+                try {
+                    pengurusList = JSON.parse(pengurusAttr);
+                } catch(e) {
+                    console.error("Gagal parse pengurus", e);
+                }
+                const pBody = document.getElementById('dt-pengurus-body');
+                pBody.innerHTML = '';
+                if (pengurusList.length > 0) {
+                    pengurusList.forEach(p => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td class="text-white">${p.jabatan}</td>
+                            <td class="text-white">${p.nama}</td>
+                            <td class="text-white">${p.no_hp || '-'}</td>
+                        `;
+                        pBody.appendChild(tr);
+                    });
+                } else {
+                    pBody.innerHTML = `<tr><td colspan="3" class="text-center text-muted">Belum ada pengurus diisi</td></tr>`;
+                }
 
                 // Hide unused rows
                 document.getElementById('row-dt-kegiatan').classList.add('d-none');
@@ -2379,6 +2519,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 mStep4.checked = progress == 100;
 
                 // Action buttons for ormas
+                const cetakPermohonanBtn = document.createElement('a');
+                cetakPermohonanBtn.href = `<?= base_url('layanan/cetak-permohonan') ?>/${id}`;
+                cetakPermohonanBtn.target = '_blank';
+                cetakPermohonanBtn.className = 'btn btn-outline-info fw-bold me-2';
+                cetakPermohonanBtn.innerHTML = '<i class="fa-solid fa-print me-1"></i> Cetak Permohonan';
+                actionsContainer.appendChild(cetakPermohonanBtn);
+
                 if (status === 'Pending') {
                     const verifForm = document.createElement('form');
                     verifForm.action = `<?= base_url('admin/proses-pendaftaran') ?>/${id}/approve_berkas`;
@@ -2468,11 +2615,33 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('row-dt-telepon').classList.add('d-none');
                 document.getElementById('row-dt-progress').classList.add('d-none');
 
+                let fileLinks = '';
                 if (proposalName) {
-                    document.getElementById('dt-file').innerHTML = `<a href="<?= base_url('uploads/rekomendasi/') ?>/${proposalName}" target="_blank" class="btn btn-sm btn-outline-info"><i class="fa-solid fa-file-pdf me-1"></i> Buka Proposal</a>`;
-                } else {
-                    document.getElementById('dt-file').innerText = 'Tidak ada berkas diunggah';
+                    if (proposalName.trim().startsWith('{') || proposalName.trim().startsWith('[')) {
+                        try {
+                            const files = JSON.parse(proposalName);
+                            const fileNamesMap = {
+                                "1": "Surat Permohonan",
+                                "2": "Rekomendasi Lurah/Camat",
+                                "3": "Proposal Kegiatan",
+                                "4": "KTP Ketua Panitia",
+                                "5": "SK Pengurus Kegiatan",
+                                "6": "Rekomendasi Stakeholder"
+                            };
+                            for (const key in files) {
+                                if (files.hasOwnProperty(key)) {
+                                    const fileInfo = files[key];
+                                    fileLinks += `<a href="<?= base_url('uploads/rekomendasi/') ?>/${fileInfo.filename}" target="_blank" class="btn btn-sm btn-outline-info me-2 mb-2"><i class="fa-solid fa-file-pdf me-1"></i> ${fileNamesMap[key] || ('Berkas ' + key)}</a>`;
+                                }
+                            }
+                        } catch (e) {
+                            fileLinks = `<a href="<?= base_url('uploads/rekomendasi/') ?>/${proposalName}" target="_blank" class="btn btn-sm btn-outline-info"><i class="fa-solid fa-file-pdf me-1"></i> Buka Proposal</a>`;
+                        }
+                    } else {
+                        fileLinks = `<a href="<?= base_url('uploads/rekomendasi/') ?>/${proposalName}" target="_blank" class="btn btn-sm btn-outline-info"><i class="fa-solid fa-file-pdf me-1"></i> Buka Proposal</a>`;
+                    }
                 }
+                document.getElementById('dt-file').innerHTML = fileLinks || 'Tidak ada berkas diunggah';
 
                 if (ttePath) {
                     document.getElementById('dt-tte').innerHTML = `<a href="<?= base_url() ?>/${ttePath}" target="_blank" class="btn btn-sm btn-outline-success"><i class="fa-solid fa-print me-1"></i> Cetak Surat TTE Resmi</a>`;
@@ -2504,16 +2673,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     `;
                     actionsContainer.appendChild(rejectForm);
                 } else if (status === 'Approved' && !ttePath) {
-                    const tteForm = document.createElement('form');
-                    tteForm.action = `<?= base_url('admin/proses-rekomendasi') ?>/${id}/terbitkan_tte`;
-                    tteForm.method = 'POST';
-                    tteForm.className = 'd-inline me-2';
-                    tteForm.onsubmit = () => confirm('Simulasikan penerbitan TTE untuk surat rekomendasi ini?');
-                    tteForm.innerHTML = `
-                        <?= csrf_field() ?>
-                        <button type="submit" class="btn btn-primary text-white fw-bold"><i class="fa-solid fa-signature me-1"></i> Terbitkan TTE</button>
-                    `;
-                    actionsContainer.appendChild(tteForm);
+                    const tteBtn = document.createElement('button');
+                    tteBtn.type = 'button';
+                    tteBtn.className = 'btn btn-primary text-white fw-bold me-2';
+                    tteBtn.innerHTML = `<i class="fa-solid fa-signature me-1"></i> Terbitkan Surat Rekomendasi`;
+                    tteBtn.onclick = () => {
+                        modalDetailTracking.hide();
+                        setTimeout(() => {
+                            document.getElementById('terbitkan_rekomendasi_nama').innerText = nama + ' - ' + kegiatan;
+                            document.getElementById('formTerbitkanSuratRekomendasi').action = `<?= base_url('admin/proses-rekomendasi') ?>/${id}/terbitkan_tte`;
+                            document.getElementById('berkas_rekomendasi_file').value = '';
+                            new bootstrap.Modal(document.getElementById('modalTerbitkanSuratRekomendasi')).show();
+                        }, 350);
+                    };
+                    actionsContainer.appendChild(tteBtn);
                 }
 
                 // Delete button
@@ -2756,6 +2929,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.openTerbitkanModal(this);
             });
         });
+    }
+
+    // Tolak Aduan Modal JS Hook
+    const modalTolakAduanEl = document.getElementById('modalTolakAduan');
+    if (modalTolakAduanEl) {
+        const modalTolakAduan = new bootstrap.Modal(modalTolakAduanEl);
+        
+        window.openTolakAduanModal = function(id, judul) {
+            document.getElementById('tolak_aduan_judul').innerText = judul;
+            document.getElementById('formTolakAduan').action = `<?= base_url('admin/proses-pengaduan') ?>/${id}/reject`;
+            document.getElementById('tolak_aduan_alasan').value = '';
+            modalTolakAduan.show();
+        };
     }
 });
 </script>

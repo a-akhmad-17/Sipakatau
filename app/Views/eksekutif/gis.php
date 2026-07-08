@@ -77,7 +77,16 @@
         <h2 class="text-white fw-bold mb-1">Peta Sebaran GIS</h2>
         <p class="text-muted small mb-0">Pemetaan sebaran ormas, partai politik, aduan masyarakat, dan deteksi potensi gesekan sosial di Sinjai • Hari ini: <b><?= date('d M Y') ?></b></p>
     </div>
-    <div>
+    <div class="d-flex align-items-center gap-3">
+        <div class="d-flex align-items-center gap-2">
+            <label for="filter-tahun" class="text-white small mb-0 fw-semibold" style="white-space: nowrap;"><i class="fa-solid fa-filter me-1 text-danger"></i>Filter Tahun:</label>
+            <select id="filter-tahun" class="form-select form-control-custom py-1.5 px-3 text-white bg-dark border-secondary border-opacity-25" style="border-radius: 8px; width: 110px; cursor: pointer; border-color: rgba(255,255,255,0.15); background-color: rgba(0,0,0,0.5);">
+                <option value="2024">2024</option>
+                <option value="2025">2025</option>
+                <option value="2026" selected>2026</option>
+                <option value="2027">2027</option>
+            </select>
+        </div>
         <a href="<?= site_url('eksekutif') ?>" class="btn btn-outline-secondary text-white">
             <i class="fa-solid fa-arrow-left me-1.5"></i>Kembali
         </a>
@@ -113,13 +122,13 @@
                     <div class="col-6">
                         <div class="p-2 rounded text-center" style="background: var(--card-bg); border: 1px solid var(--border-color);">
                             <div class="text-muted small" style="font-size: 0.75rem;">Aduan</div>
-                            <h4 class="text-danger fw-bold mb-0"><?= count($pengaduan) ?></h4>
+                            <h4 class="text-danger fw-bold mb-0" id="count-aduan"><?= count($pengaduan) ?></h4>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="p-2 rounded text-center" style="background: var(--card-bg); border: 1px solid var(--border-color);">
                             <div class="text-muted small" style="font-size: 0.75rem;">Kerawanan</div>
-                            <h4 class="text-danger fw-bold mb-0"><?= count($hotspots) ?></h4>
+                            <h4 class="text-danger fw-bold mb-0" id="count-kerawanan"><?= count($hotspots) ?></h4>
                         </div>
                     </div>
                 </div>
@@ -129,10 +138,10 @@
             <div class="p-3 rounded filter-card d-flex flex-column flex-grow-1" style="max-height: 350px;">
                 <h5 class="text-white fw-bold mb-3 small d-flex justify-content-between align-items-center">
                     <span><i class="fa-solid fa-triangle-exclamation text-danger me-2"></i>Titik Rawan Konflik</span>
-                    <span class="badge bg-danger text-white" style="font-size:0.7rem;"><?= count($hotspots) ?> Titik</span>
+                    <span class="badge bg-danger text-white" id="badge-hotspot-count" style="font-size:0.7rem;"><?= count($hotspots) ?> Titik</span>
                 </h5>
                 
-                <div class="d-flex flex-column gap-2 overflow-y-auto pr-1" style="flex: 1;">
+                <div class="d-flex flex-column gap-2 overflow-y-auto pr-1" id="hotspots-list-container" style="flex: 1;">
                     <?php if (empty($hotspots)): ?>
                         <div class="text-muted small text-center py-4">Belum ada titik kerawanan yang didaftarkan.</div>
                     <?php else: ?>
@@ -271,36 +280,100 @@
             });
         });
 
-        // 4. Pengaduan Markers
+        // 4. Pengaduan & Hotspots data
         const pengaduan = <?= json_encode($pengaduan ?? []) ?>;
-        pengaduan.forEach(p => {
-            try {
-                let detail = JSON.parse(p.after_data);
-                if (detail) {
-                    let coords = getCoordinates(p.id, 'pengaduan');
-                    let marker = L.marker(coords, {icon: pengaduanIcon}).addTo(pengaduanGroup)
-                        .bindPopup(`<b>Aduan: ${detail.judul || 'Tanpa Judul'}</b><br>Kategori: ${detail.kategori || 'Lainnya'}<br>Tujuan: ${detail.nama_bidang || 'Umum'}`);
+        const hotspots = <?= json_encode($hotspots ?? []) ?>;
+        const hotspotMarkers = {};
+
+        function renderFilteredData(year) {
+            // Clear existing layers
+            pengaduanGroup.clearLayers();
+            hotspotGroup.clearLayers();
+            for (let key in hotspotMarkers) {
+                delete hotspotMarkers[key];
+            }
+
+            let filteredAduanCount = 0;
+            let filteredHotspots = [];
+
+            // Plot Pengaduan
+            pengaduan.forEach(p => {
+                try {
+                    let detail = JSON.parse(p.after_data);
+                    if (detail) {
+                        let pYear = p.created_at ? new Date(p.created_at).getFullYear() : 2026;
+                        if (pYear == year) {
+                            filteredAduanCount++;
+                            let coords = getCoordinates(p.id, 'pengaduan');
+                            let marker = L.marker(coords, {icon: pengaduanIcon}).addTo(pengaduanGroup)
+                                .bindPopup(`<b>Aduan: ${detail.judul || 'Tanpa Judul'}</b><br>Kategori: ${detail.kategori || 'Lainnya'}<br>Tujuan: ${detail.nama_bidang || 'Umum'}`);
+                            
+                            marker.on('click', function(e) {
+                                map.flyTo(e.latlng, 15, { animate: true, duration: 1.2 });
+                            });
+                        }
+                    }
+                } catch(e) {}
+            });
+
+            // Plot Hotspots (Conflict zones)
+            hotspots.forEach(h => {
+                let hYear = h.created_at ? new Date(h.created_at).getFullYear() : 2026;
+                if (hYear == year) {
+                    filteredHotspots.push(h);
+                    let marker = L.marker([parseFloat(h.latitude), parseFloat(h.longitude)], {icon: getHotspotIcon(h.level)}).addTo(hotspotGroup)
+                        .bindPopup(`<b>Titik Konflik: ${h.nama}</b><br>Tingkat Kerawanan: <span class="badge bg-danger">${h.level}</span><br>Detail: ${h.deskripsi}`);
                     
+                    hotspotMarkers[h.id] = marker;
+
                     marker.on('click', function(e) {
                         map.flyTo(e.latlng, 15, { animate: true, duration: 1.2 });
                     });
                 }
-            } catch(e) {}
-        });
-
-        // 5. Hotspot Markers (Conflict zones)
-        const hotspots = <?= json_encode($hotspots ?? []) ?>;
-        const hotspotMarkers = {};
-        hotspots.forEach(h => {
-            let marker = L.marker([parseFloat(h.latitude), parseFloat(h.longitude)], {icon: getHotspotIcon(h.level)}).addTo(hotspotGroup)
-                .bindPopup(`<b>Titik Konflik: ${h.nama}</b><br>Tingkat Kerawanan: <span class="badge bg-danger">${h.level}</span><br>Detail: ${h.deskripsi}`);
-            
-            hotspotMarkers[h.id] = marker;
-
-            marker.on('click', function(e) {
-                map.flyTo(e.latlng, 15, { animate: true, duration: 1.2 });
             });
-        });
+
+            // Update Summary Stats Counters
+            document.getElementById('count-aduan').innerText = filteredAduanCount;
+            document.getElementById('count-kerawanan').innerText = filteredHotspots.length;
+            document.getElementById('badge-hotspot-count').innerText = filteredHotspots.length + ' Titik';
+
+            // Update Hotspot Sidebar List
+            const listContainer = document.getElementById('hotspots-list-container');
+            listContainer.innerHTML = '';
+            if (filteredHotspots.length === 0) {
+                listContainer.innerHTML = '<div class="text-muted small text-center py-4">Belum ada titik kerawanan di tahun ini.</div>';
+            } else {
+                filteredHotspots.forEach(h => {
+                    let badgeClass = h.level === 'Tinggi' ? 'badge bg-danger-subtle text-danger border border-danger-subtle' : (h.level === 'Sedang' ? 'badge bg-warning-subtle text-warning border border-warning-subtle' : 'badge bg-info-subtle text-info border border-info-subtle');
+                    const item = document.createElement('div');
+                    item.className = 'd-flex justify-content-between align-items-center p-2 rounded hotspot-item';
+                    item.style = 'background: var(--card-bg); border: 1px solid var(--border-color); cursor: pointer; margin-bottom: 8px;';
+                    item.onclick = () => focusHotspot(h.id);
+                    item.innerHTML = `
+                        <div class="min-w-0 flex-grow-1">
+                            <div class="fw-bold text-white small text-truncate">${h.nama}</div>
+                            <div class="text-muted" style="font-size: 0.7rem;">
+                                <span class="${badgeClass} py-0 px-1.5" style="font-size: 0.65rem;">${h.level}</span>
+                                &bull; Klik untuk fokus
+                            </div>
+                        </div>
+                        <div class="text-danger small"><i class="fa-solid fa-crosshairs"></i></div>
+                    `;
+                    listContainer.appendChild(item);
+                });
+            }
+        }
+
+        // Initial render based on dropdown value
+        const filterTahunSelect = document.getElementById('filter-tahun');
+        if (filterTahunSelect) {
+            renderFilteredData(filterTahunSelect.value);
+            filterTahunSelect.addEventListener('change', function() {
+                renderFilteredData(this.value);
+            });
+        } else {
+            renderFilteredData(2026);
+        }
 
         // Add Layer Filters Control
         const overlayMaps = {

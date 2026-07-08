@@ -15,6 +15,11 @@ class User extends BaseController
 
     public function index()
     {
+        return redirect()->to(base_url('user/ormas'));
+    }
+
+    public function ormas()
+    {
         $userId = session()->get('user_id');
 
         // Ambil SEMUA data pendaftaran yang dikaitkan dengan user ini
@@ -43,12 +48,56 @@ class User extends BaseController
         }
 
         $data = [
-            'title'             => 'Dasbor Pendaftar - SIPAKATAU',
-            'pendaftaranList'   => $pendaftaranList,
-            'pendaftaran'       => $activePendaftaran
+            'title'               => 'Dasbor Ormas - SIPAKATAU',
+            'pendaftaranList'     => $pendaftaranList,
+            'pendaftaran'         => $activePendaftaran,
         ];
 
         return view('user/dashboard', $data);
+    }
+
+    public function rekomendasi()
+    {
+        $userId = session()->get('user_id');
+
+        try {
+            $riwayatRekomendasi = $this->db->table('trn_rekomendasi')
+                                    ->where('user_id', $userId)
+                                    ->orderBy('created_at', 'DESC')
+                                    ->get()
+                                    ->getResultArray();
+        } catch (\Exception $e) {
+            $riwayatRekomendasi = [];
+        }
+
+        $data = [
+            'title'              => 'Dasbor Rekomendasi Kegiatan - SIPAKATAU',
+            'riwayatRekomendasi' => $riwayatRekomendasi,
+        ];
+
+        return view('user/dashboard_rekomendasi', $data);
+    }
+
+    public function pengaduan()
+    {
+        $userId = session()->get('user_id');
+
+        try {
+            $riwayatPengaduan = $this->db->table('trn_pengaduan')
+                                    ->where('user_id', $userId)
+                                    ->orderBy('created_at', 'DESC')
+                                    ->get()
+                                    ->getResultArray();
+        } catch (\Exception $e) {
+            $riwayatPengaduan = [];
+        }
+
+        $data = [
+            'title'            => 'Dasbor Pengaduan Masyarakat - SIPAKATAU',
+            'riwayatPengaduan' => $riwayatPengaduan,
+        ];
+
+        return view('user/dashboard_pengaduan', $data);
     }
 
     public function pengajuan()
@@ -78,12 +127,21 @@ class User extends BaseController
             } else {
                 $activeStep = 3; // Pending or Approved goes to status page
             }
+
+            // Ambil data pengurus dari database
+            $pengurus = $this->db->table('mst_ormas_pengurus')
+                                 ->where('ormas_id', $pendaftaran['ormas_id'])
+                                 ->get()
+                                 ->getResultArray();
+        } else {
+            $pengurus = [];
         }
 
         $data = [
             'title'       => ($pendaftaran) ? 'Revisi Pengajuan Ormas - SIPAKATAU' : 'Form Pengajuan Ormas - SIPAKATAU',
             'pendaftaran' => $pendaftaran,
-            'activeStep'  => $activeStep
+            'activeStep'  => $activeStep,
+            'pengurus'    => $pengurus
         ];
 
         return view('user/form_pengajuan', $data);
@@ -194,6 +252,29 @@ class User extends BaseController
                 $this->db->table('sys_users')->where('id', $userId)->update(['role' => 'ormas']);
                 session()->set('role', 'ormas');
 
+                // Save Kepengurusan
+                $pengurusNames = $this->request->getPost('pengurus_nama') ?: [];
+                $pengurusJabatans = $this->request->getPost('pengurus_jabatan') ?: [];
+                $pengurusPhones = $this->request->getPost('pengurus_no_hp') ?: [];
+                foreach ($pengurusNames as $index => $name) {
+                    if (!empty($name)) {
+                        $pengurusId = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x', 
+                            mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff), 
+                            mt_rand(0, 0x0fff) | 0x4000, mt_rand(0, 0x3fff) | 0x8000, 
+                            mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+                        );
+                        $this->db->table('mst_ormas_pengurus')->insert([
+                            'id'         => $pengurusId,
+                            'ormas_id'   => $ormasId,
+                            'nama'       => $name,
+                            'jabatan'    => $pengurusJabatans[$index] ?? '',
+                            'no_hp'      => $pengurusPhones[$index] ?? '',
+                            'created_at' => date('Y-m-d H:i:s'),
+                            'updated_at' => date('Y-m-d H:i:s'),
+                        ]);
+                    }
+                }
+
                 return redirect()->to("user/pengajuan?id={$newPendaftaranId}&step=2")->with('success', 'Informasi dasar ormas berhasil disimpan. Silakan lengkapi berkas persyaratan.');
             } else {
                 // UPDATE EXISTING DRAFT / REJECTED
@@ -219,6 +300,30 @@ class User extends BaseController
                     'tipe_ormas' => $tipeOrmas,
                     'updated_at' => date('Y-m-d H:i:s')
                 ]);
+
+                // Update Kepengurusan
+                $this->db->table('mst_ormas_pengurus')->where('ormas_id', $ormasId)->delete();
+                $pengurusNames = $this->request->getPost('pengurus_nama') ?: [];
+                $pengurusJabatans = $this->request->getPost('pengurus_jabatan') ?: [];
+                $pengurusPhones = $this->request->getPost('pengurus_no_hp') ?: [];
+                foreach ($pengurusNames as $index => $name) {
+                    if (!empty($name)) {
+                        $pengurusId = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x', 
+                            mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff), 
+                            mt_rand(0, 0x0fff) | 0x4000, mt_rand(0, 0x3fff) | 0x8000, 
+                            mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+                        );
+                        $this->db->table('mst_ormas_pengurus')->insert([
+                            'id'         => $pengurusId,
+                            'ormas_id'   => $ormasId,
+                            'nama'       => $name,
+                            'jabatan'    => $pengurusJabatans[$index] ?? '',
+                            'no_hp'      => $pengurusPhones[$index] ?? '',
+                            'created_at' => date('Y-m-d H:i:s'),
+                            'updated_at' => date('Y-m-d H:i:s'),
+                        ]);
+                    }
+                }
 
                 return redirect()->to("user/pengajuan?id={$pendaftaranId}&step=2")->with('success', 'Informasi dasar ormas berhasil diperbarui. Silakan lengkapi berkas persyaratan.');
             }
@@ -338,5 +443,24 @@ class User extends BaseController
         }
 
         return $this->response->setContentType('application/json')->setBody($response);
+    }
+
+    public function rekomendasiBaru()
+    {
+        $data = [
+            'title' => 'Form Rekomendasi Kegiatan - SIPAKATAU'
+        ];
+        return view('user/form_rekomendasi', $data);
+    }
+
+    public function pengaduanBaru()
+    {
+        $bidang = $this->db->table('mst_bidang')->orderBy('nama_bidang', 'ASC')->get()->getResultArray();
+        
+        $data = [
+            'title'  => 'Form Laporan Pengaduan - SIPAKATAU',
+            'bidang' => $bidang
+        ];
+        return view('user/form_pengaduan', $data);
     }
 }

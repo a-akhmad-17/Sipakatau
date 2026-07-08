@@ -116,51 +116,13 @@
         <h2 class="text-white fw-bold mb-1">Executive Dashboard</h2>
         <p class="text-muted small mb-0">Selamat datang kembali, <b>Kepala Badan Kesbangpol Sinjai</b> • Hari ini: <b><?= date('d M Y') ?></b></p>
     </div>
-    <div class="d-none d-md-block">
-        <a href="<?= site_url('eksekutif/cetak-laporan') ?>" target="_blank" class="btn btn-portal">
-            <i class="fa-solid fa-print me-1.5"></i>Cetak Laporan Fisik
-        </a>
-    </div>
+
 </div>
 
 <!-- Row 1: Metrics Overview -->
 <div class="row g-3 mb-5">
-    <!-- Realisasi Keuangan Kumulatif -->
-    <div class="col-md-6 col-lg-3 animate-fade-up delay-1">
-        <div class="metric-card">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <span class="text-muted small fw-semibold">Realisasi Keuangan</span>
-                <div class="icon-box icon-success">
-                    <i class="fa-solid fa-rupiah-sign"></i>
-                </div>
-            </div>
-            <h3 class="text-white fw-bold mb-1"><?= number_format($persentaseKeuangan, 1) ?>%</h3>
-            <p class="text-muted small mb-2">Rp<?= number_format($totalRealisasi, 0, ',', '.') ?> dari Rp<?= number_format($totalTarget, 0, ',', '.') ?></p>
-            <div class="progress progress-custom">
-                <div class="progress-bar progress-bar-success" role="progressbar" style="width: <?= $persentaseKeuangan ?>%" aria-valuenow="<?= $persentaseKeuangan ?>" aria-valuemin="0" aria-valuemax="100"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Realisasi Fisik Rata-rata -->
-    <div class="col-md-6 col-lg-3 animate-fade-up delay-2">
-        <div class="metric-card">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <span class="text-muted small fw-semibold">Realisasi Fisik</span>
-                <div class="icon-box icon-primary">
-                    <i class="fa-solid fa-chart-line"></i>
-                </div>
-            </div>
-            <h3 class="text-white fw-bold mb-1"><?= number_format($persentaseFisik, 1) ?>%</h3>
-            <p class="text-muted small mb-2">Rata-rata Target: <?= number_format($avgTargetFisik, 1) ?>% | Real: <?= number_format($avgRealisasiFisik, 1) ?>%</p>
-            <div class="progress progress-custom">
-                <div class="progress-bar progress-bar-primary" role="progressbar" style="width: <?= $persentaseFisik ?>%" aria-valuenow="<?= $persentaseFisik ?>" aria-valuemin="0" aria-valuemax="100"></div>
-            </div>
-        </div>
-    </div>
-
     <!-- Ormas SK Merah -->
-    <div class="col-md-6 col-lg-3 animate-fade-up delay-3">
+    <div class="col-md-6 animate-fade-up delay-1">
         <a href="<?= site_url('eksekutif/ormas-merah') ?>" class="text-decoration-none">
             <div class="metric-card">
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -178,20 +140,20 @@
         </a>
     </div>
 
-    <!-- Kendala Dilaporkan -->
-    <div class="col-md-6 col-lg-3 animate-fade-up delay-4">
-        <a href="<?= site_url('eksekutif/kendala') ?>" class="text-decoration-none">
+    <!-- Aduan Masyarakat -->
+    <div class="col-md-6 animate-fade-up delay-2">
+        <a href="<?= site_url('eksekutif/pengaduan') ?>" class="text-decoration-none">
             <div class="metric-card">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="text-muted small fw-semibold">Kendala Bidang</span>
-                    <div class="icon-box <?= $kendalaCount > 0 ? 'icon-warning' : 'icon-success' ?>">
-                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span class="text-muted small fw-semibold">Aduan Masyarakat</span>
+                    <div class="icon-box <?= $pengaduanCount > 0 ? 'icon-warning' : 'icon-success' ?>">
+                        <i class="fa-solid fa-bullhorn"></i>
                     </div>
                 </div>
-                <h3 class="text-white fw-bold mb-1"><?= $kendalaCount ?> Kasus</h3>
-                <p class="text-muted small mb-2">Kendala operasional dilaporkan.</p>
+                <h3 class="text-white fw-bold mb-1"><?= $pengaduanCount ?> Aduan</h3>
+                <p class="text-muted small mb-2">Pengaduan anonim masuk.</p>
                 <div class="progress progress-custom">
-                    <div class="progress-bar <?= $kendalaCount > 0 ? 'progress-bar-warning' : 'progress-bar-success' ?>" role="progressbar" style="width: <?= $kendalaCount > 0 ? 100 : 0 ?>%" aria-valuenow="<?= $kendalaCount ?>" aria-valuemin="0" aria-valuemax="10"></div>
+                    <div class="progress-bar <?= $pengaduanCount > 0 ? 'progress-bar-warning' : 'progress-bar-success' ?>" role="progressbar" style="width: <?= $pengaduanCount > 0 ? 100 : 0 ?>%" aria-valuenow="<?= $pengaduanCount ?>" aria-valuemin="0" aria-valuemax="10"></div>
                 </div>
             </div>
         </a>
@@ -204,22 +166,6 @@
     <p class="text-muted small mb-4">Pilih salah satu menu di bawah ini atau gunakan sidebar kiri untuk memantau data secara khusus.</p>
     
     <div class="row g-4">
-        <!-- Kinerja Bidang -->
-        <div class="col-md-6 col-lg-4">
-            <div class="shortcut-card p-4 h-100 d-flex flex-column justify-content-between">
-                <div>
-                    <div class="icon-box icon-success mb-3">
-                        <i class="fa-solid fa-chart-column"></i>
-                    </div>
-                    <h5 class="text-white fw-bold mb-2">Kinerja Bidang & SPJ</h5>
-                    <p class="text-muted small">Tinjau grafik visual perbandingan realisasi anggaran keuangan dan pencapaian fisik per unit kerja.</p>
-                </div>
-                <a href="<?= site_url('eksekutif/kinerja') ?>" class="btn btn-sm btn-outline-primary w-100 mt-3">
-                    Buka Kinerja Bidang
-                </a>
-            </div>
-        </div>
-
         <!-- Peta GIS -->
         <div class="col-md-6 col-lg-4">
             <div class="shortcut-card p-4 h-100 d-flex flex-column justify-content-between">

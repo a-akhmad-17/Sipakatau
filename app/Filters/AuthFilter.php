@@ -37,7 +37,7 @@ class AuthFilter implements FilterInterface
                 // Tentukan halaman pengalihan berdasarkan role pengguna saat ini
                 $redirects = [
                     'admin' => 'admin',
-                    'pptk'  => 'bidang',
+                    'kabid' => 'bidang',
                     'kaban' => 'eksekutif',
                     'user'  => 'user',
                     'ormas' => 'user'

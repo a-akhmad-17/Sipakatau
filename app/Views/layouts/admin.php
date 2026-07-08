@@ -929,7 +929,7 @@
     $initial = strtoupper(substr($username, 0, 1));
     $roleLabels = [
         'admin' => 'Administrator',
-        'pptk'  => 'PPTK Bidang',
+        'kabid' => 'Kepala Bidang',
         'kaban' => 'Kepala Badan'
     ];
     $roleText = $roleLabels[$role] ?? ucfirst($role);
@@ -1001,21 +1001,18 @@
                         <a href="<?= site_url('admin/settings/video') ?>" class="sidebar-link ps-5 <?= ($uriString === 'admin/settings/video') ? 'active' : '' ?>">
                             <i class="fa-solid fa-video" style="font-size: 0.8rem;"></i> Video & Dokumentasi
                         </a>
-                        <a href="<?= site_url('admin/settings/spj') ?>" class="sidebar-link ps-5 <?= ($uriString === 'admin/settings/spj') ? 'active' : '' ?>">
-                            <i class="fa-solid fa-lock" style="font-size: 0.8rem;"></i> Kunci SPJ
+                        <a href="<?= site_url('admin/settings/users') ?>" class="sidebar-link ps-5 <?= ($uriString === 'admin/settings/users') ? 'active' : '' ?>">
+                            <i class="fa-solid fa-users-gear" style="font-size: 0.8rem;"></i> Kelola Pengguna
                         </a>
                     </div>
 
-                <?php elseif ($role === 'pptk'): ?>
-                    <div class="sidebar-label">Dasbor PPTK</div>
+                <?php elseif ($role === 'kabid'): ?>
+                    <div class="sidebar-label">Dasbor Kabid</div>
                     <a href="<?= site_url('bidang') ?>" class="sidebar-link active" id="menu-bidang-home">
                         <i class="fa-solid fa-chart-pie"></i> Ringkasan Dasbor
                     </a>
-                    <a href="#" class="sidebar-link scroll-anchor-link" data-target-id="formLapor">
-                        <i class="fa-solid fa-file-pen"></i> Input Laporan SPJ
-                    </a>
-                    <a href="#" class="sidebar-link scroll-anchor-link" data-target-id="riwayat-kegiatan">
-                        <i class="fa-solid fa-list-check"></i> Riwayat Kegiatan
+                    <a href="#" class="sidebar-link scroll-anchor-link" data-target-id="validasi-skt">
+                        <i class="fa-solid fa-file-signature"></i> Penerbitan SKT / Tanggapan
                     </a>
                     <a href="#" class="sidebar-link scroll-anchor-link" data-target-id="gis-map">
                         <i class="fa-solid fa-map-location-dot"></i> Peta Geografis
@@ -1047,13 +1044,49 @@
                         <i class="fa-solid fa-print"></i> Cetak Laporan Fisik
                     </a>
                 <?php elseif ($role === 'ormas' || $role === 'user'): ?>
-                    <div class="sidebar-label">Pendaftaran</div>
-                    <a href="<?= site_url('user') ?>" class="sidebar-link <?= ($uriString === 'user') ? 'active' : '' ?>">
-                        <i class="fa-solid fa-gauge-high"></i> Ringkasan Dasbor
-                    </a>
-                    <a href="<?= site_url('user/pengajuan') ?>" class="sidebar-link <?= ($uriString === 'user/pengajuan') ? 'active' : '' ?>">
-                        <i class="fa-solid fa-file-pen"></i> Form Pengajuan
-                    </a>
+                    <?php if (strpos($uriString, 'user/rekomendasi') === 0): ?>
+                        <div class="sidebar-label">Rekomendasi Kegiatan</div>
+                        <a href="<?= site_url('user/rekomendasi') ?>" class="sidebar-link <?= ($uriString === 'user/rekomendasi') ? 'active' : '' ?>">
+                            <i class="fa-solid fa-gauge-high"></i> Ringkasan Dasbor
+                        </a>
+                        <a href="<?= site_url('user/rekomendasi/baru') ?>" class="sidebar-link <?= ($uriString === 'user/rekomendasi/baru') ? 'active' : '' ?>">
+                            <i class="fa-solid fa-calendar-plus"></i> Ajukan Rekomendasi
+                        </a>
+                        <hr class="sidebar-divider my-3" style="border-top: 1px solid rgba(255,255,255,0.06); margin-left: 1.5rem; margin-right: 1.5rem;">
+                        <div class="sidebar-label text-muted">Alih Layanan</div>
+                        <a href="<?= site_url('user/pengaduan') ?>" class="sidebar-link text-muted" style="font-size: 0.8rem;">
+                            <i class="fa-solid fa-bullhorn text-muted"></i> Alih ke Portal Pengaduan
+                        </a>
+                    <?php elseif (strpos($uriString, 'user/pengaduan') === 0): ?>
+                        <div class="sidebar-label">Pengaduan Masyarakat</div>
+                        <a href="<?= site_url('user/pengaduan') ?>" class="sidebar-link <?= ($uriString === 'user/pengaduan') ? 'active' : '' ?>">
+                            <i class="fa-solid fa-gauge-high"></i> Ringkasan Dasbor
+                        </a>
+                        <a href="<?= site_url('user/pengaduan/baru') ?>" class="sidebar-link <?= ($uriString === 'user/pengaduan/baru') ? 'active' : '' ?>">
+                            <i class="fa-solid fa-bullhorn"></i> Laporkan Pengaduan
+                        </a>
+                        <hr class="sidebar-divider my-3" style="border-top: 1px solid rgba(255,255,255,0.06); margin-left: 1.5rem; margin-right: 1.5rem;">
+                        <div class="sidebar-label text-muted">Alih Layanan</div>
+                        <a href="<?= site_url('user/rekomendasi') ?>" class="sidebar-link text-muted" style="font-size: 0.8rem;">
+                            <i class="fa-solid fa-calendar-check text-muted"></i> Alih ke Rekomendasi
+                        </a>
+                    <?php else: ?>
+                        <div class="sidebar-label">Pendaftaran Ormas</div>
+                        <a href="<?= site_url('user/ormas') ?>" class="sidebar-link <?= ($uriString === 'user/ormas' || $uriString === 'user') ? 'active' : '' ?>">
+                            <i class="fa-solid fa-gauge-high"></i> Ringkasan Dasbor
+                        </a>
+                        <a href="<?= site_url('user/pengajuan') ?>" class="sidebar-link <?= ($uriString === 'user/pengajuan') ? 'active' : '' ?>">
+                            <i class="fa-solid fa-file-pen"></i> Form Pengajuan
+                        </a>
+                        <hr class="sidebar-divider my-3" style="border-top: 1px solid rgba(255,255,255,0.06); margin-left: 1.5rem; margin-right: 1.5rem;">
+                        <div class="sidebar-label text-muted">Alih Layanan</div>
+                        <a href="<?= site_url('user/rekomendasi') ?>" class="sidebar-link text-muted" style="font-size: 0.8rem;">
+                            <i class="fa-solid fa-calendar-check text-muted"></i> Dasbor Rekomendasi
+                        </a>
+                        <a href="<?= site_url('user/pengaduan') ?>" class="sidebar-link text-muted" style="font-size: 0.8rem;">
+                            <i class="fa-solid fa-bullhorn text-muted"></i> Portal Pengaduan
+                        </a>
+                    <?php endif; ?>
                 <?php endif; ?>
 
                 <div class="sidebar-label">Sistem</div>
@@ -1311,7 +1344,7 @@
                     });
                 });
 
-            } else if (role === 'pptk' || role === 'kaban') {
+            } else if (role === 'kabid' || role === 'kaban') {
                 // Scroll behavior for anchor links in dashboard
                 const scrollLinks = document.querySelectorAll('.scroll-anchor-link');
                 scrollLinks.forEach(link => {

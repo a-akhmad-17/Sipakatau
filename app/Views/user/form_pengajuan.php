@@ -288,6 +288,73 @@ $requirementsBerjenjang = [
                     </div>
                 </div>
 
+                <h5 class="text-main fw-bold mb-3 border-bottom border-secondary border-opacity-10 pb-2">2b. Susunan Kepengurusan Inti</h5>
+                <p class="text-muted small mb-3"><i class="fa-solid fa-circle-info text-info me-1"></i>Masukkan nama pengurus sesuai SK Kepengurusan Anda (minimal Ketua, Sekretaris, Bendahara).</p>
+                
+                <div class="table-responsive mb-4">
+                    <table class="table table-bordered border-secondary border-opacity-10 text-white align-middle" id="table-pengurus">
+                        <thead>
+                            <tr style="background: rgba(255, 255, 255, 0.03);">
+                                <th style="width: 30%;">Jabatan <span class="text-danger fw-bold">*</span></th>
+                                <th style="width: 40%;">Nama Lengkap <span class="text-danger fw-bold">*</span></th>
+                                <th style="width: 25%;">No. HP / WhatsApp</th>
+                                <th style="width: 5%;" class="text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pengurus-container">
+                            <?php
+                            $defaultJabatans = ['Ketua', 'Sekretaris', 'Bendahara'];
+                            $activePengurus = old('pengurus_nama') ? [] : ($pengurus ?? []);
+                            
+                            if (old('pengurus_nama')) {
+                                $oldNama = old('pengurus_nama');
+                                $oldJabatan = old('pengurus_jabatan');
+                                $oldNoHp = old('pengurus_no_hp');
+                                foreach ($oldNama as $idx => $val) {
+                                    $activePengurus[] = [
+                                        'nama' => $val,
+                                        'jabatan' => $oldJabatan[$idx] ?? '',
+                                        'no_hp' => $oldNoHp[$idx] ?? ''
+                                    ];
+                                }
+                            }
+                            
+                            if (empty($activePengurus)) {
+                                foreach ($defaultJabatans as $jab) {
+                                    $activePengurus[] = [
+                                        'nama' => '',
+                                        'jabatan' => $jab,
+                                        'no_hp' => ''
+                                    ];
+                                }
+                            }
+                            
+                            foreach ($activePengurus as $index => $p):
+                            ?>
+                            <tr class="pengurus-row">
+                                <td>
+                                    <input type="text" name="pengurus_jabatan[]" class="form-control form-control-custom form-control-sm" placeholder="Contoh: Ketua" value="<?= esc($p['jabatan']) ?>" required>
+                                </td>
+                                <td>
+                                    <input type="text" name="pengurus_nama[]" class="form-control form-control-custom form-control-sm" placeholder="Nama Lengkap" value="<?= esc($p['nama']) ?>" required>
+                                </td>
+                                <td>
+                                    <input type="text" name="pengurus_no_hp[]" class="form-control form-control-custom form-control-sm" placeholder="Contoh: 0812..." value="<?= esc($p['no_hp']) ?>">
+                                </td>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-sm btn-outline-danger border-0 rounded-circle text-danger" onclick="removePengurusRow(this)">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                    <button type="button" class="btn btn-sm btn-outline-success text-success border-success border-opacity-30 rounded-pill px-3 mb-2" onclick="addPengurusRow()">
+                        <i class="fa-solid fa-plus me-1 text-success"></i> Tambah Baris Pengurus
+                    </button>
+                </div>
+
                 <h5 class="text-main fw-bold mb-3 border-bottom border-secondary border-opacity-10 pb-2">3. Lokasi Geografis Kantor Sekretariat</h5>
                 <p class="text-muted small mb-2"><i class="fa-solid fa-circle-info text-info me-1"></i>Tentukan titik koordinat sekretariat pada peta interaktif. Klik pada peta atau drag marker biru ke posisi kantor Anda.</p>
                 
@@ -718,6 +785,38 @@ function renderValidationTable(tipe) {
         `;
         tableBody.appendChild(row);
     });
+}
+
+function addPengurusRow() {
+    const container = document.getElementById('pengurus-container');
+    const tr = document.createElement('tr');
+    tr.className = 'pengurus-row';
+    tr.innerHTML = `
+        <td>
+            <input type="text" name="pengurus_jabatan[]" class="form-control form-control-custom form-control-sm" placeholder="Contoh: Anggota" required>
+        </td>
+        <td>
+            <input type="text" name="pengurus_nama[]" class="form-control form-control-custom form-control-sm" placeholder="Nama Lengkap" required>
+        </td>
+        <td>
+            <input type="text" name="pengurus_no_hp[]" class="form-control form-control-custom form-control-sm" placeholder="Contoh: 0812...">
+        </td>
+        <td class="text-center">
+            <button type="button" class="btn btn-sm btn-outline-danger border-0 rounded-circle text-danger" onclick="removePengurusRow(this)">
+                <i class="fa-solid fa-trash-can"></i>
+            </button>
+        </td>
+    `;
+    container.appendChild(tr);
+}
+
+function removePengurusRow(btn) {
+    const rows = document.querySelectorAll('.pengurus-row');
+    if (rows.length <= 1) {
+        alert('Minimal harus ada 1 orang pengurus!');
+        return;
+    }
+    btn.closest('tr').remove();
 }
 
 function toggleOrmasRequirements(value) {

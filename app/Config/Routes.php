@@ -19,10 +19,15 @@ $routes->post('auth/google/callback', 'Auth::googleCallback');
 // User & Ormas Dashboard Routes (Protected by auth filter - role: user, ormas)
 $routes->group('user', ['filter' => 'auth:user,ormas'], function($routes) {
     $routes->get('/', 'User::index');
+    $routes->get('ormas', 'User::ormas');
     $routes->get('pengajuan', 'User::pengajuan');
     $routes->post('pengajuan/simpan', 'User::simpanPengajuan');
     $routes->post('pengajuan/minta-hapus/(:any)', 'User::mintaHapus/$1');
     $routes->get('geocode', 'User::geocode');
+    $routes->get('rekomendasi', 'User::rekomendasi');
+    $routes->get('rekomendasi/baru', 'User::rekomendasiBaru');
+    $routes->get('pengaduan', 'User::pengaduan');
+    $routes->get('pengaduan/baru', 'User::pengaduanBaru');
 });
 
 
@@ -52,6 +57,7 @@ $routes->group('admin', ['filter' => 'auth:admin'], function($routes) {
     $routes->post('delete-rekomendasi/(:any)', 'Admin::deleteRekomendasi/$1');
     $routes->post('delete-pengaduan/(:any)', 'Admin::deletePengaduan/$1');
     $routes->post('delete-file-pengaduan/(:any)', 'Admin::deleteFilePengaduan/$1');
+    $routes->post('proses-pengaduan/(:any)/(:any)', 'Admin::prosesPengaduan/$1/$2');
 
     // New Dedicated Settings Routes (CRUD)
     $routes->get('settings/visi-misi', 'Admin::settingsVisiMisi');
@@ -65,6 +71,11 @@ $routes->group('admin', ['filter' => 'auth:admin'], function($routes) {
     $routes->post('settings/bidang/tambah', 'Admin::tambahBidang');
     $routes->post('settings/bidang/update', 'Admin::updateBidang');
     $routes->post('settings/bidang/delete/(:any)', 'Admin::deleteBidang/$1');
+
+    $routes->get('settings/users', 'Admin::settingsUsers');
+    $routes->post('settings/users/tambah', 'Admin::tambahUser');
+    $routes->post('settings/users/update', 'Admin::updateUser');
+    $routes->post('settings/users/delete/(:any)', 'Admin::deleteUser/$1');
 
     $routes->get('settings/struktur', 'Admin::settingsStruktur');
     $routes->post('settings/staf/tambah', 'Admin::tambahStaf');
@@ -82,18 +93,16 @@ $routes->group('admin', ['filter' => 'auth:admin'], function($routes) {
 // Bidang Dashboard Routes (Protected by auth filter - role: kabid)
 $routes->group('bidang', ['filter' => 'auth:kabid'], function($routes) {
     $routes->get('/', 'Bidang::index');
-    $routes->post('lapor-kegiatan', 'Bidang::laporKegiatan');
+    // Kelola Pendaftaran SKT Ormas — Khusus Kabid Poldagri & Ormas
+    $routes->post('proses-pendaftaran/(:any)/(:any)', 'Bidang::prosesPendaftaran/$1/$2');
 });
 
 // Executive Dashboard Routes (Protected by auth filter - role: kaban)
 $routes->group('eksekutif', ['filter' => 'auth:kaban'], function($routes) {
     $routes->get('/', 'Eksekutif::index');
-    $routes->get('kinerja', 'Eksekutif::kinerja');
     $routes->get('ormas-merah', 'Eksekutif::ormasMerah');
     $routes->get('gis', 'Eksekutif::gis');
-    $routes->get('kendala', 'Eksekutif::kendala');
     $routes->get('pengaduan', 'Eksekutif::pengaduan');
-    $routes->get('cetak-laporan', 'Eksekutif::cetakLaporan');
 });
 
 // Public Pages Routes (Fokus C - Bakesbangpol Reference)
@@ -116,5 +125,6 @@ $routes->post('informasi/pengaduan', 'Home::simpanPengaduan');
 $routes->get('layanan/lacak', 'Home::lacakBerkas');
 $routes->post('layanan/hapus-berkas-ditolak', 'Home::hapusBerkasDitolak');
 $routes->get('layanan/cetak-rekomendasi/(:any)', 'Home::cetakRekomendasi/$1');
+$routes->get('layanan/cetak-permohonan/(:any)', 'Home::cetakPermohonan/$1');
 $routes->post('layanan/ambil-antrean', 'Home::ambilAntrean');
 

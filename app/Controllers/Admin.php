@@ -29,6 +29,16 @@ class Admin extends BaseController
                           ->get()
                           ->getResultArray();
 
+        // Ambil semua pengurus ormas dan map ke pendaftaran
+        foreach ($pendaftaran as &$p) {
+            $pengurusList = $db->table('mst_ormas_pengurus')
+                               ->where('ormas_id', $p['ormas_id'])
+                               ->get()
+                               ->getResultArray();
+            $p['pengurus_list'] = json_encode($pengurusList);
+        }
+        unset($p);
+
         // Ambil data rekomendasi kegiatan riil
         $rekomendasi = $db->table('trn_rekomendasi')
                           ->orderBy('created_at', 'DESC')
@@ -50,9 +60,11 @@ class Admin extends BaseController
         $settingsMap['titik_kerawanan'] = isset($settingsMap['titik_kerawanan']) ? json_decode($settingsMap['titik_kerawanan'], true) : [];
 
         // Ambil data pengaduan masyarakat
-        $pengaduan = $db->table('log_activities')
-                        ->where('action', 'DAFTAR_PENGADUAN_ANONIM')
-                        ->orderBy('created_at', 'DESC')
+        $pengaduan = $db->table('trn_pengaduan')
+                        ->select('trn_pengaduan.*, sys_users.username as pengaju_username, mst_bidang.nama_bidang')
+                        ->join('sys_users', 'sys_users.id = trn_pengaduan.user_id', 'left')
+                        ->join('mst_bidang', 'mst_bidang.id = trn_pengaduan.bidang_id', 'left')
+                        ->orderBy('trn_pengaduan.created_at', 'DESC')
                         ->get()
                         ->getResultArray();
 
@@ -430,13 +442,27 @@ class Admin extends BaseController
             ];
             $msg = 'Rekomendasi kegiatan berhasil disetujui Bidang terkait. Siap diterbitkan TTE.';
         } elseif ($action === 'terbitkan_tte') {
-            $tteFilename = 'rekomendasi_' . $id . '_signed.pdf';
+            $file = $this->request->getFile('berkas_rekomendasi');
+            $fileName = null;
+
+            if ($file && $file->isValid() && !$file->hasMoved()) {
+                $uploadPath = ROOTPATH . 'public/uploads/rekomendasi_tte/';
+                if (!is_dir($uploadPath)) {
+                    mkdir($uploadPath, 0755, true);
+                }
+                
+                $fileName = $file->getRandomName();
+                $file->move($uploadPath, $fileName);
+            } else {
+                return redirect()->back()->with('error', 'Gagal mengunggah berkas Surat Rekomendasi. Silakan pilih file yang valid.');
+            }
+
             $updateData = [
                 'status_rekomendasi' => 'Approved',
-                'pdf_tte_path' => 'uploads/tte/' . $tteFilename,
+                'pdf_tte_path' => 'uploads/rekomendasi_tte/' . $fileName,
                 'updated_at' => date('Y-m-d H:i:s')
             ];
-            $msg = 'TTE rekomendasi kegiatan berhasil diterbitkan!';
+            $msg = 'Surat Rekomendasi berhasil diunggah dan dikirim ke pemohon!';
         } elseif ($action === 'reject') {
             $updateData = [
                 'status_rekomendasi' => 'Rejected',
@@ -1955,9 +1981,8 @@ class Admin extends BaseController
         $db = \Config\Database::connect();
         helper('app');
 
-        $pengaduan = $db->table('log_activities')
+        $pengaduan = $db->table('trn_pengaduan')
                         ->where('id', $id)
-                        ->where('action', 'DAFTAR_PENGADUAN_ANONIM')
                         ->get()
                         ->getRowArray();
 
@@ -1965,17 +1990,16 @@ class Admin extends BaseController
             return redirect()->back()->with('error', 'Laporan pengaduan tidak ditemukan.');
         }
 
-        $detail = json_decode($pengaduan['after_data'], true) ?? [];
-        if (!empty($detail['berkas'])) {
-            $filePath = ROOTPATH . 'public/uploads/pengaduan/' . $detail['berkas'];
+        if (!empty($pengaduan['berkas'])) {
+            $filePath = ROOTPATH . 'public/uploads/pengaduan/' . $pengaduan['berkas'];
             if (file_exists($filePath)) {
                 @unlink($filePath);
             }
         }
 
-        $db->table('log_activities')->where('id', $id)->delete();
+        $db->table('trn_pengaduan')->where('id', $id)->delete();
 
-        log_activity('HAPUS_PENGADUAN_ADMIN', $pengaduan, [], 'log_activities', $id);
+        log_activity('HAPUS_PENGADUAN_ADMIN', $pengaduan, [], 'trn_pengaduan', $id);
 
         return redirect()->to('admin')->with('success', 'Laporan pengaduan berhasil dihapus.');
     }
@@ -1985,9 +2009,8 @@ class Admin extends BaseController
         $db = \Config\Database::connect();
         helper('app');
 
-        $pengaduan = $db->table('log_activities')
+        $pengaduan = $db->table('trn_pengaduan')
                         ->where('id', $id)
-                        ->where('action', 'DAFTAR_PENGADUAN_ANONIM')
                         ->get()
                         ->getRowArray();
 
@@ -1996,30 +2019,66 @@ class Admin extends BaseController
         }
 
         $beforeData = $pengaduan;
-        $detail = json_decode($pengaduan['after_data'], true) ?? [];
         
-        if (!empty($detail['berkas'])) {
-            $filePath = ROOTPATH . 'public/uploads/pengaduan/' . $detail['berkas'];
+        if (!empty($pengaduan['berkas'])) {
+            $filePath = ROOTPATH . 'public/uploads/pengaduan/' . $pengaduan['berkas'];
             if (file_exists($filePath)) {
                 @unlink($filePath);
             }
             
-            // Remove the filename from the data
-            $detail['berkas'] = null;
-            
-            $db->table('log_activities')
+            $db->table('trn_pengaduan')
                ->where('id', $id)
                ->update([
-                   'after_data' => json_encode($detail)
+                   'berkas' => null,
+                   'updated_at' => date('Y-m-d H:i:s')
                ]);
             
-            $updatedRow = $db->table('log_activities')->where('id', $id)->get()->getRowArray();
-            log_activity('HAPUS_FILE_PENGADUAN_ADMIN', $beforeData, $updatedRow, 'log_activities', $id);
+            $updatedRow = $db->table('trn_pengaduan')->where('id', $id)->get()->getRowArray();
+            log_activity('HAPUS_FILE_PENGADUAN_ADMIN', $beforeData, $updatedRow, 'trn_pengaduan', $id);
             
             return redirect()->to('admin')->with('success', 'File bukti pengaduan berhasil dihapus.');
         }
 
-        return redirect()->to('admin')->with('error', 'Pengaduan tidak memiliki file bukti.');
+        return redirect()->back()->with('error', 'Tidak ada file bukti pada pengaduan ini.');
+    }
+
+    public function prosesPengaduan(string $id, string $action)
+    {
+        $db = \Config\Database::connect();
+        helper('app');
+
+        $aduan = $db->table('trn_pengaduan')->where('id', $id)->get()->getRowArray();
+        if (!$aduan) {
+            return redirect()->back()->with('error', 'Laporan pengaduan tidak ditemukan.');
+        }
+
+        $beforeData = $aduan;
+        $status = 'Pending';
+        $alasanDitolak = null;
+
+        if ($action === 'process') {
+            $status = 'Processed';
+        } elseif ($action === 'reject') {
+            $status = 'Rejected';
+            $alasanDitolak = trim($this->request->getPost('alasan_ditolak'));
+            if (empty($alasanDitolak)) {
+                return redirect()->back()->with('error', 'Alasan penolakan pengaduan wajib diisi.');
+            }
+        } else {
+            return redirect()->back()->with('error', 'Aksi tidak valid.');
+        }
+
+        $db->table('trn_pengaduan')->where('id', $id)->update([
+            'status'         => $status,
+            'alasan_ditolak' => $alasanDitolak,
+            'updated_at'     => date('Y-m-d H:i:s')
+        ]);
+
+        $afterData = $db->table('trn_pengaduan')->where('id', $id)->get()->getRowArray();
+        log_activity('PROSES_PENGADUAN_ADMIN', $beforeData, $afterData, 'trn_pengaduan', $id);
+
+        $msg = $status === 'Processed' ? 'Pengaduan berhasil ditandai sebagai diproses.' : 'Pengaduan berhasil ditolak.';
+        return redirect()->to('admin')->with('success', $msg);
     }
 
     public function updateProgress()
@@ -2086,6 +2145,172 @@ class Admin extends BaseController
             'status_verifikasi' => $statusVerifikasi,
             'csrf_hash' => csrf_hash()
         ]);
+    }
+
+    public function settingsUsers()
+    {
+        $db = \Config\Database::connect();
+
+        // Ambil semua user
+        $users = $db->table('sys_users')
+                    ->select('sys_users.*, mst_bidang.nama_bidang')
+                    ->join('mst_bidang', 'mst_bidang.id = sys_users.bidang_id', 'left')
+                    ->orderBy('sys_users.created_at', 'DESC')
+                    ->get()
+                    ->getResultArray();
+
+        // Ambil list bidang untuk select option
+        $bidang = $db->table('mst_bidang')
+                     ->orderBy('nama_bidang', 'ASC')
+                     ->get()
+                     ->getResultArray();
+
+        $data = [
+            'title'  => 'Kelola Akun Pengguna - SIPAKATAU',
+            'users'  => $users,
+            'bidang' => $bidang
+        ];
+
+        return view('admin/settings_users', $data);
+    }
+
+    public function tambahUser()
+    {
+        $db = \Config\Database::connect();
+        helper(['app', 'form']);
+
+        $username = trim($this->request->getPost('username'));
+        $email = trim($this->request->getPost('email'));
+        $phone = trim($this->request->getPost('phone'));
+        $password = $this->request->getPost('password');
+        $role = $this->request->getPost('role');
+        $bidangId = $this->request->getPost('bidang_id');
+
+        if (empty($username) || empty($email) || empty($password) || empty($role)) {
+            return redirect()->to('admin/settings/users')->with('error', 'Username, email, password, dan role wajib diisi.');
+        }
+
+        // Cek username unik
+        $existsUsername = $db->table('sys_users')->where('username', $username)->countAllResults();
+        if ($existsUsername > 0) {
+            return redirect()->to('admin/settings/users')->with('error', 'Username "' . $username . '" sudah digunakan.');
+        }
+
+        // Cek email unik
+        $existsEmail = $db->table('sys_users')->where('email', $email)->countAllResults();
+        if ($existsEmail > 0) {
+            return redirect()->to('admin/settings/users')->with('error', 'Email "' . $email . '" sudah terdaftar.');
+        }
+
+        $userId = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x', 
+            mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff), 
+            mt_rand(0, 0x0fff) | 0x4000, mt_rand(0, 0x3fff) | 0x8000, 
+            mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+        );
+
+        $userData = [
+            'id'         => $userId,
+            'username'   => $username,
+            'password'   => password_hash($password, PASSWORD_BCRYPT),
+            'email'      => $email,
+            'phone'      => $phone ?: null,
+            'role'       => $role,
+            'bidang_id'  => ($role === 'kabid' && !empty($bidangId)) ? $bidangId : null,
+            'status'     => 'active',
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+
+        $db->table('sys_users')->insert($userData);
+
+        log_activity('TAMBAH_USER_ADMIN', [], $userData, 'sys_users', $userId);
+
+        return redirect()->to('admin/settings/users')->with('success', 'Akun pengguna baru "' . $username . '" berhasil ditambahkan.');
+    }
+
+    public function updateUser()
+    {
+        $db = \Config\Database::connect();
+        helper(['app', 'form']);
+
+        $userId = $this->request->getPost('user_id');
+        $username = trim($this->request->getPost('username'));
+        $email = trim($this->request->getPost('email'));
+        $phone = trim($this->request->getPost('phone'));
+        $password = $this->request->getPost('password');
+        $role = $this->request->getPost('role');
+        $bidangId = $this->request->getPost('bidang_id');
+
+        if (empty($userId) || empty($username) || empty($email) || empty($role)) {
+            return redirect()->to('admin/settings/users')->with('error', 'Username, email, dan role wajib diisi.');
+        }
+
+        $user = $db->table('sys_users')->where('id', $userId)->get()->getRowArray();
+        if (!$user) {
+            return redirect()->to('admin/settings/users')->with('error', 'User tidak ditemukan.');
+        }
+
+        // Cek username unik (abaikan user ini sendiri)
+        $existsUsername = $db->table('sys_users')
+                            ->where('username', $username)
+                            ->where('id !=', $userId)
+                            ->countAllResults();
+        if ($existsUsername > 0) {
+            return redirect()->to('admin/settings/users')->with('error', 'Username "' . $username . '" sudah digunakan oleh pengguna lain.');
+        }
+
+        // Cek email unik (abaikan user ini sendiri)
+        $existsEmail = $db->table('sys_users')
+                          ->where('email', $email)
+                          ->where('id !=', $userId)
+                          ->countAllResults();
+        if ($existsEmail > 0) {
+            return redirect()->to('admin/settings/users')->with('error', 'Email "' . $email . '" sudah digunakan oleh pengguna lain.');
+        }
+
+        $beforeData = $user;
+        $updateData = [
+            'username'   => $username,
+            'email'      => $email,
+            'phone'      => $phone ?: null,
+            'role'       => $role,
+            'bidang_id'  => ($role === 'kabid' && !empty($bidangId)) ? $bidangId : null,
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+
+        // Jika password diisi, update password
+        if (!empty($password)) {
+            $updateData['password'] = password_hash($password, PASSWORD_BCRYPT);
+        }
+
+        $db->table('sys_users')->where('id', $userId)->update($updateData);
+
+        $afterData = $db->table('sys_users')->where('id', $userId)->get()->getRowArray();
+        log_activity('UPDATE_USER_ADMIN', $beforeData, $afterData, 'sys_users', $userId);
+
+        return redirect()->to('admin/settings/users')->with('success', 'Akun pengguna "' . $username . '" berhasil diperbarui.');
+    }
+
+    public function deleteUser(string $id)
+    {
+        $db = \Config\Database::connect();
+        helper('app');
+
+        // Prevent self deletion
+        if ($id === session()->get('user_id')) {
+            return redirect()->to('admin/settings/users')->with('error', 'Anda tidak dapat menghapus akun Anda sendiri yang sedang aktif.');
+        }
+
+        $user = $db->table('sys_users')->where('id', $id)->get()->getRowArray();
+        if (!$user) {
+            return redirect()->to('admin/settings/users')->with('error', 'User tidak ditemukan.');
+        }
+
+        $db->table('sys_users')->where('id', $id)->delete();
+
+        log_activity('HAPUS_USER_ADMIN', $user, [], 'sys_users', $id);
+
+        return redirect()->to('admin/settings/users')->with('success', 'Akun pengguna "' . $user['username'] . '" berhasil dihapus.');
     }
 }
 

@@ -75,13 +75,20 @@ class Auth extends BaseController
             $redirects = [
                 'admin' => 'admin',
                 'kabid' => 'bidang',
-                'kaban' => 'eksekutres', // wait, let's keep eksekutif
                 'kaban' => 'eksekutif',
                 'user'  => 'user',
                 'ormas' => 'user'
             ];
-            $target = $redirects[$user['role']] ?? '/';
 
+            // Cek intended_url: hanya izinkan user & ormas ke public pages
+            $intendedUrl = session()->get('intended_url');
+            session()->remove('intended_url');
+
+            if ($intendedUrl && in_array($user['role'], ['user', 'ormas'])) {
+                return redirect()->to($intendedUrl)->with('success', 'Selamat datang kembali, ' . ucfirst($user['username']));
+            }
+
+            $target = $redirects[$user['role']] ?? '/';
             return redirect()->to($target)->with('success', 'Selamat datang kembali, ' . ucfirst($user['username']));
         }
 

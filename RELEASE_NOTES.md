@@ -1,5 +1,94 @@
 # RELEASE NOTES - SIPAKATAU
 
+## [v2.9.12] - 2026-07-08
+### ✨ Added
+- **Sistem Input Lokasi Terpadu (Smart Location Input)**: Menambahkan input lokasi cerdas 3-in-1 yang mendeteksi input teks secara otomatis (Link Google Maps, koordinat desimal manual, atau pencarian nama jalan/tempat via OpenStreetMap Nominatim API) pada formulir.
+- **Inisialisasi Peta Secara Default**: Menampilkan peta Leaflet.js secara default saat memuat halaman formulir Rekomendasi Kegiatan ([form_rekomendasi.php](file:///F:/Xampp/htdocs/SIPAKATAU/app/Views/user/form_rekomendasi.php)) dan formulir Pengaduan ([form_pengaduan.php](file:///F:/Xampp/htdocs/SIPAKATAU/app/Views/user/form_pengaduan.php)) agar pemohon dapat langsung mengklik lokasi sasaran di peta secara visual.
+- **Peta Interaktif & Penanda Visual**: Memasang penanda (marker) yang dapat digeser (draggable) saat pengguna mengklik peta atau memilih lokasi hasil pencarian.
+- **Migrasi Database Lokasi Baru**: Membuat migrasi `AddLokasiInputToPengaduan` untuk menambahkan kolom `lokasi_pengaduan` bertipe TEXT di tabel `trn_pengaduan`.
+- **Migrasi Penghapusan Kolom Lat/Lng**: Membuat migrasi `DropLatLngFromRekomendasiAndPengaduan` untuk menghapus kolom `latitude` dan `longitude` dari tabel `trn_rekomendasi` dan `trn_pengaduan` (menggantikan koordinat murni dengan penyimpanan nama tempat/link maps langsung).
+
+### 🔄 Changed
+- **Home Controller**: Menghapus penyimpanan data koordinat (`latitude` & `longitude`) pada fungsi `simpanRekomendasi()` dan `simpanPengaduan()` di [Home.php](file:///F:/Xampp/htdocs/SIPAKATAU/app/Controllers/Home.php), dan hanya menyimpan teks lokasi sasaran kegiatan (`lokasi_kegiatan`) atau lokasi kejadian (`lokasi_pengaduan`).
+
+---
+
+## [v2.9.11] - 2026-07-08
+### ✨ Added
+- **Input Kepengurusan Otomatis (Ormas)**: Menambahkan form pengisian data kepengurusan inti (Ketua, Sekretaris, Bendahara, dll.) secara dinamis pada [form_pengajuan.php](file:///F:/Xampp/htdocs/SIPAKATAU/app/Views/user/form_pengajuan.php).
+- **Pencatatan Kepengurusan ke Database**: Menambahkan logika penyimpanan data kepengurusan secara otomatis ke tabel `mst_ormas_pengurus` pada controller [User.php](file:///F:/Xampp/htdocs/SIPAKATAU/app/Controllers/User.php).
+- **Detail Kepengurusan di Panel Admin**: Menampilkan visualisasi susunan kepengurusan ormas secara dinamis pada modal detail tracking berkas di dashboard admin ([dashboard.php](file:///F:/Xampp/htdocs/SIPAKATAU/app/Views/admin/dashboard.php)).
+- **Output Surat Permohonan ke Kemendagri**: Menambahkan route, controller [Home.php](file:///F:/Xampp/htdocs/SIPAKATAU/app/Controllers/Home.php), dan print view [cetak_permohonan.php](file:///F:/Xampp/htdocs/SIPAKATAU/app/Views/layanan/cetak_permohonan.php) berformat Times New Roman 10pt (Dilengkapi TTE BSrE) untuk mempermudah pendaftaran ormas ke tingkat pusat.
+- **Filter Tahun GIS (Arsip)**: Menambahkan filter dropdown tahun pada peta sebaran GIS ([gis.php](file:///F:/Xampp/htdocs/SIPAKATAU/app/Views/eksekutif/gis.php)) untuk menyaring dan mengarsipkan titik laporan aduan dan rawan konflik sosial (default 2026).
+- **Fitur Tambah Bidang Dinamis**: Menambahkan tombol dan modal tambah bidang baru di menu pengaturan portal admin ([settings_bidang.php](file:///F:/Xampp/htdocs/SIPAKATAU/app/Views/admin/settings_bidang.php)).
+- **Pengelolaan Akun Pengguna (User Management)**: Menambahkan halaman manajemen akun pengguna baru ([settings_users.php](file:///F:/Xampp/htdocs/SIPAKATAU/app/Views/admin/settings_users.php)) di menu pengaturan admin untuk mengelola user, role, email, password, nomor HP, dan unit kerja (penempatan bidang kabid).
+- **Pemisahan & Integrasi Riwayat Pengaduan**: Memindahkan penyimpanan laporan aduan masyarakat dari `log_activities` ke tabel transaksi khusus `trn_pengaduan` untuk dipantau secara mandiri.
+- **Riwayat Pengaduan di Dashboard User**: Menyediakan tabel "Riwayat Laporan Pengaduan" di dashboard user ([dashboard.php](file:///F:/Xampp/htdocs/SIPAKATAU/app/Views/user/dashboard.php)) agar pengguna terdaftar bisa melihat status aduan mereka (Pending, Diproses, Ditolak) beserta alasan jika ditolak.
+- **Proses Pengaduan oleh Admin**: Menambahkan tombol Aksi "Proses" dan "Tolak" (disertai modal alasan penolakan) pada tabel pengaduan di dashboard admin ([dashboard.php](file:///F:/Xampp/htdocs/SIPAKATAU/app/Views/admin/dashboard.php)).
+- **Menu Layanan Cepat (Quick Services)**: Menyediakan baris shortcut card "Layanan Cepat" di dashboard user untuk memudahkan pengisian formulir pendaftaran Ormas, Rekomendasi Kegiatan, dan Portal Pengaduan.
+- **Halaman Terpisah Rekomendasi & Pengaduan User**: Membuat halaman formulir mandiri untuk pengajuan Rekomendasi Kegiatan ([form_rekomendasi.php](file:///F:/Xampp/htdocs/SIPAKATAU/app/Views/user/form_rekomendasi.php)) dan Laporan Pengaduan ([form_pengaduan.php](file:///F:/Xampp/htdocs/SIPAKATAU/app/Views/user/form_pengaduan.php)) khusus di dalam panel dasbor pengguna, sehingga pengguna tidak perlu keluar dari portal dashboard.
+- **Pemisahan Dasbor Mandiri (Separated Dashboards)**: Memisahkan dasbor pendaftar menjadi 3 dasbor mandiri berdasarkan layanan: Dasbor Ormas ([dashboard.php](file:///F:/Xampp/htdocs/SIPAKATAU/app/Views/user/dashboard.php)), Dasbor Rekomendasi Kegiatan ([dashboard_rekomendasi.php](file:///F:/Xampp/htdocs/SIPAKATAU/app/Views/user/dashboard_rekomendasi.php)), dan Dasbor Pengaduan Masyarakat ([dashboard_pengaduan.php](file:///F:/Xampp/htdocs/SIPAKATAU/app/Views/user/dashboard_pengaduan.php)).
+- **Penyembunyian Tautan Panduan Publik**: Menghapus tautan unduhan dokumen panduan & lampiran dari halaman publik ([info_registrasi.php](file:///F:/Xampp/htdocs/SIPAKATAU/app/Views/layanan/info_registrasi.php) & [info_rekomendasi.php](file:///F:/Xampp/htdocs/SIPAKATAU/app/Views/layanan/info_rekomendasi.php)) dan mengalihkannya secara internal ke dalam dasbor pendaftar agar eksklusif hanya untuk pengguna terdaftar yang login.
+- **Penyempurnaan Navigasi Rekomendasi & Pengaduan**: Menghapus tombol alih layanan ke registrasi Ormas dari sidebar Dasbor Rekomendasi Kegiatan dan Dasbor Pengaduan Masyarakat agar tidak membingungkan pengguna umum, dengan tetap mempertahankan jalan pintas antar rekomendasi dan pengaduan.
+
+### 🔄 Changed
+- **`Admin::index()`**: Query pendaftaran kini menyertakan pemetaan JSON data pengurus `mst_ormas_pengurus` untuk dikonsumsi JavaScript modal. Query pengaduan dialihkan dari `log_activities` ke `trn_pengaduan` lengkap dengan join username pengaju.
+- **`Admin::settingsUsers()`, `tambahUser()`, `updateUser()`, `deleteUser()`**: Logika CRUD akun pengguna, sanitasi password hashing BCRYPT, pengecekan keunikan username/email, dan proteksi hapus diri sendiri (self-deletion).
+- **`User::index()`**: Dialihkan secara otomatis menuju Dasbor Ormas (`user/ormas`) agar integrasi navigasi lebih terarah.
+- **`User::ormas()`, `rekomendasi()`, `pengaduan()`**: Logika pemuatan data yang difilter khusus untuk masing-masing dasbor dan integrasi sidebar navigasi dinamis.
+- **`User::rekomendasiBaru()`, `pengaduanBaru()`**: Menambahkan controller methods untuk memuat formulir kegiatan dan pengaduan di dalam layout admin/user.
+- **`Home::daftarRekomendasi()`, `pengaduan()`**: Otomatis mengalihkan pengguna yang sudah login ke dasbor internal yang sesuai alih-alih menampilkan formulir publik.
+- **`Home::simpanPengaduan()`, `Home::simpanRekomendasi()`**: Menyimpan laporan secara langsung ke tabel `trn_pengaduan`/`trn_rekomendasi` dan meredirect ke dashboard user yang sesuai jika pengaju berada dalam kondisi login.
+
+---
+
+## [v2.9.10] - 2026-07-08
+### ✨ Added
+- **Multi-Dokumen pada Form Rekomendasi Kegiatan**: Mengubah form rekomendasi kegiatan (`form_rekomendasi.php`) agar mirip dengan pengajuan ormas dengan menyediakan input file terpisah untuk 6 persyaratan dokumen resmi.
+- **Penerbitan Surat Rekomendasi Asli (TTE)**: Memperbarui fitur penerbitan TTE di dashboard admin (`admin/dashboard.php`) untuk memungkinkan admin mengunggah dokumen Surat Rekomendasi resmi (PDF) secara langsung, bukan lagi simulasi teks statis.
+- **Peningkatan UI Tracking Dokumen User**: Memperbarui halaman dasbor pendaftar (`user/dashboard.php`) dan dasbor admin agar dapat memparse data JSON multi-berkas serta menampilkan masing-masing file yang diunggah secara individual dan dinamis.
+- **Migration `ModifyFileProposalInTrnRekomendasi`**: Mengubah tipe kolom `file_proposal` pada tabel `trn_rekomendasi` menjadi `TEXT` agar mampu menampung data JSON berukuran panjang untuk metadata multi-dokumen.
+
+### 🔄 Changed
+- **`Home::simpanRekomendasi()`**: Diperbarui untuk mengunggah masing-masing dari 6 file dokumen rekomendasi kegiatan dan menyimpannya sebagai format JSON dalam kolom `file_proposal`.
+- **`Admin::prosesRekomendasi()`**: Kasus `terbitkan_tte` diubah untuk memproses berkas unggahan `berkas_rekomendasi` (PDF) ke direktori `uploads/rekomendasi_tte` dan memperbarui `pdf_tte_path` dengan file tersebut.
+
+---
+
+## [v2.9.9] - 2026-07-08
+### ✨ Added
+- **Riwayat Rekomendasi Kegiatan di Dashboard User**: Panel baru di `user/dashboard.php` yang menampilkan tabel riwayat semua pengajuan rekomendasi kegiatan milik user yang sedang login — nama kegiatan, pemohon, waktu, status badge (Menunggu/Disetujui/Ditolak), dan link unduh proposal/surat resmi.
+- **Guard Login — Form Rekomendasi Kegiatan**: Halaman `/layanan/rekomendasi` kini memerlukan login. Jika belum login, user di-redirect ke halaman login dengan pesan info dan `intended_url` disimpan ke session agar setelah login langsung diarahkan ke form yang dituju.
+- **Guard Login — Form Pengaduan**: Halaman `/informasi/pengaduan` kini memerlukan login sebelum bisa mengirim aduan. Alur redirect `intended_url` juga aktif.
+- **Intended URL Redirect Pasca Login**: `Auth::attemptLogin()` kini mengecek `session intended_url` — jika ada (dan role user/ormas), redirect ke URL yang dituju sebelum diperintahkan login. Berlaku untuk rekomendasi dan pengaduan.
+- **Kolom `user_id` di `trn_rekomendasi`**: Migration baru menambahkan kolom `user_id VARCHAR(36) NULL` ke tabel `trn_rekomendasi` agar pengajuan rekomendasi kegiatan dapat dilacak per akun pengguna.
+
+### 🔄 Changed
+- **`Home::simpanRekomendasi()`**: Insert ke `trn_rekomendasi` kini menyertakan `user_id` dari session (null jika tidak login/anonim).
+- **`Home::pengaduan()` & `Home::daftarRekomendasi()`**: Return type diubah agar kompatibel dengan `RedirectResponse` dari guard login.
+- **`User::index()`**: Menambahkan query `riwayatRekomendasi` dan meneruskannya ke view.
+- **`Auth::attemptLogin()`**: Duplikat key `kaban => eksekutres` dihapus; logika `intended_url` one-time redirect ditambahkan.
+
+---
+
+## [v2.9.8] - 2026-07-08
+### ✨ Added
+- **Panel Kelola Pendaftaran SKT di Dashboard Kabid Poldagri**: Menambahkan fitur lengkap pengelolaan pendaftaran SKT Ormas khusus untuk akun `kabid_poldagri` (role kabid dengan kode bidang `POLDAGRI_ORMAS`):
+  - **Stat Cards**: Ringkasan Total Pengajuan, Menunggu Validasi, Siap Terbitkan SKT, dan SKT Diterbitkan.
+  - **Tabel Tracking Berkas**: Menampilkan seluruh pengajuan beserta nama ormas, nomor registrasi, progress bar, status badge berwarna, dan tanggal pengajuan.
+  - **Aksi Validasi Bidang**: Tombol "Validasi" untuk menyetujui berkas ke tahap penerbitan SKT (progress → 75%).
+  - **Modal Terbitkan SKT**: Form upload file SKT (PDF/gambar) yang langsung tersimpan dan dikirim ke pemohon (progress → 100%).
+  - **Modal Tolak Berkas**: Form input alasan penolakan dengan konfirmasi.
+  - **Tombol Unduh Berkas & SKT**: Akses langsung ke berkas pengajuan dan dokumen SKT yang sudah diterbitkan.
+- **Route Baru `/bidang/proses-pendaftaran`**: Menambahkan route POST `bidang/proses-pendaftaran/(:any)/(:any)` di group kabid untuk memproses aksi pendaftaran SKT.
+- **Guard Kewenangan Bidang**: Method `prosesPendaftaran` di controller `Bidang` memiliki guard yang memastikan hanya kabid dengan kode bidang `POLDAGRI_ORMAS` yang dapat melakukan aksi.
+
+### 🔄 Changed
+- **Upgrade `Bidang` Controller**: Refactor controller `Bidang.php` — menambahkan method `prosesPendaftaran()` dan logika pengambilan data pendaftaran yang difilter berdasarkan `kode_bidang`.
+- **Upgrade View `dashboard_bidang.php`**: Panel kelola SKT hanya dirender saat `$isPoldagri === true`, sehingga kabid lain tetap melihat tampilan GIS-only tanpa panel tidak relevan.
+
+---
+
 ## [v2.9.7] - 2026-07-07
 ### ✨ Added
 - **Form Input Nomor Telepon pada Registrasi Akun**: Menambahkan kolom input nomor telepon/WhatsApp pada form pendaftaran akun baru (`register.php`) agar admin Kesbangpol dapat langsung menghubungi pengguna jika SKT telah diterbitkan.
