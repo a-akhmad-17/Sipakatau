@@ -219,7 +219,7 @@
 <!-- Modal Detail Progress Rekomendasi -->
 <div class="modal fade" id="modalDetailProgressRekomendasi" tabindex="-1" aria-labelledby="modalDetailProgressRekomendasiLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content" style="background: var(--sidebar-bg); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; backdrop-filter: blur(20px);">
+        <div class="modal-content" style="background: var(--card-bg) !important; border: 1px solid var(--border-color) !important; border-radius: 16px; overflow: hidden; backdrop-filter: blur(20px); color: var(--text-main) !important;">
             <!-- Modal Header -->
             <div class="modal-header border-bottom py-3.5 px-4" style="border-color: var(--border-color) !important;">
                 <div class="d-flex align-items-center gap-3">
@@ -227,7 +227,7 @@
                         <i class="fa-solid fa-route fa-lg"></i>
                     </div>
                     <div>
-                        <h5 class="modal-title text-white fw-bold font-heading mb-0.5" id="modalDetailProgressRekomendasiLabel">Detail Pelacakan Progres</h5>
+                        <h5 class="modal-title fw-bold font-heading mb-0.5" id="modalDetailProgressRekomendasiLabel" style="color: var(--text-main) !important;">Detail Pelacakan Progres</h5>
                         <span class="small text-muted">Layanan Rekomendasi Kegiatan</span>
                     </div>
                 </div>
@@ -237,7 +237,7 @@
             <div class="modal-body p-4" style="max-height: 75vh; overflow-y: auto;">
                 <!-- General Info Table -->
                 <div class="table-responsive mb-4">
-                    <table class="table table-custom mb-0 text-white" style="font-size: 0.85rem;">
+                    <table class="table table-custom mb-0" style="font-size: 0.85rem; color: var(--text-main) !important;">
                         <tbody>
                             <tr>
                                 <th style="width: 30%; background: rgba(255,255,255,0.02);" class="text-muted">Nama Pemohon / Lembaga</th>
@@ -269,7 +269,7 @@
 
                 <!-- Progress Tracker Timeline -->
                 <div class="mb-4 p-4 rounded" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: 12px;">
-                    <h6 class="small fw-bold mb-4 text-white"><i class="fa-solid fa-spinner fa-spin text-warning me-2"></i>Alur Proses Verifikasi</h6>
+                    <h6 class="small fw-bold mb-4" style="color: var(--text-main) !important;"><i class="fa-solid fa-spinner fa-spin text-warning me-2"></i>Alur Proses Verifikasi</h6>
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3" id="m-rek-timeline-container">
                         <!-- Populated dynamically via JS -->
                     </div>
@@ -277,9 +277,9 @@
 
                 <!-- Document Checklist Table -->
                 <div>
-                    <h6 class="small fw-bold mb-3 text-white"><i class="fa-solid fa-paperclip text-success me-2"></i>Berkas Persyaratan yang Telah Diunggah</h6>
+                    <h6 class="small fw-bold mb-3" style="color: var(--text-main) !important;"><i class="fa-solid fa-paperclip text-success me-2"></i>Berkas Persyaratan yang Telah Diunggah</h6>
                     <div class="table-responsive">
-                        <table class="table table-custom mb-0 text-white" style="font-size: 0.82rem;">
+                        <table class="table table-custom mb-0" style="font-size: 0.82rem; color: var(--text-main) !important;">
                             <thead>
                                 <tr style="background: rgba(255, 255, 255, 0.02);">
                                     <th class="text-center" style="width: 5%;">#</th>
@@ -365,11 +365,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 timelineContainer.innerHTML = `
                     <div class="d-flex flex-column align-items-center flex-fill position-relative">
                         <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold ${step1 === 'completed' ? 'bg-success text-white' : (step1 === 'active' ? 'bg-warning text-dark animate-pulse' : 'bg-secondary text-white-50')}" style="width:36px; height:36px; font-size:13px; z-index: 2;">1</div>
-                        <span class="small fw-semibold mt-2 ${step1 !== '' ? 'text-white' : 'text-muted'}">1. Verifikasi Berkas (75%)</span>
+                        <span class="small fw-semibold mt-2 ${step1 !== '' ? '' : 'text-muted'}">1. Verifikasi Berkas (75%)</span>
                     </div>
                     <div class="d-flex flex-column align-items-center flex-fill position-relative">
                         <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold ${step2 === 'completed' ? 'bg-success text-white' : (step2 === 'active' ? 'bg-warning text-dark animate-pulse' : 'bg-secondary text-white-50')}" style="width:36px; height:36px; font-size:13px; z-index: 2;">2</div>
-                        <span class="small fw-semibold mt-2 ${step2 !== '' ? 'text-white' : 'text-muted'}">2. TTE Surat Selesai (100%)</span>
+                        <span class="small fw-semibold mt-2 ${step2 !== '' ? '' : 'text-muted'}">2. TTE Surat Selesai (100%)</span>
                     </div>
                 `;
 
