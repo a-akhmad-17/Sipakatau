@@ -2939,6 +2939,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error updating progress:', error);
             window.showToast('Terjadi kesalahan koneksi.', 'danger');
             setTimeout(() => location.reload(), 1500);
+        });
     };
 
     window.verifyDoc = function(id, type, docIndex, status) {
