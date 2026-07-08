@@ -235,6 +235,7 @@
                                                  data-file="<?= esc($rek['file_proposal'] ?? '') ?>" 
                                                  data-mulai="<?= date('d F Y', strtotime($rek['tgl_mulai'])) ?>" 
                                                  data-selesai="<?= date('d F Y', strtotime($rek['tgl_selesai'])) ?>"
+                                                 data-tte="<?= esc($rek['pdf_tte_path'] ?? '') ?>"
                                                  data-tanggal="<?= date('d F Y H:i:s', strtotime($rek['created_at'])) ?>">
                                              <i class="fa-solid fa-list-check me-1"></i> Detail
                                          </button>
@@ -345,6 +346,10 @@
                                 <th style="background: rgba(255,255,255,0.02);" class="text-muted">Progres Alur</th>
                                 <td id="m-rek-progress" class="text-warning fw-bold">-</td>
                             </tr>
+                            <tr id="row-m-rek-tte" class="d-none">
+                                <th style="background: rgba(255,255,255,0.02);" class="text-muted">Surat Rekomendasi Resmi</th>
+                                <td id="m-rek-tte-download"></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -414,6 +419,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 const file = this.getAttribute('data-file');
                 const mulai = this.getAttribute('data-mulai');
                 const selesai = this.getAttribute('data-selesai');
+
+                const tte = this.getAttribute('data-tte');
+                const rowTte = document.getElementById('row-m-rek-tte');
+                if (tte && tte.trim() !== '') {
+                    rowTte.classList.remove('d-none');
+                    document.getElementById('m-rek-tte-download').innerHTML = `<a href="<?= base_url() ?>/${tte}" target="_blank" class="btn btn-sm btn-success text-white fw-bold"><i class="fa-solid fa-download me-1.5"></i>Unduh Surat Rekomendasi Resmi (TTE)</a>`;
+                } else {
+                    rowTte.classList.add('d-none');
+                }
 
                 document.getElementById('m-rek-nama').innerText = nama;
                 document.getElementById('m-rek-kegiatan').innerText = kegiatan;
