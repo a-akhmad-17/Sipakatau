@@ -54,6 +54,7 @@ $routes->group('admin', ['filter' => 'auth:admin'], function($routes) {
     $routes->post('antrean/lewat/(:any)', 'Admin::lewatAntrean/$1');
     $routes->post('delete-pendaftaran/(:any)', 'Admin::deletePendaftaran/$1');
     $routes->post('update-progress', 'Admin::updateProgress');
+    $routes->post('verify-document', 'Admin::verifyDocument');
     $routes->post('delete-rekomendasi/(:any)', 'Admin::deleteRekomendasi/$1');
     $routes->post('delete-pengaduan/(:any)', 'Admin::deletePengaduan/$1');
     $routes->post('delete-file-pengaduan/(:any)', 'Admin::deleteFilePengaduan/$1');

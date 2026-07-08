@@ -654,9 +654,10 @@ $requirementsBerjenjang = [
                             <thead>
                                 <tr style="background: rgba(255, 255, 255, 0.02);">
                                     <th class="text-center" style="width: 5%;">#</th>
-                                    <th style="width: 45%;">Jenis Dokumen</th>
-                                    <th class="text-center" style="width: 25%;">Ukuran File</th>
-                                    <th class="text-center" style="width: 25%;">Tautan Unduh</th>
+                                    <th style="width: 35%;">Jenis Dokumen</th>
+                                    <th class="text-center" style="width: 15%;">Ukuran File</th>
+                                    <th class="text-center" style="width: 25%;">Status Verifikasi</th>
+                                    <th class="text-center" style="width: 20%;">Tautan Unduh</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -674,6 +675,21 @@ $requirementsBerjenjang = [
                                         </td>
                                         <td class="text-center align-middle text-muted small">
                                             <?= $exist ? $exist['size'] : '-' ?>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <?php if ($exist): ?>
+                                                <?php 
+                                                $docStatus = $exist['status'] ?? 'pending';
+                                                if ($docStatus === 'verified'): ?>
+                                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1 rounded"><i class="fa-solid fa-circle-check me-1"></i> Terverifikasi</span>
+                                                <?php elseif ($docStatus === 'rejected'): ?>
+                                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2.5 py-1 rounded"><i class="fa-solid fa-circle-xmark me-1"></i> Ditolak</span>
+                                                <?php else: ?>
+                                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2.5 py-1 rounded"><i class="fa-solid fa-clock me-1"></i> Sedang Diperiksa</span>
+                                                <?php endif; ?>
+                                            <?php else: ?>
+                                                <span class="text-muted small">-</span>
+                                            <?php endif; ?>
                                         </td>
                                         <td class="text-center align-middle">
                                             <?php if ($exist): ?>

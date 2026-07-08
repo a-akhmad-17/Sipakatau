@@ -2147,6 +2147,146 @@ class Admin extends BaseController
         ]);
     }
 
+    public function verifyDocument()
+    {
+        $json = $this->request->getJSON(true);
+        if (!$json) {
+            return $this->response->setJSON(['status' => false, 'message' => 'Request tidak valid.']);
+        }
+
+        $id = $json['id'] ?? null;
+        $type = $json['type'] ?? null;
+        $docIndex = $json['doc_index'] ?? null;
+        $status = $json['status'] ?? 'pending';
+
+        if (!$id || !$type || !$docIndex) {
+            return $this->response->setJSON(['status' => false, 'message' => 'Parameter tidak lengkap.']);
+        }
+
+        $db = \Config\Database::connect();
+
+        if ($type === 'ormas') {
+            $pendaftaran = $db->table('trn_pendaftaran')->where('id', $id)->get()->getRowArray();
+            if (!$pendaftaran) {
+                return $this->response->setJSON(['status' => false, 'message' => 'Pendaftaran tidak ditemukan.']);
+            }
+            $ormasId = $pendaftaran['ormas_id'];
+            $ormas = $db->table('mst_ormas')->where('id', $ormasId)->get()->getRowArray();
+            if (!$ormas) {
+                return $this->response->setJSON(['status' => false, 'message' => 'Data Ormas tidak ditemukan.']);
+            }
+
+            $berkas = json_decode($ormas['file_berkas'], true) ?: [];
+            if (!isset($berkas[$docIndex])) {
+                return $this->response->setJSON(['status' => false, 'message' => 'Dokumen tidak ditemukan dalam berkas pengajuan.']);
+            }
+
+            $berkas[$docIndex]['status'] = $status;
+            
+            $tipeOrmas = $ormas['tipe_ormas'] ?? 'Lokal';
+            $totalFiles = ($tipeOrmas === 'Lokal') ? 12 : 16;
+            
+            $verifiedCount = 0;
+            foreach ($berkas as $fileInfo) {
+                if (isset($fileInfo['status']) && $fileInfo['status'] === 'verified') {
+                    $verifiedCount++;
+                }
+            }
+
+            $newProgress = round(($verifiedCount / $totalFiles) * 50);
+            if ($newProgress > 50) $newProgress = 50;
+
+            if ($pendaftaran['progress_percentage'] > 50) {
+                $newProgress = $pendaftaran['progress_percentage'];
+            }
+
+            $statusVerifikasi = $pendaftaran['status_verifikasi'];
+            if ($verifiedCount === $totalFiles && $statusVerifikasi === 'Pending') {
+                $statusVerifikasi = 'Approved';
+                $newProgress = 50;
+            }
+
+            $db->table('mst_ormas')->where('id', $ormasId)->update([
+                'file_berkas' => json_encode($berkas),
+                'updated_at'  => date('Y-m-d H:i:s')
+            ]);
+
+            $db->table('trn_pendaftaran')->where('id', $id)->update([
+                'progress_percentage' => $newProgress,
+                'status_verifikasi'   => $statusVerifikasi,
+                'updated_at'          => date('Y-m-d H:i:s')
+            ]);
+
+            helper('app');
+            log_activity('VERIFIKASI_DOKUMEN_ORMAS', $ormas, array_merge($ormas, ['file_berkas' => json_encode($berkas)]), 'mst_ormas', $ormasId);
+
+            return $this->response->setJSON([
+                'status' => true,
+                'message' => 'Status dokumen berhasil diperbarui.',
+                'progress' => $newProgress,
+                'status_verifikasi' => $statusVerifikasi,
+                'file_data' => json_encode($berkas),
+                'csrf_hash' => csrf_hash()
+            ]);
+
+        } elseif ($type === 'rekomendasi') {
+            $rekomendasi = $db->table('trn_rekomendasi')->where('id', $id)->get()->getRowArray();
+            if (!$rekomendasi) {
+                return $this->response->setJSON(['status' => false, 'message' => 'Rekomendasi tidak ditemukan.']);
+            }
+
+            $proposal = json_decode($rekomendasi['file_proposal'], true) ?: [];
+            if (!isset($proposal[$docIndex])) {
+                return $this->response->setJSON(['status' => false, 'message' => 'Dokumen tidak ditemukan dalam berkas pengajuan.']);
+            }
+
+            $proposal[$docIndex]['status'] = $status;
+
+            $totalRequired = 5;
+            $verifiedCount = 0;
+            for ($i = 1; $i <= 5; $i++) {
+                if (isset($proposal[$i]) && isset($proposal[$i]['status']) && $proposal[$i]['status'] === 'verified') {
+                    $verifiedCount++;
+                }
+            }
+
+            $newProgress = round(($verifiedCount / $totalRequired) * 75);
+            if ($newProgress > 75) $newProgress = 75;
+
+            if ($rekomendasi['progress_percentage'] > 75) {
+                $newProgress = $rekomendasi['progress_percentage'];
+            }
+
+            $statusRekomendasi = $rekomendasi['status_rekomendasi'];
+            if ($verifiedCount === $totalRequired && $statusRekomendasi === 'Pending') {
+                $statusRekomendasi = 'Approved';
+                $newProgress = 75;
+            }
+
+            $db->table('trn_rekomendasi')->where('id', $id)->update([
+                'file_proposal'       => json_encode($proposal),
+                'progress_percentage' => $newProgress,
+                'status_rekomendasi'  => $statusRekomendasi,
+                'updated_at'          => date('Y-m-d H:i:s')
+            ]);
+
+            helper('app');
+            log_activity('VERIFIKASI_DOKUMEN_REKOMENDASI', $rekomendasi, array_merge($rekomendasi, ['file_proposal' => json_encode($proposal)]), 'trn_rekomendasi', $id);
+
+            return $this->response->setJSON([
+                'status' => true,
+                'message' => 'Status dokumen berhasil diperbarui.',
+                'progress' => $newProgress,
+                'status_rekomendasi' => $statusRekomendasi,
+                'file_data' => json_encode($proposal),
+                'csrf_hash' => csrf_hash()
+            ]);
+        }
+
+        return $this->response->setJSON(['status' => false, 'message' => 'Tipe ajuan tidak dikenal.']);
+    }
+
+
     public function settingsUsers()
     {
         $db = \Config\Database::connect();

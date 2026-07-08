@@ -160,15 +160,24 @@
                                                     <button class="btn btn-sm btn-outline-secondary dropdown-toggle py-1 px-2.5" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 11.5px;">
                                                         <i class="fa-solid fa-folder-open me-1"></i> Berkas Syarat
                                                     </button>
-                                                    <ul class="dropdown-menu dropdown-menu-dark" style="font-size: 12px; background: var(--bg-color); border: 1px solid var(--border-color);">
-                                                        <?php foreach ($files as $key => $fileInfo): ?>
-                                                            <li>
-                                                                <a class="dropdown-item py-1.5" href="<?= base_url('uploads/rekomendasi/' . $fileInfo['filename']) ?>" target="_blank">
-                                                                    <i class="fa-solid fa-file-pdf me-1.5 text-danger"></i><?= esc($fileNamesMap[$key] ?? 'Berkas ' . $key) ?>
-                                                                </a>
-                                                            </li>
-                                                        <?php endforeach; ?>
-                                                    </ul>
+                                                     <ul class="dropdown-menu dropdown-menu-dark" style="font-size: 12px; background: var(--bg-color); border: 1px solid var(--border-color); min-width: 200px;">
+                                                         <?php foreach ($files as $key => $fileInfo): ?>
+                                                             <li>
+                                                                 <a class="dropdown-item py-1.5 d-flex justify-content-between align-items-center gap-2" href="<?= base_url('uploads/rekomendasi/' . $fileInfo['filename']) ?>" target="_blank">
+                                                                     <span><i class="fa-solid fa-file-pdf me-1.5 text-danger"></i><?= esc($fileNamesMap[$key] ?? 'Berkas ' . $key) ?></span>
+                                                                     <?php 
+                                                                     $docStatus = $fileInfo['status'] ?? 'pending';
+                                                                     if ($docStatus === 'verified'): ?>
+                                                                         <span class="badge bg-success" style="font-size: 9px; padding: 2px 4px;"><i class="fa-solid fa-check"></i></span>
+                                                                     <?php elseif ($docStatus === 'rejected'): ?>
+                                                                         <span class="badge bg-danger" style="font-size: 9px; padding: 2px 4px;"><i class="fa-solid fa-xmark"></i></span>
+                                                                     <?php else: ?>
+                                                                         <span class="badge bg-warning text-dark" style="font-size: 9px; padding: 2px 4px;"><i class="fa-solid fa-clock"></i></span>
+                                                                     <?php endif; ?>
+                                                                 </a>
+                                                             </li>
+                                                         <?php endforeach; ?>
+                                                     </ul>
                                                 </div>
                                             <?php else: ?>
                                                 <a href="<?= base_url('uploads/rekomendasi/' . $rek['file_proposal']) ?>" target="_blank"

@@ -2344,7 +2344,15 @@ document.addEventListener('DOMContentLoaded', function() {
         {"name": "Pasfoto Pengurus", "desc": "Pasfoto Pengurus ukuran 4x6 cm sebanyak 2 lembar", "tte": false},
         {"name": "Fotokopi KTP Pengurus", "desc": "Fotokopi KTP Pengurus (Ketua, Sekretaris, Bendahara)", "tte": false},
         {"name": "Surat Keputusan (SK) Pengurus", "desc": "Surat Keputusan (SK) Pengurus Organisasi", "tte": false},
-        {"name": "Foto Sekretariat", "desc": "Foto Sekretariat (Tampak depan menampilkan Papan Nama resmi)", "tte": false}
+    ];
+
+    const globalRequirementsRekomendasi = [
+        {"name": "Surat Permohonan", "desc": "Surat Permohonan Rekomendasi Kegiatan ditujukan kepada Kepala Badan Kesbangpol Kab. Sinjai", "tte": true},
+        {"name": "Rekomendasi Lurah/Camat", "desc": "Surat Rekomendasi Kegiatan dari Kantor Lurah setempat dan diketahui Camat", "tte": true},
+        {"name": "Proposal Kegiatan", "desc": "Proposal Kegiatan lengkap (berisi latar belakang, rencana acara, sasaran, dll.)", "tte": true},
+        {"name": "KTP Ketua Panitia", "desc": "Fotokopi KTP Ketua Panitia Pelaksana / Pemohon", "tte": false},
+        {"name": "SK Pengurus Kegiatan", "desc": "Surat Keputusan (SK) Pengurus Kegiatan", "tte": false},
+        {"name": "Rekomendasi Stakeholder", "desc": "Surat Rekomendasi pendukung dari Stakeholder terkait (Opsional)", "tte": true}
     ];
 
     // Detail Tracking Modal populator
@@ -2479,10 +2487,25 @@ document.addEventListener('DOMContentLoaded', function() {
                     let statusBadge = `<span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 small"><i class="fa-solid fa-circle-xmark me-1"></i> Belum Ada</span>`;
                     let tteBadge = req.tte ? `<span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-0.5" style="font-size: 0.72rem;"><i class="fa-solid fa-signature me-1"></i> TTE</span>` : `<span class="badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25 px-2 py-0.5" style="font-size: 0.72rem;">Non TTE</span>`;
                     let keterangan = exist ? `Size: ${exist.size}` : '-';
-                    let actionCol = exist ? `<a href="<?= base_url('uploads/ormas/') ?>/${exist.filename}" target="_blank" class="btn btn-sm btn-info text-white px-2 py-1"><i class="fa-solid fa-circle-info"></i></a>` : '-';
-
+                    
+                    let actionCol = '-';
                     if (exist) {
-                        statusBadge = `<span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 small"><i class="fa-solid fa-circle-check me-1"></i> Ada</span>`;
+                        let docStatus = exist.status || 'pending';
+                        if (docStatus === 'verified') {
+                            statusBadge = `<span class="badge bg-success text-white border px-2 py-1 small"><i class="fa-solid fa-circle-check me-1"></i> Terverifikasi</span>`;
+                        } else if (docStatus === 'rejected') {
+                            statusBadge = `<span class="badge bg-danger text-white border px-2 py-1 small"><i class="fa-solid fa-circle-xmark me-1"></i> Ditolak</span>`;
+                        } else {
+                            statusBadge = `<span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 small"><i class="fa-solid fa-clock me-1"></i> Belum Diperiksa</span>`;
+                        }
+
+                        actionCol = `
+                            <div class="d-flex justify-content-center gap-1">
+                                <a href="<?= base_url('uploads/ormas/') ?>/${exist.filename}" target="_blank" class="btn btn-xs btn-info text-white px-2 py-1" title="Lihat Berkas"><i class="fa-solid fa-eye"></i></a>
+                                <button type="button" class="btn btn-xs btn-success text-white px-2 py-1" onclick="verifyDoc('${id}', 'ormas', '${fileIdx}', 'verified')" title="Setujui Dokumen"><i class="fa-solid fa-check"></i></button>
+                                <button type="button" class="btn btn-xs btn-danger text-white px-2 py-1" onclick="verifyDoc('${id}', 'ormas', '${fileIdx}', 'rejected')" title="Tolak Dokumen"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                        `;
                     }
 
                     const tr = document.createElement('tr');
@@ -2614,40 +2637,72 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('row-dt-email').classList.add('d-none');
                 document.getElementById('row-dt-telepon').classList.add('d-none');
                 document.getElementById('row-dt-progress').classList.add('d-none');
-
-                let fileLinks = '';
-                if (proposalName) {
-                    if (proposalName.trim().startsWith('{') || proposalName.trim().startsWith('[')) {
-                        try {
-                            const files = JSON.parse(proposalName);
-                            const fileNamesMap = {
-                                "1": "Surat Permohonan",
-                                "2": "Rekomendasi Lurah/Camat",
-                                "3": "Proposal Kegiatan",
-                                "4": "KTP Ketua Panitia",
-                                "5": "SK Pengurus Kegiatan",
-                                "6": "Rekomendasi Stakeholder"
-                            };
-                            for (const key in files) {
-                                if (files.hasOwnProperty(key)) {
-                                    const fileInfo = files[key];
-                                    fileLinks += `<a href="<?= base_url('uploads/rekomendasi/') ?>/${fileInfo.filename}" target="_blank" class="btn btn-sm btn-outline-info me-2 mb-2"><i class="fa-solid fa-file-pdf me-1"></i> ${fileNamesMap[key] || ('Berkas ' + key)}</a>`;
-                                }
-                            }
-                        } catch (e) {
-                            fileLinks = `<a href="<?= base_url('uploads/rekomendasi/') ?>/${proposalName}" target="_blank" class="btn btn-sm btn-outline-info"><i class="fa-solid fa-file-pdf me-1"></i> Buka Proposal</a>`;
-                        }
-                    } else {
-                        fileLinks = `<a href="<?= base_url('uploads/rekomendasi/') ?>/${proposalName}" target="_blank" class="btn btn-sm btn-outline-info"><i class="fa-solid fa-file-pdf me-1"></i> Buka Proposal</a>`;
-                    }
-                }
-                document.getElementById('dt-file').innerHTML = fileLinks || 'Tidak ada berkas diunggah';
+                document.getElementById('row-dt-file').classList.add('d-none');
 
                 if (ttePath) {
                     document.getElementById('dt-tte').innerHTML = `<a href="<?= base_url() ?>/${ttePath}" target="_blank" class="btn btn-sm btn-outline-success"><i class="fa-solid fa-print me-1"></i> Cetak Surat TTE Resmi</a>`;
                 } else {
                     document.getElementById('dt-tte').innerText = 'Belum diterbitkan TTE';
                 }
+
+                // Show dynamic checklist table for Rekomendasi
+                const checklistContainer = document.getElementById('container-dt-checklist-table');
+                checklistContainer.classList.remove('d-none');
+                
+                const checklistBody = document.getElementById('dt-checklist-table-body');
+                checklistBody.innerHTML = '';
+
+                let filesList = {};
+                try {
+                    if (proposalName && (proposalName.trim().startsWith('{') || proposalName.trim().startsWith('['))) {
+                        filesList = JSON.parse(proposalName);
+                    }
+                } catch (e) {
+                    console.error("Gagal parse berkas JSON", e);
+                }
+
+                globalRequirementsRekomendasi.forEach((req, idx) => {
+                    const fileIdx = idx + 1;
+                    const exist = filesList[fileIdx] || null;
+
+                    let statusBadge = `<span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 small"><i class="fa-solid fa-circle-xmark me-1"></i> Belum Ada</span>`;
+                    let tteBadge = req.tte ? `<span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-0.5" style="font-size: 0.72rem;"><i class="fa-solid fa-signature me-1"></i> TTE</span>` : `<span class="badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25 px-2 py-0.5" style="font-size: 0.72rem;">Non TTE</span>`;
+                    let keterangan = exist ? `Size: ${exist.size}` : '-';
+                    
+                    let actionCol = '-';
+                    if (exist) {
+                        let docStatus = exist.status || 'pending';
+                        if (docStatus === 'verified') {
+                            statusBadge = `<span class="badge bg-success text-white border px-2 py-1 small"><i class="fa-solid fa-circle-check me-1"></i> Terverifikasi</span>`;
+                        } else if (docStatus === 'rejected') {
+                            statusBadge = `<span class="badge bg-danger text-white border px-2 py-1 small"><i class="fa-solid fa-circle-xmark me-1"></i> Ditolak</span>`;
+                        } else {
+                            statusBadge = `<span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 small"><i class="fa-solid fa-clock me-1"></i> Belum Diperiksa</span>`;
+                        }
+
+                        actionCol = `
+                            <div class="d-flex justify-content-center gap-1">
+                                <a href="<?= base_url('uploads/rekomendasi/') ?>/${exist.filename}" target="_blank" class="btn btn-xs btn-info text-white px-2 py-1" title="Lihat Berkas"><i class="fa-solid fa-eye"></i></a>
+                                <button type="button" class="btn btn-xs btn-success text-white px-2 py-1" onclick="verifyDoc('${id}', 'rekomendasi', '${fileIdx}', 'verified')" title="Setujui Dokumen"><i class="fa-solid fa-check"></i></button>
+                                <button type="button" class="btn btn-xs btn-danger text-white px-2 py-1" onclick="verifyDoc('${id}', 'rekomendasi', '${fileIdx}', 'rejected')" title="Tolak Dokumen"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                        `;
+                    }
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="text-center align-middle">${fileIdx}</td>
+                        <td class="align-middle">
+                            <div class="fw-bold text-main small">${req.name}</div>
+                            <div class="text-muted" style="font-size: 0.72rem;">${req.desc}</div>
+                        </td>
+                        <td class="text-center align-middle">${statusBadge}</td>
+                        <td class="text-center align-middle">${tteBadge}</td>
+                        <td class="text-center align-middle text-muted small">${keterangan}</td>
+                        <td class="text-center align-middle">${actionCol}</td>
+                    `;
+                    checklistBody.appendChild(tr);
+                });
 
                 // Action buttons for Rekomendasi
                 if (status === 'Pending') {
@@ -2884,6 +2939,69 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error updating progress:', error);
             window.showToast('Terjadi kesalahan koneksi.', 'danger');
             setTimeout(() => location.reload(), 1500);
+    };
+
+    window.verifyDoc = function(id, type, docIndex, status) {
+        const statusLabels = { 'verified': 'menyetujui', 'rejected': 'menolak', 'pending': 'mereset' };
+        if (!confirm(`Apakah Anda yakin ingin ${statusLabels[status]} dokumen ini?`)) {
+            return;
+        }
+
+        fetch('<?= base_url('admin/verify-document') ?>', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': currentCsrfHash
+            },
+            body: JSON.stringify({
+                id: id,
+                type: type,
+                doc_index: docIndex,
+                status: status
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status) {
+                if (data.csrf_hash) {
+                    currentCsrfHash = data.csrf_hash;
+                }
+                window.showToast(data.message, 'success');
+                progressUpdated = true;
+
+                const detailBtn = document.querySelector(`.btn-detail-tracking[data-id="${id}"][data-type="${type}"]`);
+                if (detailBtn) {
+                    detailBtn.setAttribute('data-file', data.file_data);
+                    if (data.progress !== undefined) {
+                        detailBtn.setAttribute('data-progress', data.progress);
+                        const dtProgress = document.getElementById('dt-progress');
+                        if (dtProgress) {
+                            dtProgress.innerText = data.progress + '%';
+                        }
+                    }
+                    if (data.status_verifikasi !== undefined) {
+                        detailBtn.setAttribute('data-status', data.status_verifikasi);
+                        const dtStatus = document.getElementById('dt-status');
+                        if (dtStatus) {
+                            dtStatus.innerHTML = `<span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1 rounded-pill">${data.status_verifikasi}</span>`;
+                        }
+                    }
+                    if (data.status_rekomendasi !== undefined) {
+                        detailBtn.setAttribute('data-status', data.status_rekomendasi);
+                        const dtStatus = document.getElementById('dt-status');
+                        if (dtStatus) {
+                            dtStatus.innerHTML = `<span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2.5 py-1 rounded-pill">${data.status_rekomendasi}</span>`;
+                        }
+                    }
+                    detailBtn.click();
+                }
+            } else {
+                window.showToast(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error verifying document:', error);
+            window.showToast('Terjadi kesalahan koneksi.', 'danger');
         });
     };
 
