@@ -26,6 +26,7 @@ $routes->group('user', ['filter' => 'auth:user,ormas'], function($routes) {
     $routes->get('geocode', 'User::geocode');
     $routes->get('rekomendasi', 'User::rekomendasi');
     $routes->get('rekomendasi/baru', 'User::rekomendasiBaru');
+    $routes->post('rekomendasi/minta-hapus/(:any)', 'User::mintaHapusRekomendasi/$1');
     $routes->get('pengaduan', 'User::pengaduan');
     $routes->get('pengaduan/baru', 'User::pengaduanBaru');
 });
@@ -43,6 +44,8 @@ $routes->group('admin', ['filter' => 'auth:admin'], function($routes) {
     $routes->post('proses-pendaftaran/setujui-hapus/(:any)', 'Admin::setujuiHapusPendaftaran/$1');
     $routes->post('proses-pendaftaran/tolak-hapus/(:any)', 'Admin::tolakHapusPendaftaran/$1');
     $routes->post('proses-rekomendasi/(:any)/(:any)', 'Admin::prosesRekomendasi/$1/$2');
+    $routes->post('proses-rekomendasi/setujui-hapus/(:any)', 'Admin::setujuiHapusRekomendasi/$1');
+    $routes->post('proses-rekomendasi/tolak-hapus/(:any)', 'Admin::tolakHapusRekomendasi/$1');
     $routes->post('tambah-hotspot', 'Admin::tambahHotspot');
     $routes->post('delete-hotspot/(:any)', 'Admin::deleteHotspot/$1');
     $routes->post('tambah-parpol', 'Admin::tambahParpol');

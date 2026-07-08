@@ -1976,6 +1976,73 @@ class Admin extends BaseController
         return redirect()->to('admin')->with('success', 'Permintaan penghapusan Ormas dibatalkan.');
     }
 
+    public function setujuiHapusRekomendasi(string $id)
+    {
+        $db = \Config\Database::connect();
+        helper(['app', 'telegram']);
+
+        $rekomendasi = $db->table('trn_rekomendasi')->where('id', $id)->get()->getRowArray();
+        if (!$rekomendasi) {
+            return redirect()->back()->with('error', 'Data rekomendasi tidak ditemukan.');
+        }
+
+        // Delete files
+        if (!empty($rekomendasi['file_proposal'])) {
+            try {
+                $files = json_decode($rekomendasi['file_proposal'], true);
+                if (is_array($files)) {
+                    foreach ($files as $fileObj) {
+                        if (isset($fileObj['filepath'])) {
+                            @unlink(ROOTPATH . 'public/' . $fileObj['filepath']);
+                        }
+                    }
+                } else {
+                    @unlink(ROOTPATH . 'public/uploads/rekomendasi/' . $rekomendasi['file_proposal']);
+                }
+            } catch (\Exception $e) {
+                @unlink(ROOTPATH . 'public/uploads/rekomendasi/' . $rekomendasi['file_proposal']);
+            }
+        }
+
+        // Delete TTE letter file if exists
+        if (!empty($rekomendasi['pdf_tte_path'])) {
+            @unlink(ROOTPATH . 'public/' . $rekomendasi['pdf_tte_path']);
+        }
+
+        // Delete from database
+        $db->table('trn_rekomendasi')->where('id', $id)->delete();
+
+        log_activity('SETUJUI_HAPUS_REKOMENDASI_ADMIN', $rekomendasi, [], 'trn_rekomendasi', $id);
+
+        telegram_send_transaction('🗑️ Penghapusan Rekomendasi Disetujui Admin', [
+            'Pemohon'          => $rekomendasi['pemohon'],
+            'Nama Kegiatan'    => $rekomendasi['nama_kegiatan'],
+            'Status'           => 'Terhapus Permanen'
+        ]);
+
+        return redirect()->to('admin')->with('success', 'Penghapusan rekomendasi kegiatan berhasil disetujui.');
+    }
+
+    public function tolakHapusRekomendasi(string $id)
+    {
+        $db = \Config\Database::connect();
+        helper(['app']);
+
+        $rekomendasi = $db->table('trn_rekomendasi')->where('id', $id)->get()->getRowArray();
+        if (!$rekomendasi) {
+            return redirect()->back()->with('error', 'Data rekomendasi tidak ditemukan.');
+        }
+
+        $db->table('trn_rekomendasi')->where('id', $id)->update([
+            'delete_requested' => 0,
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
+
+        log_activity('TOLAK_HAPUS_REKOMENDASI_ADMIN', $rekomendasi, ['delete_requested' => 0], 'trn_rekomendasi', $id);
+
+        return redirect()->to('admin')->with('success', 'Permintaan penghapusan rekomendasi dibatalkan.');
+    }
+
     public function deletePengaduan(string $id)
     {
         $db = \Config\Database::connect();

@@ -214,6 +214,18 @@
                                                  data-tanggal="<?= date('d F Y H:i:s', strtotime($rek['created_at'])) ?>">
                                              <i class="fa-solid fa-list-check me-1"></i> Detail
                                          </button>
+                                         <?php if (isset($rek['delete_requested']) && $rek['delete_requested'] == 1): ?>
+                                             <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2.5 py-1 rounded small mb-1.5 w-100 text-center" style="font-size: 10px;">
+                                                 <i class="fa-solid fa-clock me-1"></i> Menunggu Hapus
+                                             </span>
+                                         <?php else: ?>
+                                             <form action="<?= base_url('user/rekomendasi/minta-hapus/' . $rek['id']) ?>" method="POST" class="d-inline w-100" onsubmit="return confirm('Apakah Anda yakin ingin mengajukan permohonan penghapusan Rekomendasi Kegiatan ini?')">
+                                                 <?= csrf_field() ?>
+                                                 <button type="submit" class="btn btn-sm btn-outline-danger py-1 px-2.5 mb-1.5 w-100" style="font-size: 11px;" title="Minta Hapus Rekomendasi">
+                                                     <i class="fa-solid fa-trash-can me-1"></i> Hapus
+                                                 </button>
+                                             </form>
+                                         <?php endif; ?>
                                         <?php if (!empty($rek['file_proposal'])): ?>
                                             <?php 
                                             $files = json_decode($rek['file_proposal'], true);

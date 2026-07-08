@@ -260,9 +260,11 @@
             <i class="fa-solid fa-trash-can me-2"></i>Persetujuan Hapus
             <?php 
             $db = \Config\Database::connect();
-            $countMintaHapus = $db->table('trn_pendaftaran')->where('delete_requested', 1)->countAllResults();
-            if ($countMintaHapus > 0): ?>
-                <span class="badge bg-danger ms-1"><?= $countMintaHapus ?></span>
+            $countMintaHapusOrmas = $db->table('trn_pendaftaran')->where('delete_requested', 1)->countAllResults();
+            $countMintaHapusRek = $db->table('trn_rekomendasi')->where('delete_requested', 1)->countAllResults();
+            $totalCountMintaHapus = $countMintaHapusOrmas + $countMintaHapusRek;
+            if ($totalCountMintaHapus > 0): ?>
+                <span class="badge bg-danger ms-1"><?= $totalCountMintaHapus ?></span>
             <?php endif; ?>
         </button>
     </li>
@@ -966,15 +968,17 @@
     <!-- Tab Persetujuan Hapus -->
     <div class="tab-pane fade" id="tab-persetujuan" role="tabpanel">
         <div class="glass-card p-4">
-            <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom" style="border-color: var(--border-color) !important;">
                 <div>
-                    <h4 class="text-white mb-1"><i class="fa-solid fa-trash-can text-danger me-2"></i>Persetujuan Penghapusan Ormas</h4>
-                    <p class="text-muted small mb-0">Daftar pengajuan penghapusan data Ormas/pendaftaran yang diajukan oleh pengguna atau admin. Aksi di bawah ini memerlukan persetujuan akhir.</p>
+                    <h4 class="text-white mb-1"><i class="fa-solid fa-trash-can text-danger me-2"></i>Persetujuan Penghapusan Berkas Layanan</h4>
+                    <p class="text-muted small mb-0">Daftar pengajuan penghapusan data Ormas dan Rekomendasi Kegiatan yang diajukan oleh pengguna. Aksi di bawah ini memerlukan persetujuan akhir.</p>
                 </div>
             </div>
 
-            <div class="table-responsive">
-                <table class="table table-custom rounded overflow-hidden">
+            <!-- SECTION 1: ORMAS DELETION REQUESTS -->
+            <h5 class="text-white mb-3"><i class="fa-solid fa-users text-primary me-2"></i>Permintaan Penghapusan Ormas</h5>
+            <div class="table-responsive mb-5">
+                <table class="table table-custom rounded overflow-hidden" style="font-size: 0.85rem;">
                     <thead>
                         <tr>
                             <th class="text-center" style="width: 15%;">No. Registrasi</th>
@@ -1006,11 +1010,64 @@
                                     <td><?= date('d M Y H:i', strtotime($rh['updated_at'] ?: $rh['created_at'])) ?></td>
                                     <td class="text-center">
                                         <div class="d-flex justify-content-center gap-2">
-                                            <form action="<?= base_url('admin/proses-pendaftaran/setujui-hapus/' . $rh['id']) ?>" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin MENYETUJUI penghapusan Ormas ini secara permanen dari database?')">
+                                            <form action="<?= base_url('admin/proses-pendaftaran/setujui-hapus/' . $rh['id']) ?>" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin MENYETUJUI penghapusan Ormas ini secara permanen?')">
                                                 <?= csrf_field() ?>
-                                                <button type="submit" class="btn btn-sm btn-danger px-2.5 py-1.5"><i class="fa-solid fa-check me-1"></i> Setujui Hapus</button>
+                                                <button type="submit" class="btn btn-sm btn-danger px-2.5 py-1.5"><i class="fa-solid fa-check me-1"></i> Setujui</button>
                                             </form>
-                                            <form action="<?= base_url('admin/proses-pendaftaran/tolak-hapus/' . $rh['id']) ?>" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan/menolak penghapusan Ormas ini?')">
+                                            <form action="<?= base_url('admin/proses-pendaftaran/tolak-hapus/' . $rh['id']) ?>" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menolak penghapusan Ormas ini?')">
+                                                <?= csrf_field() ?>
+                                                <button type="submit" class="btn btn-sm btn-outline-secondary px-2.5 py-1.5"><i class="fa-solid fa-xmark me-1"></i> Batal</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- SECTION 2: REKOMENDASI DELETION REQUESTS -->
+            <h5 class="text-white mb-3"><i class="fa-solid fa-file-signature text-warning me-2"></i>Permintaan Penghapusan Rekomendasi Kegiatan</h5>
+            <div class="table-responsive">
+                <table class="table table-custom rounded overflow-hidden" style="font-size: 0.85rem;">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">Pemohon / Lembaga</th>
+                            <th style="width: 30%;">Nama Kegiatan</th>
+                            <th style="width: 15%;">Status</th>
+                            <th style="width: 15%;">Tanggal Pengajuan</th>
+                            <th class="text-center" style="width: 15%;">Aksi Persetujuan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php 
+                        $requestHapusRek = $db->table('trn_rekomendasi')
+                                             ->where('delete_requested', 1)
+                                             ->get()
+                                             ->getResultArray();
+                        if (empty($requestHapusRek)): ?>
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4 small">Tidak ada permintaan penghapusan rekomendasi kegiatan yang perlu disetujui saat ini.</td>
+                            </tr>
+                        <?php else: ?>
+                            <?php foreach ($requestHapusRek as $rhRek): ?>
+                                <tr>
+                                    <td class="text-main fw-bold"><?= esc($rhRek['pemohon']) ?></td>
+                                    <td class="text-warning small"><?= esc($rhRek['nama_kegiatan']) ?></td>
+                                    <td>
+                                        <span class="badge <?= ($rhRek['status_rekomendasi'] === 'Approved') ? 'bg-success-subtle text-success' : (($rhRek['status_rekomendasi'] === 'Rejected') ? 'bg-danger-subtle text-danger' : 'bg-warning-subtle text-warning') ?> border px-2 py-0.5" style="font-size:0.7rem;">
+                                            <?= esc($rhRek['status_rekomendasi']) ?>
+                                        </span>
+                                    </td>
+                                    <td><?= date('d M Y H:i', strtotime($rhRek['updated_at'] ?: $rhRek['created_at'])) ?></td>
+                                    <td class="text-center">
+                                        <div class="d-flex justify-content-center gap-2">
+                                            <form action="<?= base_url('admin/proses-rekomendasi/setujui-hapus/' . $rhRek['id']) ?>" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin MENYETUJUI penghapusan Rekomendasi Kegiatan ini secara permanen?')">
+                                                <?= csrf_field() ?>
+                                                <button type="submit" class="btn btn-sm btn-danger px-2.5 py-1.5"><i class="fa-solid fa-check me-1"></i> Setujui</button>
+                                            </form>
+                                            <form action="<?= base_url('admin/proses-rekomendasi/tolak-hapus/' . $rhRek['id']) ?>" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menolak penghapusan Rekomendasi Kegiatan ini?')">
                                                 <?= csrf_field() ?>
                                                 <button type="submit" class="btn btn-sm btn-outline-secondary px-2.5 py-1.5"><i class="fa-solid fa-xmark me-1"></i> Batal</button>
                                             </form>

@@ -415,6 +415,31 @@ class User extends BaseController
         return redirect()->to('user')->with('success', 'Permintaan penghapusan Ormas berhasil diajukan. Menunggu persetujuan admin.');
     }
 
+    public function mintaHapusRekomendasi(string $id)
+    {
+        helper(['app']);
+        $userId = session()->get('user_id');
+
+        $rekomendasi = $this->db->table('trn_rekomendasi')
+                                ->where('id', $id)
+                                ->where('user_id', $userId)
+                                ->get()
+                                ->getRowArray();
+
+        if (!$rekomendasi) {
+            return redirect()->to('user/rekomendasi')->with('error', 'Pengajuan rekomendasi tidak ditemukan.');
+        }
+
+        $this->db->table('trn_rekomendasi')->where('id', $id)->update([
+            'delete_requested' => 1,
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
+
+        log_activity('MINTA_HAPUS_REKOMENDASI_USER', $rekomendasi, ['delete_requested' => 1], 'trn_rekomendasi', $id);
+
+        return redirect()->to('user/rekomendasi')->with('success', 'Permintaan penghapusan Rekomendasi Kegiatan berhasil diajukan. Menunggu persetujuan admin.');
+    }
+
     public function geocode()
     {
         $query = $this->request->getGet('q');
