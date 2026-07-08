@@ -141,8 +141,21 @@
                                         <?= $rekLabel ?>
                                     </span>
                                 </td>
-                                <td style="padding:12px 14px; text-align:center;">
-                                    <div class="d-flex flex-column align-items-center gap-1.5">
+                                 <td style="padding:12px 14px; text-align:center;">
+                                     <div class="d-flex flex-column align-items-center gap-1.5">
+                                         <button type="button" class="btn btn-sm btn-info text-white py-1 px-2.5 mb-1.5 btn-detail-rekomendasi"
+                                                 data-id="<?= $rek['id'] ?>"
+                                                 data-nama="<?= esc($rek['pemohon']) ?>"
+                                                 data-kegiatan="<?= esc($rek['nama_kegiatan']) ?>"
+                                                 data-deskripsi="<?= esc($rek['deskripsi'] ?? '-') ?>"
+                                                 data-status="<?= esc($rek['status_rekomendasi'] ?? 'Pending') ?>"
+                                                 data-progress="<?= esc($rek['progress_percentage'] ?? 0) ?>"
+                                                 data-file="<?= esc($rek['file_proposal'] ?? '') ?>" 
+                                                 data-mulai="<?= date('d F Y', strtotime($rek['tgl_mulai'])) ?>" 
+                                                 data-selesai="<?= date('d F Y', strtotime($rek['tgl_selesai'])) ?>"
+                                                 data-tanggal="<?= date('d F Y H:i:s', strtotime($rek['created_at'])) ?>">
+                                             <i class="fa-solid fa-list-check me-1"></i> Detail
+                                         </button>
                                         <?php if (!empty($rek['file_proposal'])): ?>
                                             <?php 
                                             $files = json_decode($rek['file_proposal'], true);
@@ -203,4 +216,211 @@
         </div>
     </div>
 </div>
+<!-- Modal Detail Progress Rekomendasi -->
+<div class="modal fade" id="modalDetailProgressRekomendasi" tabindex="-1" aria-labelledby="modalDetailProgressRekomendasiLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="background: var(--sidebar-bg); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; backdrop-filter: blur(20px);">
+            <!-- Modal Header -->
+            <div class="modal-header border-bottom py-3.5 px-4" style="border-color: var(--border-color) !important;">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle bg-success-subtle text-success p-2.5 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                        <i class="fa-solid fa-route fa-lg"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title text-white fw-bold font-heading mb-0.5" id="modalDetailProgressRekomendasiLabel">Detail Pelacakan Progres</h5>
+                        <span class="small text-muted">Layanan Rekomendasi Kegiatan</span>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <!-- Modal Body -->
+            <div class="modal-body p-4" style="max-height: 75vh; overflow-y: auto;">
+                <!-- General Info Table -->
+                <div class="table-responsive mb-4">
+                    <table class="table table-custom mb-0 text-white" style="font-size: 0.85rem;">
+                        <tbody>
+                            <tr>
+                                <th style="width: 30%; background: rgba(255,255,255,0.02);" class="text-muted">Nama Pemohon / Lembaga</th>
+                                <td id="m-rek-nama" class="fw-bold text-success">-</td>
+                            </tr>
+                            <tr>
+                                <th style="background: rgba(255,255,255,0.02);" class="text-muted">Judul / Tema Kegiatan</th>
+                                <td id="m-rek-kegiatan" class="text-warning">-</td>
+                            </tr>
+                            <tr>
+                                <th style="background: rgba(255,255,255,0.02);" class="text-muted">Waktu Pelaksanaan</th>
+                                <td id="m-rek-waktu">-</td>
+                            </tr>
+                            <tr>
+                                <th style="background: rgba(255,255,255,0.02);" class="text-muted">Deskripsi Rencana</th>
+                                <td id="m-rek-deskripsi">-</td>
+                            </tr>
+                            <tr>
+                                <th style="background: rgba(255,255,255,0.02);" class="text-muted">Status Ajuan</th>
+                                <td id="m-rek-status">-</td>
+                            </tr>
+                            <tr>
+                                <th style="background: rgba(255,255,255,0.02);" class="text-muted">Progres Alur</th>
+                                <td id="m-rek-progress" class="text-warning fw-bold">-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Progress Tracker Timeline -->
+                <div class="mb-4 p-4 rounded" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: 12px;">
+                    <h6 class="small fw-bold mb-4 text-white"><i class="fa-solid fa-spinner fa-spin text-warning me-2"></i>Alur Proses Verifikasi</h6>
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3" id="m-rek-timeline-container">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+                </div>
+
+                <!-- Document Checklist Table -->
+                <div>
+                    <h6 class="small fw-bold mb-3 text-white"><i class="fa-solid fa-paperclip text-success me-2"></i>Berkas Persyaratan yang Telah Diunggah</h6>
+                    <div class="table-responsive">
+                        <table class="table table-custom mb-0 text-white" style="font-size: 0.82rem;">
+                            <thead>
+                                <tr style="background: rgba(255, 255, 255, 0.02);">
+                                    <th class="text-center" style="width: 5%;">#</th>
+                                    <th style="width: 45%;">Persyaratan Berkas</th>
+                                    <th class="text-center" style="width: 25%;">Status Verifikasi</th>
+                                    <th class="text-center" style="width: 25%;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="m-rek-documents-body">
+                                <!-- Populated dynamically via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal Footer -->
+            <div class="modal-footer border-top py-3 px-4" style="border-color: var(--border-color) !important;">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?= $this->endSection() ?>
+
+<?= $this->section('scripts') ?>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const globalRequirementsRekomendasi = [
+        {"name": "Surat Permohonan", "desc": "Surat Permohonan Rekomendasi Kegiatan ditujukan kepada Kepala Badan Kesbangpol Kab. Sinjai", "tte": true},
+        {"name": "Rekomendasi Lurah/Camat", "desc": "Surat Rekomendasi Kegiatan dari Kantor Lurah setempat dan diketahui Camat", "tte": true},
+        {"name": "Proposal Kegiatan", "desc": "Proposal Kegiatan lengkap (berisi latar belakang, rencana acara, sasaran, dll.)", "tte": true},
+        {"name": "KTP Ketua Panitia", "desc": "Fotokopi KTP Ketua Panitia Pelaksana / Pemohon", "tte": false},
+        {"name": "SK Pengurus Kegiatan", "desc": "Surat Keputusan (SK) Pengurus Kegiatan", "tte": false},
+        {"name": "Rekomendasi Stakeholder", "desc": "Surat Rekomendasi pendukung dari Stakeholder terkait (Opsional)", "tte": true}
+    ];
+
+    const modalEl = document.getElementById('modalDetailProgressRekomendasi');
+    if (modalEl) {
+        const modal = new bootstrap.Modal(modalEl);
+        
+        document.querySelectorAll('.btn-detail-rekomendasi').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                const nama = this.getAttribute('data-nama');
+                const kegiatan = this.getAttribute('data-kegiatan');
+                const deskripsi = this.getAttribute('data-deskripsi');
+                const status = this.getAttribute('data-status');
+                const progress = parseInt(this.getAttribute('data-progress') || '0');
+                const file = this.getAttribute('data-file');
+                const mulai = this.getAttribute('data-mulai');
+                const selesai = this.getAttribute('data-selesai');
+
+                document.getElementById('m-rek-nama').innerText = nama;
+                document.getElementById('m-rek-kegiatan').innerText = kegiatan;
+                document.getElementById('m-rek-waktu').innerText = mulai + ' s/d ' + selesai;
+                document.getElementById('m-rek-deskripsi').innerText = deskripsi;
+                document.getElementById('m-rek-progress').innerText = progress + '% Selesai';
+
+                let statusBadge = 'bg-warning-subtle text-warning border-warning-subtle';
+                if (status === 'Approved') {
+                    statusBadge = 'bg-success-subtle text-success border-success-subtle';
+                } else if (status === 'Rejected') {
+                    statusBadge = 'bg-danger-subtle text-danger border-danger-subtle';
+                }
+                document.getElementById('m-rek-status').innerHTML = `<span class="badge ${statusBadge} px-2.5 py-1.5 rounded-pill border small">${status}</span>`;
+
+                // Build Timeline
+                let step1 = '', step2 = '';
+                if (status === 'Pending') {
+                    step1 = 'active';
+                } else if (status === 'Approved' && progress == 75) {
+                    step1 = 'completed'; step2 = 'active';
+                } else if (status === 'Approved' && progress == 100) {
+                    step1 = 'completed'; step2 = 'completed';
+                } else if (status === 'Rejected') {
+                    step1 = 'active';
+                }
+
+                // Render Timeline HTML
+                const timelineContainer = document.getElementById('m-rek-timeline-container');
+                timelineContainer.className = "d-flex justify-content-between align-items-center w-100 flex-wrap gap-2 text-center mt-3";
+                timelineContainer.innerHTML = `
+                    <div class="d-flex flex-column align-items-center flex-fill position-relative">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold ${step1 === 'completed' ? 'bg-success text-white' : (step1 === 'active' ? 'bg-warning text-dark animate-pulse' : 'bg-secondary text-white-50')}" style="width:36px; height:36px; font-size:13px; z-index: 2;">1</div>
+                        <span class="small fw-semibold mt-2 ${step1 !== '' ? 'text-white' : 'text-muted'}">1. Verifikasi Berkas (75%)</span>
+                    </div>
+                    <div class="d-flex flex-column align-items-center flex-fill position-relative">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold ${step2 === 'completed' ? 'bg-success text-white' : (step2 === 'active' ? 'bg-warning text-dark animate-pulse' : 'bg-secondary text-white-50')}" style="width:36px; height:36px; font-size:13px; z-index: 2;">2</div>
+                        <span class="small fw-semibold mt-2 ${step2 !== '' ? 'text-white' : 'text-muted'}">2. TTE Surat Selesai (100%)</span>
+                    </div>
+                `;
+
+                // Build Documents Table
+                let filesList = {};
+                try {
+                    if (file && (file.trim().startsWith('{') || file.trim().startsWith('['))) {
+                        filesList = JSON.parse(file);
+                    }
+                } catch(e) {}
+
+                const docsBody = document.getElementById('m-rek-documents-body');
+                docsBody.innerHTML = '';
+
+                globalRequirementsRekomendasi.forEach((req, idx) => {
+                    const fileIdx = idx + 1;
+                    const exist = filesList[fileIdx] || null;
+
+                    let statusCol = '<span class="text-muted small">-</span>';
+                    let actionCol = '<span class="text-danger small"><i class="fa-solid fa-circle-xmark me-1"></i> Belum Diunggah</span>';
+
+                    if (exist) {
+                        const docStatus = exist.status || 'pending';
+                        if (docStatus === 'verified') {
+                            statusCol = `<span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 rounded small"><i class="fa-solid fa-circle-check me-1"></i> Terverifikasi</span>`;
+                        } else if (docStatus === 'rejected') {
+                            statusCol = `<span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded small"><i class="fa-solid fa-circle-xmark me-1"></i> Ditolak</span>`;
+                        } else {
+                            statusCol = `<span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 rounded small"><i class="fa-solid fa-clock me-1"></i> Sedang Diperiksa</span>`;
+                        }
+
+                        actionCol = `<a href="<?= base_url('uploads/rekomendasi/') ?>/${exist.filename}" target="_blank" class="btn btn-sm btn-outline-info py-0.5 px-2.5" style="font-size:11px;"><i class="fa-solid fa-file-pdf me-1"></i> Buka File</a>`;
+                    }
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="text-center align-middle">${fileIdx}</td>
+                        <td class="align-middle">
+                            <div class="fw-semibold text-main small">${req.name}</div>
+                            <div class="text-muted" style="font-size: 0.75rem;">${req.desc}</div>
+                        </td>
+                        <td class="text-center align-middle">${statusCol}</td>
+                        <td class="text-center align-middle">${actionCol}</td>
+                    `;
+                    docsBody.appendChild(tr);
+                });
+
+                modal.show();
+            });
+        });
+    }
+});
+</script>
 <?= $this->endSection() ?>

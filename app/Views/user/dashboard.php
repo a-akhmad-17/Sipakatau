@@ -579,6 +579,22 @@
                                     </td>
                                     <td class="text-center">
                                         <div class="d-flex justify-content-center gap-1 flex-wrap">
+                                             <button type="button" class="btn btn-sm btn-info text-white py-1 px-2.5 btn-detail-ormas" 
+                                                     data-id="<?= $item['id'] ?>"
+                                                     data-registrasi="<?= esc($item['nomor_registrasi']) ?>"
+                                                     data-nama="<?= esc($item['nama_ormas']) ?>"
+                                                     data-alamat="<?= esc($item['alamat']) ?>"
+                                                     data-email="<?= esc($item['email']) ?>"
+                                                     data-telepon="<?= esc($item['telepon']) ?>"
+                                                     data-status="<?= esc($item['status_verifikasi']) ?>"
+                                                     data-progress="<?= esc($item['progress_percentage']) ?>"
+                                                     data-file="<?= esc($item['file_berkas'] ?? '') ?>" 
+                                                     data-tipe-ormas="<?= esc($item['tipe_ormas'] ?? 'Lokal') ?>"
+                                                     data-sk-kepengurusan="<?= !empty($item['tgl_sk_kepengurusan']) ? date('d F Y', strtotime($item['tgl_sk_kepengurusan'])) : '-' ?>" 
+                                                     data-sk-kedaluwarsa="<?= !empty($item['tgl_sk_kedaluwarsa']) ? date('d F Y', strtotime($item['tgl_sk_kedaluwarsa'])) : '-' ?>"
+                                                     data-tanggal="<?= date('d F Y H:i:s', strtotime($item['created_at'])) ?>">
+                                                 <i class="fa-solid fa-list-check me-1"></i> Detail
+                                             </button>
                                             <?php if (!$isActive): ?>
                                                 <a href="<?= base_url('user/pengajuan?id=' . $item['id']) ?>" class="btn btn-sm btn-outline-primary py-1 px-2.5" title="Tampilkan Progres">
                                                     <i class="fa-solid fa-eye me-1"></i> Tampilkan
@@ -627,10 +643,212 @@
     </div>
 <?php endif; ?>
 
+<!-- Modal Detail Progress Ormas -->
+<div class="modal fade" id="modalDetailProgressOrmas" tabindex="-1" aria-labelledby="modalDetailProgressOrmasLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="background: var(--sidebar-bg); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; backdrop-filter: blur(20px);">
+            <!-- Modal Header -->
+            <div class="modal-header border-bottom py-3.5 px-4" style="border-color: var(--border-color) !important;">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle bg-primary-subtle text-primary p-2.5 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                        <i class="fa-solid fa-route fa-lg"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title text-white fw-bold font-heading mb-0.5" id="modalDetailProgressOrmasLabel">Detail Pelacakan Progres</h5>
+                        <span class="small text-muted" id="m-ormas-registrasi">Reg: -</span>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <!-- Modal Body -->
+            <div class="modal-body p-4" style="max-height: 75vh; overflow-y: auto;">
+                <!-- General Info Table -->
+                <div class="table-responsive mb-4">
+                    <table class="table table-custom mb-0 text-white" style="font-size: 0.85rem;">
+                        <tbody>
+                            <tr>
+                                <th style="width: 30%; background: rgba(255,255,255,0.02);" class="text-muted">Nama Ormas / LSM</th>
+                                <td id="m-ormas-nama" class="fw-bold text-warning">-</td>
+                            </tr>
+                            <tr>
+                                <th style="background: rgba(255,255,255,0.02);" class="text-muted">Alamat Kantor</th>
+                                <td id="m-ormas-alamat">-</td>
+                            </tr>
+                            <tr>
+                                <th style="background: rgba(255,255,255,0.02);" class="text-muted">Tipe Ormas</th>
+                                <td id="m-ormas-tipe">-</td>
+                            </tr>
+                            <tr>
+                                <th style="background: rgba(255,255,255,0.02);" class="text-muted">Status Ajuan</th>
+                                <td id="m-ormas-status">-</td>
+                            </tr>
+                            <tr>
+                                <th style="background: rgba(255,255,255,0.02);" class="text-muted">Progres Selesai</th>
+                                <td id="m-ormas-progress" class="text-warning fw-bold">-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Progress Tracker Timeline -->
+                <div class="mb-4 p-4 rounded" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: 12px;">
+                    <h6 class="small fw-bold mb-4 text-white"><i class="fa-solid fa-spinner fa-spin text-warning me-2"></i>Alur Proses Verifikasi</h6>
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3" id="m-ormas-timeline-container">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+                </div>
+
+                <!-- Document Checklist Table -->
+                <div>
+                    <h6 class="small fw-bold mb-3 text-white"><i class="fa-solid fa-paperclip text-success me-2"></i>Berkas Persyaratan yang Telah Diunggah</h6>
+                    <div class="table-responsive">
+                        <table class="table table-custom mb-0 text-white" style="font-size: 0.82rem;">
+                            <thead>
+                                <tr style="background: rgba(255, 255, 255, 0.02);">
+                                    <th class="text-center" style="width: 5%;">#</th>
+                                    <th style="width: 45%;">Persyaratan Berkas</th>
+                                    <th class="text-center" style="width: 25%;">Status Verifikasi</th>
+                                    <th class="text-center" style="width: 25%;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="m-ormas-documents-body">
+                                <!-- Populated dynamically via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal Footer -->
+            <div class="modal-footer border-top py-3 px-4" style="border-color: var(--border-color) !important;">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
 <script>
     // Responsive timeline adjustments if needed
+    document.addEventListener('DOMContentLoaded', function() {
+        const globalRequirementsLokal = <?= json_encode($requirementsLokal) ?>;
+        const globalRequirementsBerjenjang = <?= json_encode($requirementsBerjenjang) ?>;
+
+        const modalEl = document.getElementById('modalDetailProgressOrmas');
+        if (modalEl) {
+            const modal = new bootstrap.Modal(modalEl);
+            
+            document.querySelectorAll('.btn-detail-ormas').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    const reg = this.getAttribute('data-registrasi');
+                    const nama = this.getAttribute('data-nama');
+                    const alamat = this.getAttribute('data-alamat');
+                    const status = this.getAttribute('data-status');
+                    const progress = parseInt(this.getAttribute('data-progress') || '0');
+                    const file = this.getAttribute('data-file');
+                    const tipeOrmas = this.getAttribute('data-tipe-ormas') || 'Lokal';
+
+                    document.getElementById('m-ormas-registrasi').innerText = 'Reg: ' + reg;
+                    document.getElementById('m-ormas-nama').innerText = nama;
+                    document.getElementById('m-ormas-alamat').innerText = alamat;
+                    document.getElementById('m-ormas-tipe').innerText = tipeOrmas;
+                    document.getElementById('m-ormas-progress').innerText = progress + '% Selesai';
+
+                    let statusBadge = 'bg-warning-subtle text-warning border-warning-subtle';
+                    if (status === 'Approved') {
+                        statusBadge = 'bg-success-subtle text-success border-success-subtle';
+                    } else if (status === 'Rejected') {
+                        statusBadge = 'bg-danger-subtle text-danger border-danger-subtle';
+                    }
+                    document.getElementById('m-ormas-status').innerHTML = `<span class="badge ${statusBadge} px-2.5 py-1.5 rounded-pill border small">${status}</span>`;
+
+                    // Build Timeline
+                    let step1 = 'completed', step2 = '', step3 = '', step4 = '';
+                    if (status === 'Pending') {
+                        step1 = 'active';
+                    } else if (status === 'Approved' && progress == 50) {
+                        step1 = 'completed'; step2 = 'active';
+                    } else if (status === 'Approved' && progress == 75) {
+                        step1 = 'completed'; step2 = 'completed'; step3 = 'active';
+                    } else if (status === 'Approved' && progress == 100) {
+                        step1 = 'completed'; step2 = 'completed'; step3 = 'completed'; step4 = 'completed';
+                    } else if (status === 'Rejected') {
+                        step1 = 'active';
+                    }
+
+                    // Render Timeline HTML
+                    const timelineContainer = document.getElementById('m-ormas-timeline-container');
+                    timelineContainer.className = "d-flex justify-content-between align-items-center w-100 flex-wrap gap-2 text-center mt-3";
+                    timelineContainer.innerHTML = `
+                        <div class="d-flex flex-column align-items-center flex-fill position-relative">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold ${step1 === 'completed' ? 'bg-success text-white' : (step1 === 'active' ? 'bg-warning text-dark animate-pulse' : 'bg-secondary text-white-50')}" style="width:36px; height:36px; font-size:13px; z-index: 2;">1</div>
+                            <span class="small fw-semibold mt-2 ${step1 !== '' ? 'text-white' : 'text-muted'}">1. Verifikasi Berkas</span>
+                        </div>
+                        <div class="d-flex flex-column align-items-center flex-fill position-relative">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold ${step2 === 'completed' ? 'bg-success text-white' : (step2 === 'active' ? 'bg-warning text-dark animate-pulse' : 'bg-secondary text-white-50')}" style="width:36px; height:36px; font-size:13px; z-index: 2;">2</div>
+                            <span class="small fw-semibold mt-2 ${step2 !== '' ? 'text-white' : 'text-muted'}">2. Ke Kemendagri</span>
+                        </div>
+                        <div class="d-flex flex-column align-items-center flex-fill position-relative">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold ${step3 === 'completed' ? 'bg-success text-white' : (step3 === 'active' ? 'bg-warning text-dark animate-pulse' : 'bg-secondary text-white-50')}" style="width:36px; height:36px; font-size:13px; z-index: 2;">3</div>
+                            <span class="small fw-semibold mt-2 ${step3 !== '' ? 'text-white' : 'text-muted'}">3. Validasi Bidang</span>
+                        </div>
+                        <div class="d-flex flex-column align-items-center flex-fill position-relative">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold ${step4 === 'completed' ? 'bg-success text-white' : (step4 === 'active' ? 'bg-warning text-dark animate-pulse' : 'bg-secondary text-white-50')}" style="width:36px; height:36px; font-size:13px; z-index: 2;">4</div>
+                            <span class="small fw-semibold mt-2 ${step4 !== '' ? 'text-white' : 'text-muted'}">4. TTE Selesai</span>
+                        </div>
+                    `;
+
+                    // Build Documents Table
+                    let filesList = {};
+                    try {
+                        if (file && file.trim().startsWith('{')) {
+                            filesList = JSON.parse(file);
+                        }
+                    } catch(e) {}
+
+                    const activeReqs = tipeOrmas === 'Lokal' ? globalRequirementsLokal : globalRequirementsBerjenjang;
+                    const docsBody = document.getElementById('m-ormas-documents-body');
+                    docsBody.innerHTML = '';
+
+                    activeReqs.forEach((req, idx) => {
+                        const fileIdx = idx + 1;
+                        const exist = filesList[fileIdx] || null;
+
+                        let statusCol = '<span class="text-muted small">-</span>';
+                        let actionCol = '<span class="text-danger small"><i class="fa-solid fa-circle-xmark me-1"></i> Belum Diunggah</span>';
+
+                        if (exist) {
+                            const docStatus = exist.status || 'pending';
+                            if (docStatus === 'verified') {
+                                statusCol = `<span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 rounded small"><i class="fa-solid fa-circle-check me-1"></i> Terverifikasi</span>`;
+                            } else if (docStatus === 'rejected') {
+                                statusCol = `<span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded small"><i class="fa-solid fa-circle-xmark me-1"></i> Ditolak</span>`;
+                            } else {
+                                statusCol = `<span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 rounded small"><i class="fa-solid fa-clock me-1"></i> Sedang Diperiksa</span>`;
+                            }
+
+                            actionCol = `<a href="<?= base_url('uploads/ormas/') ?>/${exist.filename}" target="_blank" class="btn btn-sm btn-outline-info py-0.5 px-2.5" style="font-size:11px;"><i class="fa-solid fa-file-pdf me-1"></i> Buka File</a>`;
+                        }
+
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td class="text-center align-middle">${fileIdx}</td>
+                            <td class="align-middle">
+                                <div class="fw-semibold text-main small">${req.name}</div>
+                                <div class="text-muted" style="font-size: 0.75rem;">${req.desc}</div>
+                            </td>
+                            <td class="text-center align-middle">${statusCol}</td>
+                            <td class="text-center align-middle">${actionCol}</td>
+                        `;
+                        docsBody.appendChild(tr);
+                    });
+
+                    modal.show();
+                });
+            });
+        }
+    });
 </script>
 <?= $this->endSection() ?>
