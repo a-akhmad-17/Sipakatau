@@ -292,15 +292,13 @@ $requirementsBerjenjang = [
                 <p class="text-muted small mb-3"><i class="fa-solid fa-circle-info text-info me-1"></i>Masukkan nama pengurus sesuai SK Kepengurusan Anda (minimal Ketua, Sekretaris, Bendahara).</p>
                 
                 <div class="table-responsive mb-4">
-                    <table class="table table-bordered border-secondary border-opacity-10 text-white align-middle" id="table-pengurus" style="font-size: 0.85rem;">
+                    <table class="table table-bordered border-secondary border-opacity-10 text-white align-middle" id="table-pengurus">
                         <thead>
                             <tr style="background: rgba(255, 255, 255, 0.03);">
-                                <th style="width: 20%;">Jabatan <span class="text-danger fw-bold">*</span></th>
-                                <th style="width: 25%;">Nama Lengkap <span class="text-danger fw-bold">*</span></th>
-                                <th style="width: 15%;">No. HP / WhatsApp</th>
-                                <th style="width: 18%;">Unggah KTP</th>
-                                <th style="width: 18%;">Pasfoto 4x6</th>
-                                <th style="width: 4%;" class="text-center">Aksi</th>
+                                <th style="width: 30%;">Jabatan <span class="text-danger fw-bold">*</span></th>
+                                <th style="width: 40%;">Nama Lengkap <span class="text-danger fw-bold">*</span></th>
+                                <th style="width: 25%;">No. HP / WhatsApp</th>
+                                <th style="width: 5%;" class="text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="pengurus-container">
@@ -312,15 +310,11 @@ $requirementsBerjenjang = [
                                 $oldNama = old('pengurus_nama');
                                 $oldJabatan = old('pengurus_jabatan');
                                 $oldNoHp = old('pengurus_no_hp');
-                                $oldKtp = old('pengurus_old_ktp') ?: [];
-                                $oldPasfoto = old('pengurus_old_pasfoto') ?: [];
                                 foreach ($oldNama as $idx => $val) {
                                     $activePengurus[] = [
                                         'nama' => $val,
                                         'jabatan' => $oldJabatan[$idx] ?? '',
-                                        'no_hp' => $oldNoHp[$idx] ?? '',
-                                        'file_ktp' => $oldKtp[$idx] ?? '',
-                                        'file_pasfoto' => $oldPasfoto[$idx] ?? ''
+                                        'no_hp' => $oldNoHp[$idx] ?? ''
                                     ];
                                 }
                             }
@@ -330,9 +324,7 @@ $requirementsBerjenjang = [
                                     $activePengurus[] = [
                                         'nama' => '',
                                         'jabatan' => $jab,
-                                        'no_hp' => '',
-                                        'file_ktp' => '',
-                                        'file_pasfoto' => ''
+                                        'no_hp' => ''
                                     ];
                                 }
                             }
@@ -349,38 +341,6 @@ $requirementsBerjenjang = [
                                 <td>
                                     <input type="text" name="pengurus_no_hp[]" class="form-control form-control-custom form-control-sm" placeholder="Contoh: 0812..." value="<?= esc($p['no_hp']) ?>">
                                 </td>
-                                <td>
-                                    <input type="hidden" name="pengurus_old_ktp[]" value="<?= esc($p['file_ktp'] ?? '') ?>">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <label class="btn btn-sm btn-outline-secondary mb-0 py-1 px-2 d-flex align-items-center justify-content-center" style="cursor: pointer; font-size: 0.7rem; min-width: 32px; border-color: rgba(255,255,255,0.15) !important;">
-                                            <i class="fa-solid fa-cloud-arrow-up"></i>
-                                            <input type="file" name="pengurus_ktp_<?= $index ?>" class="d-none" accept=".pdf,image/*" onchange="handlePengurusFileChange(this, 'ktp', <?= $index ?>)">
-                                        </label>
-                                        <span class="file-name-ktp-<?= $index ?> small text-success text-truncate d-block" style="max-width: 90px; font-size: 0.72rem;">
-                                            <?php if (!empty($p['file_ktp'])): ?>
-                                                <a href="<?= base_url('uploads/ormas/' . $p['file_ktp']) ?>" target="_blank" class="text-info text-decoration-none" title="Unduh KTP"><i class="fa-solid fa-check text-success me-1"></i>Ada</a>
-                                            <?php else: ?>
-                                                <span class="text-muted text-opacity-50">Kosong</span>
-                                            <?php endif; ?>
-                                        </span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <input type="hidden" name="pengurus_old_pasfoto[]" value="<?= esc($p['file_pasfoto'] ?? '') ?>">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <label class="btn btn-sm btn-outline-secondary mb-0 py-1 px-2 d-flex align-items-center justify-content-center" style="cursor: pointer; font-size: 0.7rem; min-width: 32px; border-color: rgba(255,255,255,0.15) !important;">
-                                            <i class="fa-solid fa-image"></i>
-                                            <input type="file" name="pengurus_pasfoto_<?= $index ?>" class="d-none" accept="image/*" onchange="handlePengurusFileChange(this, 'pasfoto', <?= $index ?>)">
-                                        </label>
-                                        <span class="file-name-pasfoto-<?= $index ?> small text-success text-truncate d-block" style="max-width: 90px; font-size: 0.72rem;">
-                                            <?php if (!empty($p['file_pasfoto'])): ?>
-                                                <a href="<?= base_url('uploads/ormas/' . $p['file_pasfoto']) ?>" target="_blank" class="text-info text-decoration-none" title="Unduh Pasfoto"><i class="fa-solid fa-check text-success me-1"></i>Ada</a>
-                                            <?php else: ?>
-                                                <span class="text-muted text-opacity-50">Kosong</span>
-                                            <?php endif; ?>
-                                        </span>
-                                    </div>
-                                </td>
                                 <td class="text-center">
                                     <button type="button" class="btn btn-sm btn-outline-danger border-0 rounded-circle text-danger" onclick="removePengurusRow(this)">
                                         <i class="fa-solid fa-trash-can"></i>
@@ -396,18 +356,22 @@ $requirementsBerjenjang = [
                 </div>
 
                 <h5 class="text-main fw-bold mb-3 border-bottom border-secondary border-opacity-10 pb-2">3. Lokasi Geografis Kantor Sekretariat</h5>
-                <p class="text-muted small mb-2"><i class="fa-solid fa-circle-info text-info me-1"></i>Tentukan titik koordinat sekretariat pada peta interaktif. Klik pada peta atau drag marker biru ke posisi kantor Anda.</p>
+                <p class="text-muted small mb-2"><i class="fa-solid fa-circle-info text-info me-1"></i>Cari alamat, masukkan titik koordinat manual, atau tempel link Google Maps untuk mendeteksi posisi kantor Anda pada peta interaktif.</p>
                 
-                <div class="row g-3 mb-3">
-                    <div class="col-sm-6">
-                        <label for="latitude" class="form-label small text-muted">Latitude (Lintang)</label>
-                        <input type="number" step="any" name="latitude" id="latitude" class="form-control form-control-custom" placeholder="Contoh: -5.1489" value="<?= esc($lat) ?>">
+                <div class="mb-3">
+                    <div class="input-group">
+                        <input type="text" id="map_search_input" class="form-control form-control-custom" placeholder="Ketik nama jalan, koordinat (contoh: -5.148, 120.129), atau tempel link Google Maps...">
+                        <button type="button" class="btn btn-portal text-white btn-sm" id="btn-detect-map" style="background: var(--portal-color) !important; border-color: var(--portal-color) !important;">
+                            <i class="fa-solid fa-magnifying-glass-location me-1"></i> Deteksi Lokasi
+                        </button>
                     </div>
-                    <div class="col-sm-6">
-                        <label for="longitude" class="form-label small text-muted">Longitude (Bujur)</label>
-                        <input type="number" step="any" name="longitude" id="longitude" class="form-control form-control-custom" placeholder="Contoh: 120.1294" value="<?= esc($lng) ?>">
+                    <div class="d-flex justify-content-between align-items-center mt-1.5">
+                        <span id="map-search-status" class="small text-muted" style="font-size: 11px;">Peta otomatis menggeser marker ke posisi terdeteksi. Anda juga masih bisa menggeser marker biru di peta secara manual.</span>
                     </div>
                 </div>
+
+                <input type="hidden" name="latitude" id="latitude" value="<?= esc($lat) ?>">
+                <input type="hidden" name="longitude" id="longitude" value="<?= esc($lng) ?>">
                 <div id="form-map" class="mb-4"></div>
 
                 <div class="d-flex justify-content-end gap-2 border-top border-secondary border-opacity-10 pt-4 mt-4">
@@ -477,6 +441,72 @@ $requirementsBerjenjang = [
                             </thead>
                             <tbody id="validation-table-body">
                                 <!-- Populated dynamically by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Berkas Identitas Pengurus (KTP & Pasfoto) -->
+                <div class="card mb-4 border-0" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden;">
+                    <div class="card-header py-3 px-4" style="background: rgba(13, 202, 240, 0.15); border-bottom: 1px solid var(--border-color);">
+                        <h5 class="mb-0 text-white fw-bold font-heading" style="font-size: 1.05rem;"><i class="fa-solid fa-users me-2 text-info"></i>Unggah Identitas Pengurus (KTP & Pasfoto 4x6)</h5>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-bordered border-secondary border-opacity-10 text-white align-middle mb-0" style="font-size: 0.85rem; background: rgba(255,255,255,0.01);">
+                            <thead>
+                                <tr style="background: rgba(255, 255, 255, 0.02);">
+                                    <th style="width: 25%;">Nama Pengurus</th>
+                                    <th style="width: 25%;">Jabatan</th>
+                                    <th style="width: 25%;">Unggah KTP (PDF/Gambar)</th>
+                                    <th style="width: 25%;">Pasfoto 4x6 (Gambar)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if (empty($pengurus)): ?>
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted py-4 small">Belum ada data pengurus diisi di Langkah 1.</td>
+                                    </tr>
+                                <?php else: ?>
+                                    <?php foreach ($pengurus as $idx => $p): ?>
+                                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.03);">
+                                            <td class="fw-semibold text-main"><?= esc($p['nama']) ?></td>
+                                            <td class="text-muted small"><?= esc($p['jabatan']) ?></td>
+                                            <td>
+                                                <input type="hidden" name="pengurus_id[]" value="<?= esc($p['id']) ?>">
+                                                <input type="hidden" name="pengurus_old_ktp[]" value="<?= esc($p['file_ktp'] ?? '') ?>">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <label class="btn btn-sm btn-outline-secondary mb-0 py-1 px-2.5 d-flex align-items-center justify-content-center" style="cursor: pointer; font-size: 0.72rem; min-width: 32px; border-color: rgba(255,255,255,0.15) !important;">
+                                                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                                                        <input type="file" name="pengurus_ktp_<?= $idx ?>" class="d-none" accept=".pdf,image/*" onchange="handlePengurusFileChange(this, 'ktp', <?= $idx ?>)">
+                                                    </label>
+                                                    <span class="file-name-ktp-<?= $idx ?> small text-success text-truncate d-block" style="max-width: 140px; font-size: 0.72rem;">
+                                                        <?php if (!empty($p['file_ktp'])): ?>
+                                                            <a href="<?= base_url('uploads/ormas/' . $p['file_ktp']) ?>" target="_blank" class="text-info text-decoration-none" title="Unduh KTP"><i class="fa-solid fa-check text-success me-1"></i>Ada</a>
+                                                        <?php else: ?>
+                                                            <span class="text-muted text-opacity-50">Kosong</span>
+                                                        <?php endif; ?>
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <input type="hidden" name="pengurus_old_pasfoto[]" value="<?= esc($p['file_pasfoto'] ?? '') ?>">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <label class="btn btn-sm btn-outline-secondary mb-0 py-1 px-2.5 d-flex align-items-center justify-content-center" style="cursor: pointer; font-size: 0.72rem; min-width: 32px; border-color: rgba(255,255,255,0.15) !important;">
+                                                        <i class="fa-solid fa-image"></i>
+                                                        <input type="file" name="pengurus_pasfoto_<?= $idx ?>" class="d-none" accept="image/*" onchange="handlePengurusFileChange(this, 'pasfoto', <?= $idx ?>)">
+                                                    </label>
+                                                    <span class="file-name-pasfoto-<?= $idx ?> small text-success text-truncate d-block" style="max-width: 140px; font-size: 0.72rem;">
+                                                        <?php if (!empty($p['file_pasfoto'])): ?>
+                                                            <a href="<?= base_url('uploads/ormas/' . $p['file_pasfoto']) ?>" target="_blank" class="text-info text-decoration-none" title="Unduh Pasfoto"><i class="fa-solid fa-check text-success me-1"></i>Ada</a>
+                                                        <?php else: ?>
+                                                            <span class="text-muted text-opacity-50">Kosong</span>
+                                                        <?php endif; ?>
+                                                    </span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </tbody>
                         </table>
                     </div>
@@ -855,40 +885,8 @@ function handlePengurusFileChange(input, type, index) {
     }
 }
 
-function reindexPengurusRows() {
-    const container = document.getElementById('pengurus-container');
-    if (!container) return;
-    const rows = container.querySelectorAll('.pengurus-row');
-    rows.forEach((row, idx) => {
-        // Update input type=file names
-        const ktpInput = row.querySelector('input[type="file"][name^="pengurus_ktp_"]');
-        if (ktpInput) {
-            ktpInput.name = `pengurus_ktp_${idx}`;
-            ktpInput.setAttribute('onchange', `handlePengurusFileChange(this, 'ktp', ${idx})`);
-        }
-        
-        const pasfotoInput = row.querySelector('input[type="file"][name^="pengurus_pasfoto_"]');
-        if (pasfotoInput) {
-            pasfotoInput.name = `pengurus_pasfoto_${idx}`;
-            pasfotoInput.setAttribute('onchange', `handlePengurusFileChange(this, 'pasfoto', ${idx})`);
-        }
-
-        // Update spans classes for filename mapping
-        const ktpSpan = row.querySelector('span[class^="file-name-ktp-"]');
-        if (ktpSpan) {
-            ktpSpan.className = `file-name-ktp-${idx} small text-success text-truncate d-block`;
-        }
-        
-        const pasfotoSpan = row.querySelector('span[class^="file-name-pasfoto-"]');
-        if (pasfotoSpan) {
-            pasfotoSpan.className = `file-name-pasfoto-${idx} small text-success text-truncate d-block`;
-        }
-    });
-}
-
 function addPengurusRow() {
     const container = document.getElementById('pengurus-container');
-    const index = container.querySelectorAll('.pengurus-row').length;
     const tr = document.createElement('tr');
     tr.className = 'pengurus-row';
     tr.innerHTML = `
@@ -901,26 +899,6 @@ function addPengurusRow() {
         <td>
             <input type="text" name="pengurus_no_hp[]" class="form-control form-control-custom form-control-sm" placeholder="Contoh: 0812...">
         </td>
-        <td>
-            <input type="hidden" name="pengurus_old_ktp[]" value="">
-            <div class="d-flex align-items-center gap-2">
-                <label class="btn btn-sm btn-outline-secondary mb-0 py-1 px-2 d-flex align-items-center justify-content-center" style="cursor: pointer; font-size: 0.7rem; min-width: 32px; border-color: rgba(255,255,255,0.15) !important;">
-                    <i class="fa-solid fa-cloud-arrow-up"></i>
-                    <input type="file" name="pengurus_ktp_${index}" class="d-none" accept=".pdf,image/*" onchange="handlePengurusFileChange(this, 'ktp', ${index})">
-                </label>
-                <span class="file-name-ktp-${index} small text-success text-truncate d-block" style="max-width: 90px; font-size: 0.72rem;"><span class="text-muted text-opacity-50">Kosong</span></span>
-            </div>
-        </td>
-        <td>
-            <input type="hidden" name="pengurus_old_pasfoto[]" value="">
-            <div class="d-flex align-items-center gap-2">
-                <label class="btn btn-sm btn-outline-secondary mb-0 py-1 px-2 d-flex align-items-center justify-content-center" style="cursor: pointer; font-size: 0.7rem; min-width: 32px; border-color: rgba(255,255,255,0.15) !important;">
-                    <i class="fa-solid fa-image"></i>
-                    <input type="file" name="pengurus_pasfoto_${index}" class="d-none" accept="image/*" onchange="handlePengurusFileChange(this, 'pasfoto', ${index})">
-                </label>
-                <span class="file-name-pasfoto-${index} small text-success text-truncate d-block" style="max-width: 90px; font-size: 0.72rem;"><span class="text-muted text-opacity-50">Kosong</span></span>
-            </div>
-        </td>
         <td class="text-center">
             <button type="button" class="btn btn-sm btn-outline-danger border-0 rounded-circle text-danger" onclick="removePengurusRow(this)">
                 <i class="fa-solid fa-trash-can"></i>
@@ -928,7 +906,6 @@ function addPengurusRow() {
         </td>
     `;
     container.appendChild(tr);
-    reindexPengurusRows();
 }
 
 function removePengurusRow(btn) {
@@ -938,7 +915,6 @@ function removePengurusRow(btn) {
         return;
     }
     btn.closest('tr').remove();
-    reindexPengurusRows();
 }
 
 function toggleOrmasRequirements(value) {
@@ -1213,6 +1189,84 @@ document.addEventListener('DOMContentLoaded', function() {
         btnGeocode.addEventListener('click', function() {
             performGeocoding(alamatTextarea.value || '', true);
         });
+    }
+
+    // Unified Location Input Detector (Search address, raw coordinates, Google Maps links)
+    const btnDetectMap = document.getElementById('btn-detect-map');
+    const mapSearchInput = document.getElementById('map_search_input');
+    const mapSearchStatus = document.getElementById('map-search-status');
+
+    if (btnDetectMap && mapSearchInput) {
+        btnDetectMap.addEventListener('click', function() {
+            detectLocationInput();
+        });
+        mapSearchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                detectLocationInput();
+            }
+        });
+    }
+
+    function detectLocationInput() {
+        const val = mapSearchInput.value.trim();
+        if (!val) return;
+
+        mapSearchStatus.innerHTML = '<span class="text-info"><i class="fa-solid fa-spinner fa-spin"></i> Melacak lokasi...</span>';
+
+        // 1. Cek koordinat mentah (misal: -5.148, 120.129)
+        const coordRegex = /([-+]?\d{1,2}\.\d+)\s*,\s*([-+]?\d{1,3}\.\d+)/;
+        const match = val.match(coordRegex);
+        if (match) {
+            const lat = parseFloat(match[1]);
+            const lng = parseFloat(match[2]);
+            updateMapPosition(lat, lng);
+            mapSearchStatus.innerHTML = '<span class="text-success"><i class="fa-solid fa-circle-check"></i> Koordinat berhasil dideteksi!</span>';
+            return;
+        }
+
+        // 2. Cek link Google Maps (misal: @-5.148,120.129 atau ?q=-5.148,120.129)
+        const gmapsRegex = /@([-+]?\d{1,2}\.\d+),([-+]?\d{1,3}\.\d+)/;
+        const matchGmaps = val.match(gmapsRegex);
+        if (matchGmaps) {
+            const lat = parseFloat(matchGmaps[1]);
+            const lng = parseFloat(matchGmaps[2]);
+            updateMapPosition(lat, lng);
+            mapSearchStatus.innerHTML = '<span class="text-success"><i class="fa-solid fa-circle-check"></i> Lokasi link Google Maps berhasil dideteksi!</span>';
+            return;
+        }
+
+        // 3. Cari menggunakan alamat via user/geocode
+        fetch(`<?= base_url('user/geocode') ?>?q=${encodeURIComponent(val)}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.length > 0) {
+                    const lat = parseFloat(data[0].lat);
+                    const lon = parseFloat(data[0].lon);
+                    updateMapPosition(lat, lon);
+                    mapSearchStatus.innerHTML = '<span class="text-success"><i class="fa-solid fa-circle-check"></i> Alamat berhasil dideteksi!</span>';
+                } else {
+                    mapSearchStatus.innerHTML = '<span class="text-danger"><i class="fa-solid fa-circle-xmark"></i> Lokasi tidak ditemukan. Silakan masukkan koordinat secara manual atau geser marker.</span>';
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                mapSearchStatus.innerHTML = '<span class="text-danger"><i class="fa-solid fa-circle-xmark"></i> Layanan geocoding sedang sibuk.</span>';
+            });
+    }
+
+    function updateMapPosition(lat, lng) {
+        latInput.value = lat.toFixed(6);
+        lngInput.value = lng.toFixed(6);
+        const newLatLng = L.latLng(lat, lng);
+        if (marker) {
+            marker.setLatLng(newLatLng);
+        } else {
+            marker = L.marker(newLatLng, { draggable: true }).addTo(map);
+            bindMarkerEvents(marker);
+        }
+        map.setView(newLatLng, 16);
+        updateFormProgress();
     }
 
     // Initialize Active Step
