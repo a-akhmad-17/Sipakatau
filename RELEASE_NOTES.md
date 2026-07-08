@@ -11,6 +11,9 @@
 ### 🔄 Changed
 - **Home Controller**: Menghapus penyimpanan data koordinat (`latitude` & `longitude`) pada fungsi `simpanRekomendasi()` dan `simpanPengaduan()` di [Home.php](file:///F:/Xampp/htdocs/SIPAKATAU/app/Controllers/Home.php), dan hanya menyimpan teks lokasi sasaran kegiatan (`lokasi_kegiatan`) atau lokasi kejadian (`lokasi_pengaduan`).
 
+### 🐛 Fixed
+- **Validasi Berkas Rekomendasi**: Menghapus atribut `required` bawaan HTML5 pada input file unggah dokumen yang tersembunyi (`d-none`) di halaman rekomendasi ([form_rekomendasi.php](file:///F:/Xampp/htdocs/SIPAKATAU/app/Views/user/form_rekomendasi.php) dan [form_rekomendasi.php](file:///F:/Xampp/htdocs/SIPAKATAU/app/Views/layanan/form_rekomendasi.php)). Hal ini mencegah pemblokiran klik tombol "Ajukan Rekomendasi" (silent blocking) oleh peramban (browser) saat berkas belum dipilih, lalu menggantikannya dengan validasi berbasis JavaScript.
+
 ---
 
 ## [v2.9.11] - 2026-07-08

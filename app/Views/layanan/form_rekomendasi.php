@@ -181,7 +181,7 @@
                                         <div class="d-flex align-items-center gap-2">
                                             <label class="btn btn-sm btn-outline-secondary mb-0 py-1 px-2.5" style="cursor: pointer; font-size: 0.72rem;">
                                                 <i class="fa-solid fa-cloud-arrow-up me-1"></i> Pilih File
-                                                <input type="file" name="file_proposal_<?= $req['id'] ?>" id="file_proposal_<?= $req['id'] ?>" class="d-none berkas-file-input" data-index="<?= $req['id'] ?>" data-required="<?= $req['required'] ? 'true' : 'false' ?>" accept=".pdf,.zip,.jpg,.jpeg,.png,.webp" onchange="handleFileInputChange(this, <?= $req['id'] ?>)" <?= $req['required'] ? 'required' : '' ?>>
+                                                <input type="file" name="file_proposal_<?= $req['id'] ?>" id="file_proposal_<?= $req['id'] ?>" class="d-none berkas-file-input" data-index="<?= $req['id'] ?>" data-required="<?= $req['required'] ? 'true' : 'false' ?>" accept=".pdf,.zip,.jpg,.jpeg,.png,.webp" onchange="handleFileInputChange(this, <?= $req['id'] ?>)">
                                             </label>
                                             <span id="file-chosen-name-<?= $req['id'] ?>" class="small text-success fw-bold text-truncate d-none" style="max-width: 120px;"></span>
                                         </div>
@@ -288,7 +288,28 @@
 
         // Clear draft on successful form submit
         if (form) {
-            form.addEventListener('submit', () => {
+            form.addEventListener('submit', (e) => {
+                // Validate required files via JS since they are hidden (d-none)
+                const fileInputs = document.querySelectorAll('.berkas-file-input');
+                let isValid = true;
+                let missingDocs = [];
+
+                fileInputs.forEach(input => {
+                    const isRequired = input.getAttribute('data-required') === 'true';
+                    if (isRequired && (!input.files || input.files.length === 0)) {
+                        isValid = false;
+                        const row = input.closest('tr');
+                        const docName = row ? row.querySelector('.fw-semibold').textContent.replace('*', '').trim() : 'Dokumen';
+                        missingDocs.push(docName);
+                    }
+                });
+
+                if (!isValid) {
+                    e.preventDefault();
+                    alert('Harap unggah semua dokumen persyaratan wajib:\n- ' + missingDocs.join('\n- '));
+                    return false;
+                }
+
                 localStorage.removeItem('draft_rekomendasi');
             });
         }
