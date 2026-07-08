@@ -743,8 +743,6 @@
             </div>
         </div>
     </div>
-        </div>
-    </div>
 
     <!-- Tab 4: Peta GIS & Laporan Konflik -->
     <div class="tab-pane fade" id="tab-gis" role="tabpanel">

@@ -138,31 +138,6 @@
         </div>
     </div>
 
-    <!-- Persyaratan Dokumen & Panduan -->
-    <div class="glass-card mb-4 p-4">
-        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2 pb-2 border-bottom" style="border-color: rgba(255,255,255,.05) !important;">
-            <h5 class="text-white mb-0"><i class="fa-solid fa-list-check text-warning me-2"></i>Persyaratan Rekomendasi Kegiatan (6 Berkas Utama)</h5>
-            <a href="https://drive.google.com/uc?export=download&id=1WsgeJzVebDi-eGE9B7uYifcAiW05hxgW" class="btn btn-sm btn-outline-warning text-white py-1.5 px-3" style="font-size:0.8rem; border-radius:8px;">
-                <i class="fa-solid fa-file-word me-1.5"></i>Unduh Panduan & Lampiran (.docx)
-            </a>
-        </div>
-        <div class="row g-3">
-            <div class="col-md-6">
-                <ul class="list-group list-group-flush" style="background: transparent;">
-                    <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0 py-1.5" style="font-size:12.5px;"><i class="fa-solid fa-square-check text-success me-2"></i>1. Surat Permohonan Rekomendasi Kegiatan ditujukan kepada Kepala Badan Kesbangpol Kab. Sinjai</li>
-                    <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0 py-1.5" style="font-size:12.5px;"><i class="fa-solid fa-square-check text-success me-2"></i>2. Surat Rekomendasi Kegiatan dari Kantor Lurah setempat dan diketahui Camat</li>
-                    <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0 py-1.5" style="font-size:12.5px;"><i class="fa-solid fa-square-check text-success me-2"></i>3. Proposal Kegiatan lengkap (berisi latar belakang, rencana acara, sasaran, dll.)</li>
-                </ul>
-            </div>
-            <div class="col-md-6">
-                <ul class="list-group list-group-flush" style="background: transparent;">
-                    <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0 py-1.5" style="font-size:12.5px;"><i class="fa-solid fa-square-check text-success me-2"></i>4. Fotokopi KTP Ketua Panitia Pelaksana</li>
-                    <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0 py-1.5" style="font-size:12.5px;"><i class="fa-solid fa-square-check text-success me-2"></i>5. Surat Keputusan (SK) Pengurus Kegiatan</li>
-                    <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0 py-1.5" style="font-size:12.5px;"><i class="fa-solid fa-square-check text-success me-2"></i>6. Surat Rekomendasi pendukung dari Stakeholder terkait (Opsional)</li>
-                </ul>
-            </div>
-        </div>
-    </div>
 
     <!-- Riwayat Rekomendasi Kegiatan -->
     <div class="glass-card">
