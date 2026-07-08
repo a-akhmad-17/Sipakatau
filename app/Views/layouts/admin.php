@@ -971,14 +971,17 @@
                     <a href="<?= site_url('admin#tab-parpol') ?>" class="sidebar-link sidebar-tab-link" data-target-tab="parpol-tab" data-tab-hash="tab-parpol">
                         <i class="fa-solid fa-building-flag"></i> Partai Politik
                     </a>
-                    <a href="<?= site_url('admin#tab-tracking') ?>" class="sidebar-link sidebar-tab-link" data-target-tab="tracking-tab" data-tab-hash="tab-tracking">
-                        <i class="fa-solid fa-route"></i> Tracking Berkas
+                    <a href="<?= site_url('admin#tab-tracking-ormas') ?>" class="sidebar-link sidebar-tab-link" data-target-tab="tracking-ormas-tab" data-tab-hash="tab-tracking-ormas">
+                        <i class="fa-solid fa-users-viewfinder"></i> Verifikasi Ormas
+                    </a>
+                    <a href="<?= site_url('admin#tab-tracking-rekomendasi') ?>" class="sidebar-link sidebar-tab-link" data-target-tab="tracking-rekomendasi-tab" data-tab-hash="tab-tracking-rekomendasi">
+                        <i class="fa-solid fa-file-signature"></i> Verifikasi Rekomendasi
                     </a>
                     <a href="<?= site_url('admin#tab-gis') ?>" class="sidebar-link sidebar-tab-link" data-target-tab="gis-tab" data-tab-hash="tab-gis">
                         <i class="fa-solid fa-map-location-dot"></i> Peta GIS & Konflik
                     </a>
                     <a href="<?= site_url('admin#tab-pengaduan') ?>" class="sidebar-link sidebar-tab-link" data-target-tab="pengaduan-tab" data-tab-hash="tab-pengaduan">
-                        <i class="fa-solid fa-bullhorn"></i> Pengaduan
+                        <i class="fa-solid fa-bullhorn"></i> Pengaduan Masyarakat
                     </a>
                     <a href="<?= site_url('admin#tab-antrean') ?>" class="sidebar-link sidebar-tab-link" data-target-tab="antrean-tab" data-tab-hash="tab-antrean">
                         <i class="fa-solid fa-ticket"></i> Antrean MPP

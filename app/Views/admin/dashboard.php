@@ -241,7 +241,10 @@
         <button class="nav-link" id="parpol-tab" data-bs-toggle="tab" data-bs-target="#tab-parpol" type="button" role="tab"><i class="fa-solid fa-building-flag me-2"></i>Partai Politik</button>
     </li>
     <li class="nav-item">
-        <button class="nav-link" id="tracking-tab" data-bs-toggle="tab" data-bs-target="#tab-tracking" type="button" role="tab"><i class="fa-solid fa-route me-2"></i>Tracking Berkas</button>
+        <button class="nav-link" id="tracking-ormas-tab" data-bs-toggle="tab" data-bs-target="#tab-tracking-ormas" type="button" role="tab"><i class="fa-solid fa-users-viewfinder me-2"></i>Verifikasi Ormas</button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" id="tracking-rekomendasi-tab" data-bs-toggle="tab" data-bs-target="#tab-tracking-rekomendasi" type="button" role="tab"><i class="fa-solid fa-file-signature me-2"></i>Verifikasi Rekomendasi</button>
     </li>
     <li class="nav-item">
         <button class="nav-link" id="gis-tab" data-bs-toggle="tab" data-bs-target="#tab-gis" type="button" role="tab"><i class="fa-solid fa-map-location-dot me-2"></i>Peta GIS & Konflik</button>
@@ -491,255 +494,164 @@
             </div>
         </div>
     </div>
-    <!-- Tab 3: Tracking Berkas (Table View Only) -->
-    <div class="tab-pane fade" id="tab-tracking" role="tabpanel">
+    <!-- Tab 3a: Verifikasi Ormas -->
+    <div class="tab-pane fade" id="tab-tracking-ormas" role="tabpanel">
         <div class="glass-card p-4">
-            <style>
-                #trackingSubTabs .nav-link.active {
-                    background: var(--primary-grad) !important;
-                    color: #fff !important;
-                }
-                #trackingSubTabs .nav-link {
-                    color: var(--text-muted);
-                    transition: all 0.2s;
-                }
-                #trackingSubTabs .nav-link:hover {
-                    color: var(--text-main);
-                }
-            </style>
             <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3 pb-3 border-bottom" style="border-color: var(--border-color) !important;">
                 <div>
-                    <h4 class="text-white mb-1"><i class="fa-solid fa-route text-info me-2"></i>Pelacakan Progres Dokumen Layanan</h4>
-                    <p class="text-muted small mb-0">Kelola dan pantau seluruh ajuan dokumen layanan pendaftaran ormas, rekomendasi kegiatan, serta laporan aduan masyarakat.</p>
+                    <h4 class="text-white mb-1"><i class="fa-solid fa-users-viewfinder text-primary me-2"></i>Verifikasi Pendaftaran Ormas</h4>
+                    <p class="text-muted small mb-0">Kelola dan verifikasi berkas ajuan pendaftaran Ormas baru tingkat Kabupaten.</p>
                 </div>
-                <!-- Sub Tabs Navigation -->
-                <ul class="nav nav-pills gap-2 bg-black bg-opacity-25 p-1 rounded" id="trackingSubTabs" role="tablist" style="border: 1px solid var(--border-color);">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active btn-sm fw-bold px-3 py-1.5" id="track-ormas-tab" data-bs-toggle="pill" data-bs-target="#sub-track-ormas" type="button" role="tab" aria-controls="sub-track-ormas" aria-selected="true">
-                            <i class="fa-solid fa-users me-1.5 text-primary"></i> Pendaftaran Ormas
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link btn-sm fw-bold px-3 py-1.5" id="track-rek-tab" data-bs-toggle="pill" data-bs-target="#sub-track-rek" type="button" role="tab" aria-controls="sub-track-rek" aria-selected="false">
-                            <i class="fa-solid fa-calendar-check me-1.5 text-warning"></i> Rekomendasi Kegiatan
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link btn-sm fw-bold px-3 py-1.5" id="track-aduan-tab" data-bs-toggle="pill" data-bs-target="#sub-track-aduan" type="button" role="tab" aria-controls="sub-track-aduan" aria-selected="false">
-                            <i class="fa-solid fa-bullhorn me-1.5 text-danger"></i> Aduan Masyarakat
-                        </button>
-                    </li>
-                </ul>
             </div>
 
-            <div class="tab-content" id="trackingSubTabsContent">
-                <!-- Pane 1: Pendaftaran Ormas -->
-                <div class="tab-pane fade show active" id="sub-track-ormas" role="tabpanel" aria-labelledby="track-ormas-tab">
-                    <div class="table-responsive">
-                        <table class="table table-custom rounded overflow-hidden" style="font-size: 0.85rem;">
-                            <thead>
+            <div class="table-responsive">
+                <table class="table table-custom rounded overflow-hidden" style="font-size: 0.85rem;">
+                    <thead>
+                        <tr>
+                            <th class="text-center" style="width: 5%;">#</th>
+                            <th style="width: 35%;">Nama Ormas</th>
+                            <th class="text-center" style="width: 15%;">No. Registrasi</th>
+                            <th class="text-center" style="width: 15%;">Tanggal Masuk</th>
+                            <th class="text-center" style="width: 15%;">Status / Progres</th>
+                            <th class="text-center" style="width: 15%;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (empty($pendaftaran)): ?>
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">Belum ada pengajuan Ormas masuk.</td>
+                            </tr>
+                        <?php else: ?>
+                            <?php foreach ($pendaftaran as $idx => $p): ?>
                                 <tr>
-                                    <th class="text-center" style="width: 5%;">#</th>
-                                    <th style="width: 35%;">Nama Ormas</th>
-                                    <th class="text-center" style="width: 15%;">No. Registrasi</th>
-                                    <th class="text-center" style="width: 15%;">Tanggal Masuk</th>
-                                    <th class="text-center" style="width: 15%;">Status / Progres</th>
-                                    <th class="text-center" style="width: 15%;">Aksi</th>
+                                    <td class="text-center align-middle"><?= $idx + 1 ?></td>
+                                    <td class="align-middle">
+                                        <div class="fw-bold text-main"><?= esc($p['nama_ormas']) ?></div>
+                                        <div class="text-muted small" style="font-size:0.75rem;">Tipe: <?= esc($p['tipe_ormas'] ?? 'Lokal') ?></div>
+                                    </td>
+                                    <td class="text-center align-middle fw-semibold text-warning">
+                                        <?= esc($p['nomor_registrasi']) ?>
+                                    </td>
+                                    <td class="text-center align-middle text-muted small">
+                                        <?= date('d M Y H:i', strtotime($p['created_at'])) ?>
+                                    </td>
+                                    <td class="text-center align-middle">
+                                        <div class="d-flex flex-column align-items-center gap-1">
+                                            <span class="badge bg-light-subtle text-white border border-secondary border-opacity-25 px-2 py-0.5" style="font-size:0.7rem;">
+                                                <?= esc($p['status_verifikasi']) ?>
+                                            </span>
+                                            <span class="badge <?= ($p['progress_percentage'] == 100) ? 'bg-success' : (($p['progress_percentage'] >= 75) ? 'bg-primary' : (($p['progress_percentage'] >= 50) ? 'bg-info' : 'bg-warning')) ?>" style="font-size:0.7rem;">
+                                                Progres: <?= $p['progress_percentage'] ?>%
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td class="text-center align-middle">
+                                        <div class="d-flex justify-content-center gap-1.5">
+                                            <button type="button" class="btn btn-sm btn-info text-white px-2.5 py-1 btn-detail-tracking" 
+                                                    data-type="ormas"
+                                                    data-id="<?= esc($p['id']) ?>"
+                                                    data-registrasi="<?= esc($p['nomor_registrasi']) ?>"
+                                                    data-nama="<?= esc($p['nama_ormas']) ?>"
+                                                    data-alamat="<?= esc($p['alamat']) ?>"
+                                                    data-email="<?= esc($p['email']) ?>"
+                                                    data-telepon="<?= esc($p['telepon']) ?>"
+                                                    data-status="<?= esc($p['status_verifikasi']) ?>"
+                                                    data-progress="<?= esc($p['progress_percentage']) ?>"
+                                                    data-file="<?= esc($p['file_berkas'] ?? '') ?>" 
+                                                    data-tipe-ormas="<?= esc($p['tipe_ormas'] ?? 'Lokal') ?>"
+                                                    data-sk-kepengurusan="<?= !empty($p['tgl_sk_kepengurusan']) ? date('d F Y', strtotime($p['tgl_sk_kepengurusan'])) : '-' ?>" 
+                                                    data-sk-kedaluwarsa="<?= !empty($p['tgl_sk_kedaluwarsa']) ? date('d F Y', strtotime($p['tgl_sk_kedaluwarsa'])) : '-' ?>"
+                                                    data-tanggal="<?= date('d F Y H:i:s', strtotime($p['created_at'])) ?>"
+                                                    data-pengurus="<?= esc($p['pengurus_list'] ?? '[]') ?>">
+                                                <i class="fa-solid fa-list-check me-1"></i> Detail
+                                            </button>
+                                            <form action="<?= base_url('admin/delete-pendaftaran/' . $p['id']) ?>" method="POST" class="d-inline" onsubmit="return confirm('Hapus berkas pendaftaran Ormas ini secara permanen?')">
+                                                <?= csrf_field() ?>
+                                                <button type="submit" class="btn btn-sm btn-outline-danger px-2.5 py-1" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+                                            </form>
+                                        </div>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (empty($pendaftaran)): ?>
-                                    <tr>
-                                        <td colspan="6" class="text-center text-muted py-4">Belum ada pengajuan Ormas masuk.</td>
-                                    </tr>
-                                <?php else: ?>
-                                    <?php foreach ($pendaftaran as $idx => $p): ?>
-                                        <tr>
-                                            <td class="text-center align-middle"><?= $idx + 1 ?></td>
-                                            <td class="align-middle">
-                                                <div class="fw-bold text-main"><?= esc($p['nama_ormas']) ?></div>
-                                                <div class="text-muted small" style="font-size:0.75rem;">Tipe: <?= esc($p['tipe_ormas'] ?? 'Lokal') ?></div>
-                                            </td>
-                                            <td class="text-center align-middle fw-semibold text-warning">
-                                                <?= esc($p['nomor_registrasi']) ?>
-                                            </td>
-                                            <td class="text-center align-middle text-muted small">
-                                                <?= date('d M Y H:i', strtotime($p['created_at'])) ?>
-                                            </td>
-                                            <td class="text-center align-middle">
-                                                <div class="d-flex flex-column align-items-center gap-1">
-                                                    <span class="badge bg-light-subtle text-white border border-secondary border-opacity-25 px-2 py-0.5" style="font-size:0.7rem;">
-                                                        <?= esc($p['status_verifikasi']) ?>
-                                                    </span>
-                                                    <span class="badge <?= ($p['progress_percentage'] == 100) ? 'bg-success' : (($p['progress_percentage'] >= 75) ? 'bg-primary' : (($p['progress_percentage'] >= 50) ? 'bg-info' : 'bg-warning')) ?>" style="font-size:0.7rem;">
-                                                        Progres: <?= $p['progress_percentage'] ?>%
-                                                    </span>
-                                                </div>
-                                            </td>
-                                            <td class="text-center align-middle">
-                                                <div class="d-flex justify-content-center gap-1.5">
-                                                    <button type="button" class="btn btn-sm btn-info text-white px-2.5 py-1 btn-detail-tracking" 
-                                                            data-type="ormas"
-                                                            data-id="<?= esc($p['id']) ?>"
-                                                            data-registrasi="<?= esc($p['nomor_registrasi']) ?>"
-                                                            data-nama="<?= esc($p['nama_ormas']) ?>"
-                                                            data-alamat="<?= esc($p['alamat']) ?>"
-                                                            data-email="<?= esc($p['email']) ?>"
-                                                            data-telepon="<?= esc($p['telepon']) ?>"
-                                                            data-status="<?= esc($p['status_verifikasi']) ?>"
-                                                            data-progress="<?= esc($p['progress_percentage']) ?>"
-                                                            data-file="<?= esc($p['file_berkas'] ?? '') ?>" 
-                                                            data-tipe-ormas="<?= esc($p['tipe_ormas'] ?? 'Lokal') ?>"
-                                                            data-sk-kepengurusan="<?= !empty($p['tgl_sk_kepengurusan']) ? date('d F Y', strtotime($p['tgl_sk_kepengurusan'])) : '-' ?>" 
-                                                            data-sk-kedaluwarsa="<?= !empty($p['tgl_sk_kedaluwarsa']) ? date('d F Y', strtotime($p['tgl_sk_kedaluwarsa'])) : '-' ?>"
-                                                            data-tanggal="<?= date('d F Y H:i:s', strtotime($p['created_at'])) ?>"
-                                                            data-pengurus="<?= esc($p['pengurus_list'] ?? '[]') ?>">
-                                                        <i class="fa-solid fa-list-check me-1"></i> Detail
-                                                    </button>
-                                                    <form action="<?= base_url('admin/delete-pendaftaran/' . $p['id']) ?>" method="POST" class="d-inline" onsubmit="return confirm('Hapus berkas pendaftaran Ormas ini secara permanen?')">
-                                                        <?= csrf_field() ?>
-                                                        <button type="submit" class="btn btn-sm btn-outline-danger px-2.5 py-1" title="Hapus"><i class="fa-solid fa-trash"></i></button>
-                                                    </form>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-                <!-- Pane 2: Rekomendasi Kegiatan -->
-                <div class="tab-pane fade" id="sub-track-rek" role="tabpanel" aria-labelledby="track-rek-tab">
-                    <div class="table-responsive">
-                        <table class="table table-custom rounded overflow-hidden" style="font-size: 0.85rem;">
-                            <thead>
-                                <tr>
-                                    <th class="text-center" style="width: 5%;">#</th>
-                                    <th style="width: 35%;">Pemohon / Lembaga</th>
-                                    <th style="width: 25%;">Nama Kegiatan</th>
-                                    <th class="text-center" style="width: 15%;">Tanggal Masuk</th>
-                                    <th class="text-center" style="width: 10%;">Status</th>
-                                    <th class="text-center" style="width: 15%;">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (empty($rekomendasi)): ?>
-                                    <tr>
-                                        <td colspan="6" class="text-center text-muted py-4">Belum ada pengajuan rekomendasi kegiatan masuk.</td>
-                                    </tr>
-                                <?php else: ?>
-                                    <?php foreach ($rekomendasi as $idx => $r): ?>
-                                        <tr>
-                                            <td class="text-center align-middle"><?= $idx + 1 ?></td>
-                                            <td class="align-middle fw-bold text-main">
-                                                <?= esc($r['pemohon']) ?>
-                                            </td>
-                                            <td class="align-middle text-warning small">
-                                                <?= esc($r['nama_kegiatan']) ?>
-                                            </td>
-                                            <td class="text-center align-middle text-muted small">
-                                                <?= date('d M Y H:i', strtotime($r['created_at'])) ?>
-                                            </td>
-                                            <td class="text-center align-middle">
-                                                <span class="badge <?= ($r['status_rekomendasi'] === 'Approved') ? 'bg-success-subtle text-success' : (($r['status_rekomendasi'] === 'Rejected') ? 'bg-danger-subtle text-danger' : 'bg-warning-subtle text-warning') ?> border px-2 py-0.5" style="font-size:0.7rem;">
-                                                    <?= esc($r['status_rekomendasi']) ?>
-                                                </span>
-                                            </td>
-                                            <td class="text-center align-middle">
-                                                <div class="d-flex justify-content-center gap-1.5">
-                                                    <button type="button" class="btn btn-sm btn-info text-white px-2.5 py-1 btn-detail-tracking" 
-                                                            data-type="rekomendasi"
-                                                            data-id="<?= esc($r['id']) ?>"
-                                                            data-nama="<?= esc($r['pemohon']) ?>"
-                                                            data-kegiatan="<?= esc($r['nama_kegiatan']) ?>"
-                                                            data-deskripsi="<?= esc($r['deskripsi'] ?? '-') ?>"
-                                                            data-status="<?= esc($r['status_rekomendasi']) ?>"
-                                                            data-file="<?= esc($r['file_proposal'] ?? '') ?>" 
-                                                            data-mulai="<?= date('d F Y', strtotime($r['tgl_mulai'])) ?>" 
-                                                            data-selesai="<?= date('d F Y', strtotime($r['tgl_selesai'])) ?>"
-                                                            data-tte="<?= esc($r['pdf_tte_path'] ?? '') ?>"
-                                                            data-tanggal="<?= date('d F Y H:i:s', strtotime($r['created_at'])) ?>">
-                                                        <i class="fa-solid fa-list-check me-1"></i> Detail
-                                                    </button>
-                                                    <form action="<?= base_url('admin/delete-rekomendasi/' . $r['id']) ?>" method="POST" class="d-inline" onsubmit="return confirm('Hapus berkas rekomendasi kegiatan ini secara permanen?')">
-                                                        <?= csrf_field() ?>
-                                                        <button type="submit" class="btn btn-sm btn-outline-danger px-2.5 py-1" title="Hapus"><i class="fa-solid fa-trash"></i></button>
-                                                    </form>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
+    <!-- Tab 3b: Verifikasi Rekomendasi Kegiatan -->
+    <div class="tab-pane fade" id="tab-tracking-rekomendasi" role="tabpanel">
+        <div class="glass-card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3 pb-3 border-bottom" style="border-color: var(--border-color) !important;">
+                <div>
+                    <h4 class="text-white mb-1"><i class="fa-solid fa-file-signature text-warning me-2"></i>Verifikasi Rekomendasi Kegiatan</h4>
+                    <p class="text-muted small mb-0">Kelola dan verifikasi berkas permohonan surat rekomendasi kegiatan masyarakat.</p>
                 </div>
+            </div>
 
-                <!-- Pane 3: Aduan Masyarakat -->
-                <div class="tab-pane fade" id="sub-track-aduan" role="tabpanel" aria-labelledby="track-aduan-tab">
-                    <div class="table-responsive">
-                        <table class="table table-custom rounded overflow-hidden" style="font-size: 0.85rem;">
-                            <thead>
+            <div class="table-responsive">
+                <table class="table table-custom rounded overflow-hidden" style="font-size: 0.85rem;">
+                    <thead>
+                        <tr>
+                            <th class="text-center" style="width: 5%;">#</th>
+                            <th style="width: 35%;">Pemohon / Lembaga</th>
+                            <th style="width: 25%;">Nama Kegiatan</th>
+                            <th class="text-center" style="width: 15%;">Tanggal Masuk</th>
+                            <th class="text-center" style="width: 10%;">Status</th>
+                            <th class="text-center" style="width: 15%;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (empty($rekomendasi)): ?>
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">Belum ada pengajuan rekomendasi kegiatan masuk.</td>
+                            </tr>
+                        <?php else: ?>
+                            <?php foreach ($rekomendasi as $idx => $r): ?>
                                 <tr>
-                                    <th class="text-center" style="width: 5%;">#</th>
-                                    <th style="width: 35%;">Judul Laporan</th>
-                                    <th class="text-center" style="width: 20%;">Kategori</th>
-                                    <th class="text-center" style="width: 15%;">Tanggal Masuk</th>
-                                    <th class="text-center" style="width: 15%;">Status</th>
-                                    <th class="text-center" style="width: 10%;">Aksi</th>
+                                    <td class="text-center align-middle"><?= $idx + 1 ?></td>
+                                    <td class="align-middle fw-bold text-main">
+                                        <?= esc($r['pemohon']) ?>
+                                    </td>
+                                    <td class="align-middle text-warning small">
+                                        <?= esc($r['nama_kegiatan']) ?>
+                                    </td>
+                                    <td class="text-center align-middle text-muted small">
+                                        <?= date('d M Y H:i', strtotime($r['created_at'])) ?>
+                                    </td>
+                                    <td class="text-center align-middle">
+                                        <span class="badge <?= ($r['status_rekomendasi'] === 'Approved') ? 'bg-success-subtle text-success' : (($r['status_rekomendasi'] === 'Rejected') ? 'bg-danger-subtle text-danger' : 'bg-warning-subtle text-warning') ?> border px-2 py-0.5" style="font-size:0.7rem;">
+                                            <?= esc($r['status_rekomendasi']) ?>
+                                        </span>
+                                    </td>
+                                    <td class="text-center align-middle">
+                                        <div class="d-flex justify-content-center gap-1.5">
+                                            <button type="button" class="btn btn-sm btn-info text-white px-2.5 py-1 btn-detail-tracking" 
+                                                    data-type="rekomendasi"
+                                                    data-id="<?= esc($r['id']) ?>"
+                                                    data-nama="<?= esc($r['pemohon']) ?>"
+                                                    data-kegiatan="<?= esc($r['nama_kegiatan']) ?>"
+                                                    data-deskripsi="<?= esc($r['deskripsi'] ?? '-') ?>"
+                                                    data-status="<?= esc($r['status_rekomendasi']) ?>"
+                                                    data-file="<?= esc($r['file_proposal'] ?? '') ?>" 
+                                                    data-mulai="<?= date('d F Y', strtotime($r['tgl_mulai'])) ?>" 
+                                                    data-selesai="<?= date('d F Y', strtotime($r['tgl_selesai'])) ?>"
+                                                    data-tte="<?= esc($r['pdf_tte_path'] ?? '') ?>"
+                                                    data-tanggal="<?= date('d F Y H:i:s', strtotime($r['created_at'])) ?>">
+                                                <i class="fa-solid fa-list-check me-1"></i> Detail
+                                            </button>
+                                            <form action="<?= base_url('admin/delete-rekomendasi/' . $r['id']) ?>" method="POST" class="d-inline" onsubmit="return confirm('Hapus berkas rekomendasi kegiatan ini secara permanen?')">
+                                                <?= csrf_field() ?>
+                                                <button type="submit" class="btn btn-sm btn-outline-danger px-2.5 py-1" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+                                            </form>
+                                        </div>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (empty($pengaduan)): ?>
-                                    <tr>
-                                        <td colspan="6" class="text-center text-muted py-4">Belum ada aduan masyarakat masuk.</td>
-                                    </tr>
-                                <?php else: ?>
-                                    <?php foreach ($pengaduan as $idx => $ad): 
-                                        $det = json_decode($ad['after_data'], true) ?? []; ?>
-                                        <tr>
-                                            <td class="text-center align-middle"><?= $idx + 1 ?></td>
-                                            <td class="align-middle fw-bold text-main">
-                                                <?= esc($det['judul'] ?? 'Aduan Anonim') ?>
-                                            </td>
-                                            <td class="text-center align-middle small text-warning">
-                                                <?= esc(ucfirst($det['kategori'] ?? 'Lainnya')) ?>
-                                            </td>
-                                            <td class="text-center align-middle text-muted small">
-                                                <?= date('d M Y H:i', strtotime($ad['created_at'])) ?>
-                                            </td>
-                                            <td class="text-center align-middle">
-                                                <span class="badge bg-success-subtle text-success px-2 py-0.5" style="font-size:0.7rem;">Selesai</span>
-                                            </td>
-                                            <td class="text-center align-middle">
-                                                <div class="d-flex justify-content-center gap-1.5">
-                                                    <button type="button" class="btn btn-sm btn-info text-white px-2.5 py-1 btn-detail-tracking" 
-                                                            data-type="aduan"
-                                                            data-id="<?= esc($ad['id']) ?>"
-                                                            data-nama="Anonim / Pelapor"
-                                                            data-judul="<?= esc($det['judul'] ?? 'Tanpa Judul') ?>"
-                                                            data-kategori="<?= esc($det['kategori'] ?? 'Lainnya') ?>"
-                                                            data-bidang="<?= esc($det['nama_bidang'] ?? 'Umum') ?>"
-                                                            data-deskripsi="<?= esc($det['deskripsi'] ?? '-') ?>"
-                                                            data-file="<?= esc($det['berkas'] ?? '') ?>"
-                                                            data-tanggal="<?= date('d F Y H:i:s', strtotime($ad['created_at'])) ?>">
-                                                        <i class="fa-solid fa-list-check me-1"></i> Detail
-                                                    </button>
-                                                    <form action="<?= base_url('admin/delete-pengaduan/' . $ad['id']) ?>" method="POST" class="d-inline" onsubmit="return confirm('Hapus laporan pengaduan ini secara permanen?')">
-                                                        <?= csrf_field() ?>
-                                                        <button type="submit" class="btn btn-sm btn-outline-danger px-2.5 py-1" title="Hapus"><i class="fa-solid fa-trash"></i></button>
-                                                    </form>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
