@@ -1484,6 +1484,8 @@
                                                     <th>Jabatan</th>
                                                     <th>Nama Lengkap</th>
                                                     <th>Kontak HP</th>
+                                                    <th class="text-center">Berkas KTP</th>
+                                                    <th class="text-center">Pasfoto 4x6</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="dt-pengurus-body">
@@ -2453,18 +2455,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 const pBody = document.getElementById('dt-pengurus-body');
                 pBody.innerHTML = '';
                 if (pengurusList.length > 0) {
-                    pengurusList.forEach(p => {
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td class="text-white">${p.jabatan}</td>
-                            <td class="text-white">${p.nama}</td>
-                            <td class="text-white">${p.no_hp || '-'}</td>
-                        `;
-                        pBody.appendChild(tr);
-                    });
-                } else {
-                    pBody.innerHTML = `<tr><td colspan="3" class="text-center text-muted">Belum ada pengurus diisi</td></tr>`;
-                }
+                     pengurusList.forEach(p => {
+                         const tr = document.createElement('tr');
+                         let ktpLink = p.file_ktp 
+                             ? `<a href="<?= base_url('uploads/ormas/') ?>/${p.file_ktp}" target="_blank" class="btn btn-xs btn-outline-info py-0.5 px-2" style="font-size: 10px; border-radius: 4px;"><i class="fa-solid fa-file-arrow-down me-1"></i>KTP</a>` 
+                             : `<span class="text-muted small">Kosong</span>`;
+                         let pasfotoLink = p.file_pasfoto 
+                             ? `<a href="<?= base_url('uploads/ormas/') ?>/${p.file_pasfoto}" target="_blank" class="btn btn-xs btn-outline-info py-0.5 px-2" style="font-size: 10px; border-radius: 4px;"><i class="fa-solid fa-image me-1"></i>Foto</a>` 
+                             : `<span class="text-muted small">Kosong</span>`;
+
+                         tr.innerHTML = `
+                             <td class="text-white">${p.jabatan}</td>
+                             <td class="text-white">${p.nama}</td>
+                             <td class="text-white">${p.no_hp || '-'}</td>
+                             <td class="text-center">${ktpLink}</td>
+                             <td class="text-center">${pasfotoLink}</td>
+                         `;
+                         pBody.appendChild(tr);
+                     });
+                 } else {
+                     pBody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">Belum ada pengurus diisi</td></tr>`;
+                 }
 
                 // Hide unused rows
                 document.getElementById('row-dt-kegiatan').classList.add('d-none');

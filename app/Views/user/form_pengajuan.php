@@ -292,13 +292,15 @@ $requirementsBerjenjang = [
                 <p class="text-muted small mb-3"><i class="fa-solid fa-circle-info text-info me-1"></i>Masukkan nama pengurus sesuai SK Kepengurusan Anda (minimal Ketua, Sekretaris, Bendahara).</p>
                 
                 <div class="table-responsive mb-4">
-                    <table class="table table-bordered border-secondary border-opacity-10 text-white align-middle" id="table-pengurus">
+                    <table class="table table-bordered border-secondary border-opacity-10 text-white align-middle" id="table-pengurus" style="font-size: 0.85rem;">
                         <thead>
                             <tr style="background: rgba(255, 255, 255, 0.03);">
-                                <th style="width: 30%;">Jabatan <span class="text-danger fw-bold">*</span></th>
-                                <th style="width: 40%;">Nama Lengkap <span class="text-danger fw-bold">*</span></th>
-                                <th style="width: 25%;">No. HP / WhatsApp</th>
-                                <th style="width: 5%;" class="text-center">Aksi</th>
+                                <th style="width: 20%;">Jabatan <span class="text-danger fw-bold">*</span></th>
+                                <th style="width: 25%;">Nama Lengkap <span class="text-danger fw-bold">*</span></th>
+                                <th style="width: 15%;">No. HP / WhatsApp</th>
+                                <th style="width: 18%;">Unggah KTP</th>
+                                <th style="width: 18%;">Pasfoto 4x6</th>
+                                <th style="width: 4%;" class="text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="pengurus-container">
@@ -310,11 +312,15 @@ $requirementsBerjenjang = [
                                 $oldNama = old('pengurus_nama');
                                 $oldJabatan = old('pengurus_jabatan');
                                 $oldNoHp = old('pengurus_no_hp');
+                                $oldKtp = old('pengurus_old_ktp') ?: [];
+                                $oldPasfoto = old('pengurus_old_pasfoto') ?: [];
                                 foreach ($oldNama as $idx => $val) {
                                     $activePengurus[] = [
                                         'nama' => $val,
                                         'jabatan' => $oldJabatan[$idx] ?? '',
-                                        'no_hp' => $oldNoHp[$idx] ?? ''
+                                        'no_hp' => $oldNoHp[$idx] ?? '',
+                                        'file_ktp' => $oldKtp[$idx] ?? '',
+                                        'file_pasfoto' => $oldPasfoto[$idx] ?? ''
                                     ];
                                 }
                             }
@@ -324,7 +330,9 @@ $requirementsBerjenjang = [
                                     $activePengurus[] = [
                                         'nama' => '',
                                         'jabatan' => $jab,
-                                        'no_hp' => ''
+                                        'no_hp' => '',
+                                        'file_ktp' => '',
+                                        'file_pasfoto' => ''
                                     ];
                                 }
                             }
@@ -340,6 +348,38 @@ $requirementsBerjenjang = [
                                 </td>
                                 <td>
                                     <input type="text" name="pengurus_no_hp[]" class="form-control form-control-custom form-control-sm" placeholder="Contoh: 0812..." value="<?= esc($p['no_hp']) ?>">
+                                </td>
+                                <td>
+                                    <input type="hidden" name="pengurus_old_ktp[]" value="<?= esc($p['file_ktp'] ?? '') ?>">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <label class="btn btn-sm btn-outline-secondary mb-0 py-1 px-2 d-flex align-items-center justify-content-center" style="cursor: pointer; font-size: 0.7rem; min-width: 32px; border-color: rgba(255,255,255,0.15) !important;">
+                                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                                            <input type="file" name="pengurus_ktp_<?= $index ?>" class="d-none" accept=".pdf,image/*" onchange="handlePengurusFileChange(this, 'ktp', <?= $index ?>)">
+                                        </label>
+                                        <span class="file-name-ktp-<?= $index ?> small text-success text-truncate d-block" style="max-width: 90px; font-size: 0.72rem;">
+                                            <?php if (!empty($p['file_ktp'])): ?>
+                                                <a href="<?= base_url('uploads/ormas/' . $p['file_ktp']) ?>" target="_blank" class="text-info text-decoration-none" title="Unduh KTP"><i class="fa-solid fa-check text-success me-1"></i>Ada</a>
+                                            <?php else: ?>
+                                                <span class="text-muted text-opacity-50">Kosong</span>
+                                            <?php endif; ?>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <input type="hidden" name="pengurus_old_pasfoto[]" value="<?= esc($p['file_pasfoto'] ?? '') ?>">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <label class="btn btn-sm btn-outline-secondary mb-0 py-1 px-2 d-flex align-items-center justify-content-center" style="cursor: pointer; font-size: 0.7rem; min-width: 32px; border-color: rgba(255,255,255,0.15) !important;">
+                                            <i class="fa-solid fa-image"></i>
+                                            <input type="file" name="pengurus_pasfoto_<?= $index ?>" class="d-none" accept="image/*" onchange="handlePengurusFileChange(this, 'pasfoto', <?= $index ?>)">
+                                        </label>
+                                        <span class="file-name-pasfoto-<?= $index ?> small text-success text-truncate d-block" style="max-width: 90px; font-size: 0.72rem;">
+                                            <?php if (!empty($p['file_pasfoto'])): ?>
+                                                <a href="<?= base_url('uploads/ormas/' . $p['file_pasfoto']) ?>" target="_blank" class="text-info text-decoration-none" title="Unduh Pasfoto"><i class="fa-solid fa-check text-success me-1"></i>Ada</a>
+                                            <?php else: ?>
+                                                <span class="text-muted text-opacity-50">Kosong</span>
+                                            <?php endif; ?>
+                                        </span>
+                                    </div>
                                 </td>
                                 <td class="text-center">
                                     <button type="button" class="btn btn-sm btn-outline-danger border-0 rounded-circle text-danger" onclick="removePengurusRow(this)">
@@ -726,8 +766,8 @@ const requirementsLokal = [
     { name: "NPWP Organisasi", desc: "NPWP atas nama Organisasi", tte: false, template: "" },
     { name: "Formulir Isian Data Ormas", desc: "Formulir Isian Data Ormas (ditandatangani Ketua & Sekretaris)", tte: true, template: "https://drive.google.com/uc?export=download&id=1XqCYdQYp87AXN4RGMvJqJKslvA05nRNR" },
     { name: "Rekomendasi Kementerian", desc: "Surat Rekomendasi Kementerian Agama (Ormas Agama) / Kebudayaan", tte: true, template: "" },
-    { name: "Biodata & KTP Pengurus", desc: "Biodata & KTP Pengurus (Ketua, Sekretaris, Bendahara)", tte: false, template: "" },
-    { name: "Pasfoto Pengurus", desc: "Pasfoto Pengurus 4x6 cm 2 Lembar (Latar Merah)", tte: false, template: "" },
+    { name: "Biodata & KTP Pengurus", desc: "Biodata & KTP Pengurus (Ketua, Sekretaris, Bendahara)", tte: false, template: "", isPengurus: true },
+    { name: "Pasfoto Pengurus", desc: "Pasfoto Pengurus 4x6 cm 2 Lembar (Latar Merah)", tte: false, template: "", isPengurus: true },
     { name: "SK & Foto Sekretariat", desc: "SK Pengurus & Foto Sekretariat (Tampak depan menampilkan Papan Nama)", tte: false, template: "" },
     { name: "Kontrak/Izin Pakai Gedung", desc: "Surat Perjanjian Kontrak/Izin Pakai Gedung dari Pemilik Gedung", tte: true, template: "" },
     { name: "Rekening & Logo Organisasi", desc: "Nomor Rekening Organisasi & File Logo Organisasi", tte: false, template: "" }
@@ -738,8 +778,8 @@ const requirementsBerjenjang = [
     { name: "Surat Pernyataan Resmi", desc: "Surat Pernyataan Resmi (Meterai Rp 10.000)", tte: true, template: "https://drive.google.com/uc?export=download&id=1UX2CJCfXpWZUix7o-j3jY9cld63dX7KS" },
     { name: "Surat Keterangan Domisili", desc: "Surat Keterangan Domisili (Alamat domisili kop surat & sekretariat)", tte: true, template: "" },
     { name: "Formulir Isian Data Ormas", desc: "Formulir Isian Data Ormas (ditandatangani Ketua & Sekretaris)", tte: true, template: "https://drive.google.com/uc?export=download&id=1UX2CJCfXpWZUix7o-j3jY9cld63dX7KS" },
-    { name: "Pasfoto Pengurus", desc: "Pasfoto Pengurus ukuran 4x6 cm sebanyak 2 lembar", tte: false, template: "" },
-    { name: "Fotokopi KTP Pengurus", desc: "Fotokopi KTP Pengurus (Ketua, Sekretaris, Bendahara)", tte: false, template: "" },
+    { name: "Pasfoto Pengurus", desc: "Pasfoto Pengurus ukuran 4x6 cm sebanyak 2 lembar", tte: false, template: "", isPengurus: true },
+    { name: "Fotokopi KTP Pengurus", desc: "Fotokopi KTP Pengurus (Ketua, Sekretaris, Bendahara)", tte: false, template: "", isPengurus: true },
     { name: "Surat Keputusan (SK) Pengurus", desc: "Surat Keputusan (SK) Pengurus Organisasi", tte: false, template: "" },
     { name: "Foto Sekretariat", desc: "Foto Sekretariat (Tampak depan menampilkan Papan Nama resmi)", tte: false, template: "" }
 ];
@@ -763,6 +803,7 @@ function renderValidationTable(tipe) {
     const activeReqs = tipe === 'Lokal' ? requirementsLokal : requirementsBerjenjang;
 
     activeReqs.forEach((req, idx) => {
+        if (req.isPengurus) return; // Skip rendering
         const fileIdx = idx + 1;
         const exist = existingFiles[fileIdx] || null;
         
@@ -803,8 +844,51 @@ function renderValidationTable(tipe) {
     });
 }
 
+function handlePengurusFileChange(input, type, index) {
+    const span = document.querySelector(`.file-name-${type}-${index}`);
+    if (span) {
+        if (input.files && input.files[0]) {
+            span.innerHTML = `<span class="text-success fw-bold"><i class="fa-solid fa-check"></i> ${input.files[0].name.substring(0, 8)}${input.files[0].name.length > 8 ? '...' : ''}</span>`;
+        } else {
+            span.innerHTML = `<span class="text-muted text-opacity-50">Kosong</span>`;
+        }
+    }
+}
+
+function reindexPengurusRows() {
+    const container = document.getElementById('pengurus-container');
+    if (!container) return;
+    const rows = container.querySelectorAll('.pengurus-row');
+    rows.forEach((row, idx) => {
+        // Update input type=file names
+        const ktpInput = row.querySelector('input[type="file"][name^="pengurus_ktp_"]');
+        if (ktpInput) {
+            ktpInput.name = `pengurus_ktp_${idx}`;
+            ktpInput.setAttribute('onchange', `handlePengurusFileChange(this, 'ktp', ${idx})`);
+        }
+        
+        const pasfotoInput = row.querySelector('input[type="file"][name^="pengurus_pasfoto_"]');
+        if (pasfotoInput) {
+            pasfotoInput.name = `pengurus_pasfoto_${idx}`;
+            pasfotoInput.setAttribute('onchange', `handlePengurusFileChange(this, 'pasfoto', ${idx})`);
+        }
+
+        // Update spans classes for filename mapping
+        const ktpSpan = row.querySelector('span[class^="file-name-ktp-"]');
+        if (ktpSpan) {
+            ktpSpan.className = `file-name-ktp-${idx} small text-success text-truncate d-block`;
+        }
+        
+        const pasfotoSpan = row.querySelector('span[class^="file-name-pasfoto-"]');
+        if (pasfotoSpan) {
+            pasfotoSpan.className = `file-name-pasfoto-${idx} small text-success text-truncate d-block`;
+        }
+    });
+}
+
 function addPengurusRow() {
     const container = document.getElementById('pengurus-container');
+    const index = container.querySelectorAll('.pengurus-row').length;
     const tr = document.createElement('tr');
     tr.className = 'pengurus-row';
     tr.innerHTML = `
@@ -817,6 +901,26 @@ function addPengurusRow() {
         <td>
             <input type="text" name="pengurus_no_hp[]" class="form-control form-control-custom form-control-sm" placeholder="Contoh: 0812...">
         </td>
+        <td>
+            <input type="hidden" name="pengurus_old_ktp[]" value="">
+            <div class="d-flex align-items-center gap-2">
+                <label class="btn btn-sm btn-outline-secondary mb-0 py-1 px-2 d-flex align-items-center justify-content-center" style="cursor: pointer; font-size: 0.7rem; min-width: 32px; border-color: rgba(255,255,255,0.15) !important;">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <input type="file" name="pengurus_ktp_${index}" class="d-none" accept=".pdf,image/*" onchange="handlePengurusFileChange(this, 'ktp', ${index})">
+                </label>
+                <span class="file-name-ktp-${index} small text-success text-truncate d-block" style="max-width: 90px; font-size: 0.72rem;"><span class="text-muted text-opacity-50">Kosong</span></span>
+            </div>
+        </td>
+        <td>
+            <input type="hidden" name="pengurus_old_pasfoto[]" value="">
+            <div class="d-flex align-items-center gap-2">
+                <label class="btn btn-sm btn-outline-secondary mb-0 py-1 px-2 d-flex align-items-center justify-content-center" style="cursor: pointer; font-size: 0.7rem; min-width: 32px; border-color: rgba(255,255,255,0.15) !important;">
+                    <i class="fa-solid fa-image"></i>
+                    <input type="file" name="pengurus_pasfoto_${index}" class="d-none" accept="image/*" onchange="handlePengurusFileChange(this, 'pasfoto', ${index})">
+                </label>
+                <span class="file-name-pasfoto-${index} small text-success text-truncate d-block" style="max-width: 90px; font-size: 0.72rem;"><span class="text-muted text-opacity-50">Kosong</span></span>
+            </div>
+        </td>
         <td class="text-center">
             <button type="button" class="btn btn-sm btn-outline-danger border-0 rounded-circle text-danger" onclick="removePengurusRow(this)">
                 <i class="fa-solid fa-trash-can"></i>
@@ -824,6 +928,7 @@ function addPengurusRow() {
         </td>
     `;
     container.appendChild(tr);
+    reindexPengurusRows();
 }
 
 function removePengurusRow(btn) {
@@ -833,6 +938,7 @@ function removePengurusRow(btn) {
         return;
     }
     btn.closest('tr').remove();
+    reindexPengurusRows();
 }
 
 function toggleOrmasRequirements(value) {

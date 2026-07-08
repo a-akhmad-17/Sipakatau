@@ -256,6 +256,7 @@ class User extends BaseController
                 $pengurusNames = $this->request->getPost('pengurus_nama') ?: [];
                 $pengurusJabatans = $this->request->getPost('pengurus_jabatan') ?: [];
                 $pengurusPhones = $this->request->getPost('pengurus_no_hp') ?: [];
+                
                 foreach ($pengurusNames as $index => $name) {
                     if (!empty($name)) {
                         $pengurusId = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x', 
@@ -263,14 +264,33 @@ class User extends BaseController
                             mt_rand(0, 0x0fff) | 0x4000, mt_rand(0, 0x3fff) | 0x8000, 
                             mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
                         );
+
+                        // Process KTP file
+                        $ktpFilename = null;
+                        $fileKtp = $this->request->getFile('pengurus_ktp_' . $index);
+                        if ($fileKtp && $fileKtp->isValid() && !$fileKtp->hasMoved()) {
+                            $ktpFilename = $fileKtp->getRandomName();
+                            $fileKtp->move($destination, $ktpFilename);
+                        }
+
+                        // Process Pasfoto file
+                        $pasfotoFilename = null;
+                        $filePasfoto = $this->request->getFile('pengurus_pasfoto_' . $index);
+                        if ($filePasfoto && $filePasfoto->isValid() && !$filePasfoto->hasMoved()) {
+                            $pasfotoFilename = $filePasfoto->getRandomName();
+                            $filePasfoto->move($destination, $pasfotoFilename);
+                        }
+
                         $this->db->table('mst_ormas_pengurus')->insert([
-                            'id'         => $pengurusId,
-                            'ormas_id'   => $ormasId,
-                            'nama'       => $name,
-                            'jabatan'    => $pengurusJabatans[$index] ?? '',
-                            'no_hp'      => $pengurusPhones[$index] ?? '',
-                            'created_at' => date('Y-m-d H:i:s'),
-                            'updated_at' => date('Y-m-d H:i:s'),
+                            'id'           => $pengurusId,
+                            'ormas_id'     => $ormasId,
+                            'nama'         => $name,
+                            'jabatan'      => $pengurusJabatans[$index] ?? '',
+                            'no_hp'        => $pengurusPhones[$index] ?? '',
+                            'file_ktp'     => $ktpFilename,
+                            'file_pasfoto' => $pasfotoFilename,
+                            'created_at'   => date('Y-m-d H:i:s'),
+                            'updated_at'   => date('Y-m-d H:i:s'),
                         ]);
                     }
                 }
@@ -302,10 +322,23 @@ class User extends BaseController
                 ]);
 
                 // Update Kepengurusan
+                $oldPengurus = $this->db->table('mst_ormas_pengurus')->where('ormas_id', $ormasId)->get()->getResultArray();
+                $oldFilesMap = [];
+                foreach ($oldPengurus as $op) {
+                    $oldFilesMap[$op['id']] = [
+                        'file_ktp' => $op['file_ktp'],
+                        'file_pasfoto' => $op['file_pasfoto']
+                    ];
+                }
+
                 $this->db->table('mst_ormas_pengurus')->where('ormas_id', $ormasId)->delete();
+
                 $pengurusNames = $this->request->getPost('pengurus_nama') ?: [];
                 $pengurusJabatans = $this->request->getPost('pengurus_jabatan') ?: [];
                 $pengurusPhones = $this->request->getPost('pengurus_no_hp') ?: [];
+                $pengurusOldKtp = $this->request->getPost('pengurus_old_ktp') ?: [];
+                $pengurusOldPasfoto = $this->request->getPost('pengurus_old_pasfoto') ?: [];
+
                 foreach ($pengurusNames as $index => $name) {
                     if (!empty($name)) {
                         $pengurusId = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x', 
@@ -313,14 +346,39 @@ class User extends BaseController
                             mt_rand(0, 0x0fff) | 0x4000, mt_rand(0, 0x3fff) | 0x8000, 
                             mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
                         );
+
+                        // Process KTP file
+                        $ktpFilename = $pengurusOldKtp[$index] ?? null;
+                        $fileKtp = $this->request->getFile('pengurus_ktp_' . $index);
+                        if ($fileKtp && $fileKtp->isValid() && !$fileKtp->hasMoved()) {
+                            if ($ktpFilename) {
+                                @unlink($destination . '/' . $ktpFilename);
+                            }
+                            $ktpFilename = $fileKtp->getRandomName();
+                            $fileKtp->move($destination, $ktpFilename);
+                        }
+
+                        // Process Pasfoto file
+                        $pasfotoFilename = $pengurusOldPasfoto[$index] ?? null;
+                        $filePasfoto = $this->request->getFile('pengurus_pasfoto_' . $index);
+                        if ($filePasfoto && $filePasfoto->isValid() && !$filePasfoto->hasMoved()) {
+                            if ($pasfotoFilename) {
+                                @unlink($destination . '/' . $pasfotoFilename);
+                            }
+                            $pasfotoFilename = $filePasfoto->getRandomName();
+                            $filePasfoto->move($destination, $pasfotoFilename);
+                        }
+
                         $this->db->table('mst_ormas_pengurus')->insert([
-                            'id'         => $pengurusId,
-                            'ormas_id'   => $ormasId,
-                            'nama'       => $name,
-                            'jabatan'    => $pengurusJabatans[$index] ?? '',
-                            'no_hp'      => $pengurusPhones[$index] ?? '',
-                            'created_at' => date('Y-m-d H:i:s'),
-                            'updated_at' => date('Y-m-d H:i:s'),
+                            'id'           => $pengurusId,
+                            'ormas_id'     => $ormasId,
+                            'nama'         => $name,
+                            'jabatan'      => $pengurusJabatans[$index] ?? '',
+                            'no_hp'        => $pengurusPhones[$index] ?? '',
+                            'file_ktp'     => $ktpFilename,
+                            'file_pasfoto' => $pasfotoFilename,
+                            'created_at'   => date('Y-m-d H:i:s'),
+                            'updated_at'   => date('Y-m-d H:i:s'),
                         ]);
                     }
                 }
