@@ -328,10 +328,14 @@
                     <!-- Filter Tahun -->
                     <select id="filter-tahun" class="form-select form-control-custom py-1 px-2.5 text-white bg-dark border-secondary border-opacity-25" style="border-radius: 6px; width: 95px; cursor: pointer; font-size: 0.75rem; background-color: rgba(0,0,0,0.5);">
                         <option value="all">Semua Thn</option>
-                        <option value="2024">2024</option>
-                        <option value="2025">2025</option>
-                        <option value="2026" selected>2026</option>
-                        <option value="2027">2027</option>
+                        <?php
+                        $startYear = 2024;
+                        $currentYear = (int)date('Y');
+                        $endYear = $currentYear + 1;
+                        for ($y = $startYear; $y <= $endYear; $y++):
+                        ?>
+                            <option value="<?php echo $y; ?>" <?php echo ($y == $currentYear) ? 'selected' : ''; ?>><?php echo $y; ?></option>
+                        <?php endfor; ?>
                     </select>
                     <!-- Filter Bulan -->
                     <select id="filter-bulan" class="form-select form-control-custom py-1 px-2.5 text-white bg-dark border-secondary border-opacity-25" style="border-radius: 6px; width: 110px; cursor: pointer; font-size: 0.75rem; background-color: rgba(0,0,0,0.5);">

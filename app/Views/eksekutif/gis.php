@@ -84,10 +84,14 @@
             <label for="filter-tahun" class="text-white small mb-0 fw-semibold" style="white-space: nowrap;"><i class="fa-solid fa-calendar me-1 text-danger"></i>Tahun:</label>
             <select id="filter-tahun" class="form-select form-control-custom py-1.5 px-2.5 text-white bg-dark border-secondary border-opacity-25" style="border-radius: 8px; width: 100px; cursor: pointer; border-color: rgba(255,255,255,0.15); background-color: rgba(0,0,0,0.5); font-size: 0.8rem;">
                 <option value="all">Semua</option>
-                <option value="2024">2024</option>
-                <option value="2025">2025</option>
-                <option value="2026" selected>2026</option>
-                <option value="2027">2027</option>
+                <?php
+                $startYear = 2024;
+                $currentYear = (int)date('Y');
+                $endYear = $currentYear + 1;
+                for ($y = $startYear; $y <= $endYear; $y++):
+                ?>
+                    <option value="<?php echo $y; ?>" <?php echo ($y == $currentYear) ? 'selected' : ''; ?>><?php echo $y; ?></option>
+                <?php endfor; ?>
             </select>
         </div>
         <!-- Filter Bulan -->
