@@ -304,7 +304,7 @@
                     <span class="text-muted small me-2"><i class="fa-solid fa-filter me-1"></i>Filter:</span>
                     <button type="button" class="btn btn-sm btn-outline-primary px-3 rounded-pill active btn-filter-pill" data-filter="all">Semua (<span id="count-all">0</span>)</button>
                     <button type="button" class="btn btn-sm btn-outline-success px-3 rounded-pill btn-filter-pill" data-filter="aktif">Aktif (<span id="count-aktif">0</span>)</button>
-                    <button type="button" class="btn btn-sm btn-outline-danger px-3 rounded-pill btn-filter-pill" data-filter="expired">Kedaluwarsa (<span id="count-expired">0</span>)</button>
+                    <button type="button" class="btn btn-sm btn-outline-danger px-3 rounded-pill btn-filter-pill" data-filter="expired">Tidak Aktif (<span id="count-expired">0</span>)</button>
                     <button type="button" class="btn btn-sm btn-outline-warning px-3 rounded-pill btn-filter-pill" data-filter="yayasan">Yayasan (<span id="count-yayasan">0</span>)</button>
                     <button type="button" class="btn btn-sm btn-outline-info px-3 rounded-pill btn-filter-pill" data-filter="lsm">LSM/Lembaga (<span id="count-lsm">0</span>)</button>
                     <button type="button" class="btn btn-sm btn-outline-secondary text-white px-3 rounded-pill btn-filter-pill" data-filter="perkumpulan">Himpunan/Perkumpulan (<span id="count-perkumpulan">0</span>)</button>
@@ -1210,7 +1210,7 @@
                             <input type="date" name="tgl_sk_kepengurusan" id="o_tgl_sk" class="form-control form-control-custom">
                         </div>
                         <div class="col-md-6">
-                            <label for="o_tgl_exp" class="form-label small text-muted">Tanggal Kedaluwarsa SK</label>
+                            <label for="o_tgl_exp" class="form-label small text-muted">Tanggal SK Tidak Aktif</label>
                             <input type="date" name="tgl_sk_kedaluwarsa" id="o_tgl_exp" class="form-control form-control-custom">
                         </div>
                         <div class="col-md-6">
