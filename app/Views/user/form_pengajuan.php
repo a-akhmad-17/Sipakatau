@@ -489,9 +489,9 @@ $requirementsBerjenjang = [
                                                     <div class="d-flex align-items-center gap-1.5">
                                                         <label class="btn btn-xs btn-outline-warning mb-0 py-1 px-2.5 d-flex align-items-center gap-1.5" style="cursor: pointer; font-size: 0.68rem; border-color: rgba(234,179,8,0.3) !important;">
                                                             <i class="fa-solid fa-file-pdf"></i> Pilih Berkas
-                                                            <input type="file" name="pengurus_biodata_<?= $idx ?>" class="d-none" accept=".pdf,.doc,.docx,image/*" onchange="handlePengurusFileChange(this, 'biodata', <?= $idx ?>)">
+                                                            <input type="file" name="pengurus_biodata_<?php echo $idx; ?>" class="d-none" accept=".pdf,.doc,.docx,image/*" onchange="handlePengurusFileChange(this, 'biodata', <?php echo $idx; ?>)">
                                                         </label>
-                                                        <span class="file-name-biodata-<?= $idx ?> small text-success text-truncate d-block" style="max-width: 100px; font-size: 0.68rem;">
+                                                        <span class="file-name-biodata-<?php echo $idx; ?> small text-success text-truncate d-block" style="max-width: 100px; font-size: 0.68rem;">
                                                             <?php if (!empty($p['file_biodata'])): ?>
                                                                 <a href="<?= base_url('uploads/ormas/' . $p['file_biodata']) ?>" target="_blank" class="text-info text-decoration-none" title="Buka Biodata"><i class="fa-solid fa-circle-check text-success"></i> Ada</a>
                                                             <?php else: ?>
@@ -507,9 +507,9 @@ $requirementsBerjenjang = [
                                                     <div class="d-flex align-items-center gap-1.5">
                                                         <label class="btn btn-xs btn-outline-info mb-0 py-1 px-2.5 d-flex align-items-center gap-1.5" style="cursor: pointer; font-size: 0.68rem; border-color: rgba(13,202,240,0.3) !important;">
                                                             <i class="fa-solid fa-id-card"></i> Pilih KTP
-                                                            <input type="file" name="pengurus_ktp_<?= $idx ?>" class="d-none" accept=".pdf,image/*" onchange="handlePengurusFileChange(this, 'ktp', <?= $idx ?>)">
+                                                            <input type="file" name="pengurus_ktp_<?php echo $idx; ?>" class="d-none" accept=".pdf,image/*" onchange="handlePengurusFileChange(this, 'ktp', <?php echo $idx; ?>)">
                                                         </label>
-                                                        <span class="file-name-ktp-<?= $idx ?> small text-success text-truncate d-block" style="max-width: 100px; font-size: 0.68rem;">
+                                                        <span class="file-name-ktp-<?php echo $idx; ?> small text-success text-truncate d-block" style="max-width: 100px; font-size: 0.68rem;">
                                                             <?php if (!empty($p['file_ktp'])): ?>
                                                                 <a href="<?= base_url('uploads/ormas/' . $p['file_ktp']) ?>" target="_blank" class="text-info text-decoration-none" title="Buka KTP"><i class="fa-solid fa-circle-check text-success"></i> Ada</a>
                                                             <?php else: ?>
@@ -525,20 +525,20 @@ $requirementsBerjenjang = [
                                                     <div class="d-flex align-items-center justify-content-center gap-3">
                                                         <div class="position-relative" style="width: 40px; height: 50px; border-radius: 4px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03);">
                                                             <?php if (!empty($p['file_pasfoto'])): ?>
-                                                                <img src="<?= base_url('uploads/ormas/' . $p['file_pasfoto']) ?>" id="avatar-preview-<?= $idx ?>" alt="Foto" style="width: 100%; height: 100%; object-fit: cover;">
+                                                                <img src="<?= base_url('uploads/ormas/' . $p['file_pasfoto']) ?>" id="avatar-preview-<?php echo $idx; ?>" alt="Foto" style="width: 100%; height: 100%; object-fit: cover;">
                                                             <?php else: ?>
-                                                                <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center text-muted text-opacity-30" id="avatar-placeholder-<?= $idx ?>">
+                                                                <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center text-muted text-opacity-30" id="avatar-placeholder-<?php echo $idx; ?>">
                                                                     <i class="fa-solid fa-user-tie" style="font-size: 12px;"></i>
                                                                 </div>
-                                                                <img src="" id="avatar-preview-<?= $idx ?>" alt="Foto" class="d-none" style="width: 100%; height: 100%; object-fit: cover;">
+                                                                <img src="" id="avatar-preview-<?php echo $idx; ?>" alt="Foto" class="d-none" style="width: 100%; height: 100%; object-fit: cover;">
                                                             <?php endif; ?>
                                                             <!-- Hover camera trigger overlay -->
                                                             <label class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-black bg-opacity-65 text-white opacity-0" style="cursor: pointer; transition: opacity 0.2s; font-size: 8px; margin-bottom: 0;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">
                                                                 <i class="fa-solid fa-camera"></i>
-                                                                <input type="file" name="pengurus_pasfoto_<?= $idx ?>" class="d-none" accept="image/*" onchange="handlePasfotoChange(this, <?= $idx ?>)">
+                                                                <input type="file" name="pengurus_pasfoto_<?php echo $idx; ?>" class="d-none" accept="image/*" onchange="handlePasfotoChange(this, <?php echo $idx; ?>)">
                                                             </label>
                                                         </div>
-                                                        <div class="file-name-pasfoto-<?= $idx ?> text-center" style="font-size: 0.68rem;">
+                                                        <div class="file-name-pasfoto-<?php echo $idx; ?> text-center" style="font-size: 0.68rem;">
                                                             <?php if (!empty($p['file_pasfoto'])): ?>
                                                                 <span class="text-success fw-bold"><i class="fa-solid fa-circle-check text-success me-1"></i>Ada</span>
                                                             <?php else: ?>
