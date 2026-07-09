@@ -136,13 +136,13 @@
                     <div class="col-4">
                         <div class="p-1.5 rounded text-center" style="background: var(--card-bg); border: 1px solid var(--border-color);">
                             <div class="text-muted" style="font-size: 0.7rem;">Ormas</div>
-                            <h5 class="text-primary fw-bold mb-0" style="font-size: 1.1rem;"><?= count($ormas) ?></h5>
+                            <h5 class="text-primary fw-bold mb-0" id="count-ormas" style="font-size: 1.1rem;">0</h5>
                         </div>
                     </div>
                     <div class="col-4">
                         <div class="p-1.5 rounded text-center" style="background: var(--card-bg); border: 1px solid var(--border-color);">
                             <div class="text-muted" style="font-size: 0.7rem;">Parpol</div>
-                            <h5 class="text-warning fw-bold mb-0" style="font-size: 1.1rem;"><?= count($parpol) ?></h5>
+                            <h5 class="text-warning fw-bold mb-0" id="count-parpol" style="font-size: 1.1rem;">0</h5>
                         </div>
                     </div>
                     <div class="col-4">
@@ -290,31 +290,9 @@
         L.marker([-5.1326246, 120.2500688], {icon: officeIcon}).addTo(officeGroup)
             .bindPopup('<b>Badan Kesbangpol Sinjai</b><br>Pusat Koordinasi Layanan & Keamanan.');
 
-        // 2. Ormas Markers
-        const ormas = <?= json_encode($ormas ?? []) ?>;
-        ormas.forEach(o => {
-            let coords = (o.latitude && o.longitude) ? [parseFloat(o.latitude), parseFloat(o.longitude)] : getCoordinates(o.id, 'ormas');
-            let marker = L.marker(coords, {icon: ormasIcon}).addTo(ormasGroup)
-                .bindPopup(`<b>Ormas: ${o.nama_ormas}</b><br>Alamat: ${o.alamat}<br>Status: <span class="badge bg-success">${o.status}</span>`);
-            
-            marker.on('click', function(e) {
-                map.flyTo(e.latlng, 15, { animate: true, duration: 1.2 });
-            });
-        });
-
-        // 3. Parpol Markers
-        const parpol = <?= json_encode($parpol ?? []) ?>;
-        parpol.forEach(p => {
-            let coords = (p.latitude && p.longitude) ? [parseFloat(p.latitude), parseFloat(p.longitude)] : getCoordinates(p.id, 'parpol');
-            let marker = L.marker(coords, {icon: parpolIcon}).addTo(parpolGroup)
-                .bindPopup(`<b>Parpol: ${p.nama_parpol}</b><br>Ketua: ${p.ketua}<br>Kontak: ${p.telepon}`);
-            
-            marker.on('click', function(e) {
-                map.flyTo(e.latlng, 15, { animate: true, duration: 1.2 });
-            });
-        });
-
         // 4. Pengaduan, Rekomendasi & Hotspots data
+        const ormas = <?= json_encode($ormas ?? []) ?>;
+        const parpol = <?= json_encode($parpol ?? []) ?>;
         const pengaduan = <?= json_encode($pengaduan ?? []) ?>;
         const rekomendasi = <?= json_encode($rekomendasi ?? []) ?>;
         const hotspots = <?= json_encode($hotspots ?? []) ?>;
@@ -322,6 +300,8 @@
 
         function renderFilteredData(year, month) {
             // Clear existing layers
+            ormasGroup.clearLayers();
+            parpolGroup.clearLayers();
             pengaduanGroup.clearLayers();
             hotspotGroup.clearLayers();
             rekomendasiGroup.clearLayers();
@@ -329,6 +309,8 @@
                 delete hotspotMarkers[key];
             }
 
+            let filteredOrmasCount = 0;
+            let filteredParpolCount = 0;
             let filteredAduanCount = 0;
             let filteredHotspots = [];
             let filteredRekomendasiCount = 0;
@@ -343,6 +325,34 @@
                 const monthMatch = (selMonth === 'all') || ((dateObj.getMonth() + 1) == selMonth);
                 return yearMatch && monthMatch;
             }
+
+            // Plot Ormas
+            ormas.forEach(o => {
+                if (matchDate(o.created_at, year, month)) {
+                    filteredOrmasCount++;
+                    let coords = (o.latitude && o.longitude) ? [parseFloat(o.latitude), parseFloat(o.longitude)] : getCoordinates(o.id, 'ormas');
+                    let marker = L.marker(coords, {icon: ormasIcon}).addTo(ormasGroup)
+                        .bindPopup(`<b>Ormas: ${o.nama_ormas}</b><br>Alamat: ${o.alamat}<br>Status: <span class="badge bg-success">${o.status}</span><br>Terdaftar: ${o.created_at || '-'}`);
+                    
+                    marker.on('click', function(e) {
+                        map.flyTo(e.latlng, 15, { animate: true, duration: 1.2 });
+                    });
+                }
+            });
+
+            // Plot Parpol
+            parpol.forEach(p => {
+                if (matchDate(p.created_at, year, month)) {
+                    filteredParpolCount++;
+                    let coords = (p.latitude && p.longitude) ? [parseFloat(p.latitude), parseFloat(p.longitude)] : getCoordinates(p.id, 'parpol');
+                    let marker = L.marker(coords, {icon: parpolIcon}).addTo(parpolGroup)
+                        .bindPopup(`<b>Parpol: ${p.nama_parpol}</b><br>Ketua: ${p.ketua}<br>Kontak: ${p.telepon}<br>Terdaftar: ${p.created_at || '-'}`);
+                    
+                    marker.on('click', function(e) {
+                        map.flyTo(e.latlng, 15, { animate: true, duration: 1.2 });
+                    });
+                }
+            });
 
             // Plot Pengaduan
             pengaduan.forEach(p => {
@@ -391,6 +401,8 @@
             });
 
             // Update Summary Stats Counters
+            document.getElementById('count-ormas').innerText = filteredOrmasCount;
+            document.getElementById('count-parpol').innerText = filteredParpolCount;
             document.getElementById('count-aduan').innerText = filteredAduanCount;
             document.getElementById('count-kerawanan').innerText = filteredHotspots.length;
             document.getElementById('count-rekomendasi').innerText = filteredRekomendasiCount;

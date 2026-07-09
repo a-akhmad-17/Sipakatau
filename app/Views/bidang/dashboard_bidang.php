@@ -440,23 +440,9 @@
         L.marker([-5.1326246, 120.2500688], {icon: officeIcon}).addTo(officeGroup)
             .bindPopup('<b>Badan Kesbangpol Sinjai</b><br>Pusat Koordinasi Layanan & Keamanan.');
 
-        const ormas = <?= json_encode($ormas ?? []) ?>;
-        ormas.forEach(o => {
-            let coords = (o.latitude && o.longitude) ? [parseFloat(o.latitude), parseFloat(o.longitude)] : getCoordinates(o.id);
-            L.marker(coords, {icon: ormasIcon}).addTo(ormasGroup)
-                .bindPopup(`<b>Ormas: ${o.nama_ormas}</b><br>Alamat: ${o.alamat}<br>Status: <span class="badge bg-success">${o.status}</span>`)
-                .on('click', e => map.flyTo(e.latlng, 15, {animate: true, duration: 1.2}));
-        });
-
-        const parpol = <?= json_encode($parpol ?? []) ?>;
-        parpol.forEach(p => {
-            let coords = (p.latitude && p.longitude) ? [parseFloat(p.latitude), parseFloat(p.longitude)] : getCoordinates(p.id);
-            L.marker(coords, {icon: parpolIcon}).addTo(parpolGroup)
-                .bindPopup(`<b>Parpol: ${p.nama_parpol}</b><br>Ketua: ${p.ketua}<br>Kontak: ${p.telepon}`)
-                .on('click', e => map.flyTo(e.latlng, 15, {animate: true, duration: 1.2}));
-        });
-
         // 4. Pengaduan, Rekomendasi & Hotspots data
+        const ormas = <?= json_encode($ormas ?? []) ?>;
+        const parpol = <?= json_encode($parpol ?? []) ?>;
         const pengaduan = <?= json_encode($pengaduan ?? []) ?>;
         const rekomendasi = <?= json_encode($rekomendasi ?? []) ?>;
         const hotspots = <?= json_encode($hotspots ?? []) ?>;
@@ -464,6 +450,8 @@
         let rekomendasiGroup = L.layerGroup().addTo(map);
 
         function renderFilteredData(year, month) {
+            ormasGroup.clearLayers();
+            parpolGroup.clearLayers();
             pengaduanGroup.clearLayers();
             hotspotGroup.clearLayers();
             rekomendasiGroup.clearLayers();
@@ -478,6 +466,26 @@
                 const monthMatch = (selMonth === 'all') || ((dateObj.getMonth() + 1) == selMonth);
                 return yearMatch && monthMatch;
             }
+
+            // Plot Ormas
+            ormas.forEach(o => {
+                if (matchDate(o.created_at, year, month)) {
+                    let coords = (o.latitude && o.longitude) ? [parseFloat(o.latitude), parseFloat(o.longitude)] : getCoordinates(o.id);
+                    L.marker(coords, {icon: ormasIcon}).addTo(ormasGroup)
+                        .bindPopup(`<b>Ormas: ${o.nama_ormas}</b><br>Alamat: ${o.alamat}<br>Status: <span class="badge bg-success">${o.status}</span><br>Terdaftar: ${o.created_at || '-'}`)
+                        .on('click', e => map.flyTo(e.latlng, 15, {animate: true, duration: 1.2}));
+                }
+            });
+
+            // Plot Parpol
+            parpol.forEach(p => {
+                if (matchDate(p.created_at, year, month)) {
+                    let coords = (p.latitude && p.longitude) ? [parseFloat(p.latitude), parseFloat(p.longitude)] : getCoordinates(p.id);
+                    L.marker(coords, {icon: parpolIcon}).addTo(parpolGroup)
+                        .bindPopup(`<b>Parpol: ${p.nama_parpol}</b><br>Ketua: ${p.ketua}<br>Kontak: ${p.telepon}<br>Terdaftar: ${p.created_at || '-'}`)
+                        .on('click', e => map.flyTo(e.latlng, 15, {animate: true, duration: 1.2}));
+                }
+            });
 
             // Plot Pengaduan
             pengaduan.forEach(p => {
