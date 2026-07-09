@@ -53,6 +53,7 @@
     .glow-ormas { background-color: #3b82f6 !important; box-shadow: 0 0 10px #3b82f6 !important; }
     .glow-parpol { background-color: #fbbf24 !important; box-shadow: 0 0 10px #fbbf24 !important; }
     .glow-pengaduan { background-color: #ef4444 !important; box-shadow: 0 0 10px #ef4444 !important; }
+    .glow-rekomendasi { background-color: #a855f7 !important; box-shadow: 0 0 10px #a855f7 !important; }
     
     .hotspot-item {
         transition: all 0.2s ease;
@@ -71,23 +72,44 @@
 <?= $this->section('content') ?>
 
 <!-- Header -->
-<div class="exec-header d-flex justify-content-between align-items-center gap-3">
+<div class="exec-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
     <div>
         <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1.5 rounded-pill mb-2 font-heading" style="font-weight:600;"><i class="fa-solid fa-map-location-dot me-1"></i>Peta Geografis</span>
         <h2 class="text-white fw-bold mb-1">Peta Sebaran GIS</h2>
-        <p class="text-muted small mb-0">Pemetaan sebaran ormas, partai politik, aduan masyarakat, dan deteksi potensi gesekan sosial di Sinjai • Hari ini: <b><?= date('d M Y') ?></b></p>
+        <p class="text-muted small mb-0">Pemetaan sebaran ormas, partai politik, aduan masyarakat, rekomendasi kegiatan, dan deteksi potensi gesekan sosial di Sinjai • Hari ini: <b><?= date('d M Y') ?></b></p>
     </div>
-    <div class="d-flex align-items-center gap-3">
+    <div class="d-flex align-items-center flex-wrap gap-2">
+        <!-- Filter Tahun -->
         <div class="d-flex align-items-center gap-2">
-            <label for="filter-tahun" class="text-white small mb-0 fw-semibold" style="white-space: nowrap;"><i class="fa-solid fa-filter me-1 text-danger"></i>Filter Tahun:</label>
-            <select id="filter-tahun" class="form-select form-control-custom py-1.5 px-3 text-white bg-dark border-secondary border-opacity-25" style="border-radius: 8px; width: 110px; cursor: pointer; border-color: rgba(255,255,255,0.15); background-color: rgba(0,0,0,0.5);">
+            <label for="filter-tahun" class="text-white small mb-0 fw-semibold" style="white-space: nowrap;"><i class="fa-solid fa-calendar me-1 text-danger"></i>Tahun:</label>
+            <select id="filter-tahun" class="form-select form-control-custom py-1.5 px-2.5 text-white bg-dark border-secondary border-opacity-25" style="border-radius: 8px; width: 100px; cursor: pointer; border-color: rgba(255,255,255,0.15); background-color: rgba(0,0,0,0.5); font-size: 0.8rem;">
+                <option value="all">Semua</option>
                 <option value="2024">2024</option>
                 <option value="2025">2025</option>
                 <option value="2026" selected>2026</option>
                 <option value="2027">2027</option>
             </select>
         </div>
-        <a href="<?= site_url('eksekutif') ?>" class="btn btn-outline-secondary text-white">
+        <!-- Filter Bulan -->
+        <div class="d-flex align-items-center gap-2">
+            <label for="filter-bulan" class="text-white small mb-0 fw-semibold" style="white-space: nowrap;"><i class="fa-solid fa-calendar-days me-1 text-danger"></i>Bulan:</label>
+            <select id="filter-bulan" class="form-select form-control-custom py-1.5 px-2.5 text-white bg-dark border-secondary border-opacity-25" style="border-radius: 8px; width: 130px; cursor: pointer; border-color: rgba(255,255,255,0.15); background-color: rgba(0,0,0,0.5); font-size: 0.8rem;">
+                <option value="all" selected>Semua Bulan</option>
+                <option value="1">Januari</option>
+                <option value="2">Februari</option>
+                <option value="3">Maret</option>
+                <option value="4">April</option>
+                <option value="5">Mei</option>
+                <option value="6">Juni</option>
+                <option value="7">Juli</option>
+                <option value="8">Agustus</option>
+                <option value="9">September</option>
+                <option value="10">Oktober</option>
+                <option value="11">November</option>
+                <option value="12">Desember</option>
+            </select>
+        </div>
+        <a href="<?= site_url('eksekutif') ?>" class="btn btn-outline-secondary text-white py-1.5 px-3" style="border-radius: 8px; font-size: 0.85rem;">
             <i class="fa-solid fa-arrow-left me-1.5"></i>Kembali
         </a>
     </div>
@@ -107,28 +129,34 @@
             <div class="p-3 rounded filter-card">
                 <h5 class="text-white fw-bold mb-3 small"><i class="fa-solid fa-chart-simple text-danger me-2"></i>Ringkasan Data GIS</h5>
                 <div class="row g-2">
-                    <div class="col-6">
-                        <div class="p-2 rounded text-center" style="background: var(--card-bg); border: 1px solid var(--border-color);">
-                            <div class="text-muted small" style="font-size: 0.75rem;">Ormas</div>
-                            <h4 class="text-primary fw-bold mb-0"><?= count($ormas) ?></h4>
+                    <div class="col-4">
+                        <div class="p-1.5 rounded text-center" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                            <div class="text-muted" style="font-size: 0.7rem;">Ormas</div>
+                            <h5 class="text-primary fw-bold mb-0" style="font-size: 1.1rem;"><?= count($ormas) ?></h5>
                         </div>
                     </div>
-                    <div class="col-6">
-                        <div class="p-2 rounded text-center" style="background: var(--card-bg); border: 1px solid var(--border-color);">
-                            <div class="text-muted small" style="font-size: 0.75rem;">Parpol</div>
-                            <h4 class="text-warning fw-bold mb-0"><?= count($parpol) ?></h4>
+                    <div class="col-4">
+                        <div class="p-1.5 rounded text-center" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                            <div class="text-muted" style="font-size: 0.7rem;">Parpol</div>
+                            <h5 class="text-warning fw-bold mb-0" style="font-size: 1.1rem;"><?= count($parpol) ?></h5>
                         </div>
                     </div>
-                    <div class="col-6">
-                        <div class="p-2 rounded text-center" style="background: var(--card-bg); border: 1px solid var(--border-color);">
-                            <div class="text-muted small" style="font-size: 0.75rem;">Aduan</div>
-                            <h4 class="text-danger fw-bold mb-0" id="count-aduan"><?= count($pengaduan) ?></h4>
+                    <div class="col-4">
+                        <div class="p-1.5 rounded text-center" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                            <div class="text-muted" style="font-size: 0.7rem;">Kegiatan</div>
+                            <h5 class="text-info fw-bold mb-0" id="count-rekomendasi" style="color: #a855f7 !important; font-size: 1.1rem;">0</h5>
                         </div>
                     </div>
-                    <div class="col-6">
+                    <div class="col-6 mt-2">
                         <div class="p-2 rounded text-center" style="background: var(--card-bg); border: 1px solid var(--border-color);">
-                            <div class="text-muted small" style="font-size: 0.75rem;">Kerawanan</div>
-                            <h4 class="text-danger fw-bold mb-0" id="count-kerawanan"><?= count($hotspots) ?></h4>
+                            <div class="text-muted small" style="font-size: 0.75rem;">Aduan Laporan</div>
+                            <h4 class="text-danger fw-bold mb-0" id="count-aduan">0</h4>
+                        </div>
+                    </div>
+                    <div class="col-6 mt-2">
+                        <div class="p-2 rounded text-center" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                            <div class="text-muted small" style="font-size: 0.75rem;">Titik Konflik</div>
+                            <h4 class="text-danger fw-bold mb-0" id="count-kerawanan">0</h4>
                         </div>
                     </div>
                 </div>
@@ -234,6 +262,7 @@
         const ormasIcon = createGlowIcon('glow-ormas', 12);
         const parpolIcon = createGlowIcon('glow-parpol', 12);
         const pengaduanIcon = createGlowIcon('glow-pengaduan', 12);
+        const rekomendasiIcon = createGlowIcon('glow-rekomendasi', 12);
 
         const getHotspotIcon = (level) => {
             let color = level === 'Tinggi' ? '#ef4444' : (level === 'Sedang' ? '#f59e0b' : '#fbbf24');
@@ -250,6 +279,7 @@
         const ormasGroup = L.markerClusterGroup().addTo(map);
         const parpolGroup = L.layerGroup().addTo(map);
         const pengaduanGroup = L.layerGroup().addTo(map);
+        const rekomendasiGroup = L.layerGroup().addTo(map);
         const hotspotGroup = L.layerGroup().addTo(map);
 
         // 1. Office Marker
@@ -280,49 +310,59 @@
             });
         });
 
-        // 4. Pengaduan & Hotspots data
+        // 4. Pengaduan, Rekomendasi & Hotspots data
         const pengaduan = <?= json_encode($pengaduan ?? []) ?>;
+        const rekomendasi = <?= json_encode($rekomendasi ?? []) ?>;
         const hotspots = <?= json_encode($hotspots ?? []) ?>;
         const hotspotMarkers = {};
 
-        function renderFilteredData(year) {
+        function renderFilteredData(year, month) {
             // Clear existing layers
             pengaduanGroup.clearLayers();
             hotspotGroup.clearLayers();
+            rekomendasiGroup.clearLayers();
             for (let key in hotspotMarkers) {
                 delete hotspotMarkers[key];
             }
 
             let filteredAduanCount = 0;
             let filteredHotspots = [];
+            let filteredRekomendasiCount = 0;
+
+            // Helper function to match year & month
+            function matchDate(dateStr, selYear, selMonth) {
+                if (!dateStr) return false;
+                const dateObj = new Date(dateStr);
+                if (isNaN(dateObj.getTime())) return false;
+                
+                const yearMatch = (selYear === 'all') || (dateObj.getFullYear() == selYear);
+                const monthMatch = (selMonth === 'all') || ((dateObj.getMonth() + 1) == selMonth);
+                return yearMatch && monthMatch;
+            }
 
             // Plot Pengaduan
             pengaduan.forEach(p => {
                 try {
                     let detail = JSON.parse(p.after_data);
-                    if (detail) {
-                        let pYear = p.created_at ? new Date(p.created_at).getFullYear() : 2026;
-                        if (pYear == year) {
-                            filteredAduanCount++;
-                            let coords = getCoordinates(p.id, 'pengaduan');
-                            let marker = L.marker(coords, {icon: pengaduanIcon}).addTo(pengaduanGroup)
-                                .bindPopup(`<b>Aduan: ${detail.judul || 'Tanpa Judul'}</b><br>Kategori: ${detail.kategori || 'Lainnya'}<br>Tujuan: ${detail.nama_bidang || 'Umum'}`);
-                            
-                            marker.on('click', function(e) {
-                                map.flyTo(e.latlng, 15, { animate: true, duration: 1.2 });
-                            });
-                        }
+                    if (detail && matchDate(p.created_at, year, month)) {
+                        filteredAduanCount++;
+                        let coords = getCoordinates(p.id, 'pengaduan');
+                        let marker = L.marker(coords, {icon: pengaduanIcon}).addTo(pengaduanGroup)
+                            .bindPopup(`<b>Aduan: ${detail.judul || 'Tanpa Judul'}</b><br>Kategori: ${detail.kategori || 'Lainnya'}<br>Tujuan: ${detail.nama_bidang || 'Umum'}<br>Tanggal Lapor: ${p.created_at}`);
+                        
+                        marker.on('click', function(e) {
+                            map.flyTo(e.latlng, 15, { animate: true, duration: 1.2 });
+                        });
                     }
                 } catch(e) {}
             });
 
             // Plot Hotspots (Conflict zones)
             hotspots.forEach(h => {
-                let hYear = h.created_at ? new Date(h.created_at).getFullYear() : 2026;
-                if (hYear == year) {
+                if (matchDate(h.created_at, year, month)) {
                     filteredHotspots.push(h);
                     let marker = L.marker([parseFloat(h.latitude), parseFloat(h.longitude)], {icon: getHotspotIcon(h.level)}).addTo(hotspotGroup)
-                        .bindPopup(`<b>Titik Konflik: ${h.nama}</b><br>Tingkat Kerawanan: <span class="badge bg-danger">${h.level}</span><br>Detail: ${h.deskripsi}`);
+                        .bindPopup(`<b>Titik Konflik: ${h.nama}</b><br>Tingkat Kerawanan: <span class="badge bg-danger">${h.level}</span><br>Detail: ${h.deskripsi}<br>Tanggal Terdeteksi: ${h.created_at || '-'}`);
                     
                     hotspotMarkers[h.id] = marker;
 
@@ -332,16 +372,31 @@
                 }
             });
 
+            // Plot Rekomendasi Kegiatan
+            rekomendasi.forEach(r => {
+                if (matchDate(r.created_at, year, month)) {
+                    filteredRekomendasiCount++;
+                    let coords = getCoordinates(r.id, 'rekomendasi');
+                    let marker = L.marker(coords, {icon: rekomendasiIcon}).addTo(rekomendasiGroup)
+                        .bindPopup(`<b>Rekomendasi: ${r.nama_kegiatan}</b><br>Pemohon: ${r.pemohon}<br>Lokasi: ${r.lokasi_kegiatan || '-'}<br>Waktu: ${r.tgl_mulai} s/d ${r.tgl_selesai}<br>Status: <span class="badge" style="background-color: #a855f7; color: #fff;">${r.status_rekomendasi}</span>`);
+                    
+                    marker.on('click', function(e) {
+                        map.flyTo(e.latlng, 15, { animate: true, duration: 1.2 });
+                    });
+                }
+            });
+
             // Update Summary Stats Counters
             document.getElementById('count-aduan').innerText = filteredAduanCount;
             document.getElementById('count-kerawanan').innerText = filteredHotspots.length;
+            document.getElementById('count-rekomendasi').innerText = filteredRekomendasiCount;
             document.getElementById('badge-hotspot-count').innerText = filteredHotspots.length + ' Titik';
 
             // Update Hotspot Sidebar List
             const listContainer = document.getElementById('hotspots-list-container');
             listContainer.innerHTML = '';
             if (filteredHotspots.length === 0) {
-                listContainer.innerHTML = '<div class="text-muted small text-center py-4">Belum ada titik kerawanan di tahun ini.</div>';
+                listContainer.innerHTML = '<div class="text-muted small text-center py-4">Belum ada titik kerawanan di periode ini.</div>';
             } else {
                 filteredHotspots.forEach(h => {
                     let badgeClass = h.level === 'Tinggi' ? 'badge bg-danger-subtle text-danger border border-danger-subtle' : (h.level === 'Sedang' ? 'badge bg-warning-subtle text-warning border border-warning-subtle' : 'badge bg-info-subtle text-info border border-info-subtle');
@@ -364,15 +419,22 @@
             }
         }
 
-        // Initial render based on dropdown value
+        // Initial render based on dropdown values
         const filterTahunSelect = document.getElementById('filter-tahun');
-        if (filterTahunSelect) {
-            renderFilteredData(filterTahunSelect.value);
-            filterTahunSelect.addEventListener('change', function() {
-                renderFilteredData(this.value);
-            });
+        const filterBulanSelect = document.getElementById('filter-bulan');
+
+        function triggerFilter() {
+            const yr = filterTahunSelect ? filterTahunSelect.value : '2026';
+            const mn = filterBulanSelect ? filterBulanSelect.value : 'all';
+            renderFilteredData(yr, mn);
+        }
+
+        if (filterTahunSelect && filterBulanSelect) {
+            triggerFilter();
+            filterTahunSelect.addEventListener('change', triggerFilter);
+            filterBulanSelect.addEventListener('change', triggerFilter);
         } else {
-            renderFilteredData(2026);
+            renderFilteredData('2026', 'all');
         }
 
         // Add Layer Filters Control
@@ -381,6 +443,7 @@
             "<span style='color: var(--text-main); font-weight: 500;'><i class='fa-solid fa-users text-primary me-1'></i> Organisasi Ormas</span>": ormasGroup,
             "<span style='color: var(--text-main); font-weight: 500;'><i class='fa-solid fa-building-flag text-warning me-1'></i> Partai Politik</span>": parpolGroup,
             "<span style='color: var(--text-main); font-weight: 500;'><i class='fa-solid fa-bullhorn text-danger me-1'></i> Laporan Pengaduan</span>": pengaduanGroup,
+            "<span style='color: var(--text-main); font-weight: 500;'><i class='fa-solid fa-calendar-check me-1' style='color:#a855f7;'></i> Rekomendasi Kegiatan</span>": rekomendasiGroup,
             "<span style='color: var(--text-main); font-weight: 500;'><i class='fa-solid fa-triangle-exclamation text-warning me-1 animate-pulse'></i> Titik Kerawanan Konflik</span>": hotspotGroup
         };
         

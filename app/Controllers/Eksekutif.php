@@ -67,12 +67,18 @@ class Eksekutif extends BaseController
                         ->get()
                         ->getResultArray();
 
+        $rekomendasi = $db->table('trn_rekomendasi')
+                          ->orderBy('created_at', 'DESC')
+                          ->get()
+                          ->getResultArray();
+
         $data = [
-            'title'     => 'Peta Sebaran GIS - SIPAKATAU',
-            'ormas'     => $ormas,
-            'parpol'    => $parpol,
-            'hotspots'  => $hotspots,
-            'pengaduan' => $pengaduan
+            'title'       => 'Peta Sebaran GIS - SIPAKATAU',
+            'ormas'       => $ormas,
+            'parpol'      => $parpol,
+            'hotspots'    => $hotspots,
+            'pengaduan'   => $pengaduan,
+            'rekomendasi' => $rekomendasi
         ];
 
         return view('eksekutif/gis', $data);
