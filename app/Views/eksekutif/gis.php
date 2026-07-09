@@ -86,6 +86,16 @@
                 <option value="all">Semua</option>
                 <?php
                 $startYear = 2024;
+                if (!empty($ormas)) {
+                    foreach ($ormas as $o) {
+                        if (!empty($o['tgl_sk_kepengurusan'])) {
+                            $y = (int)date('Y', strtotime($o['tgl_sk_kepengurusan']));
+                            if ($y > 2000 && $y < $startYear) {
+                                $startYear = $y;
+                            }
+                        }
+                    }
+                }
                 $currentYear = (int)date('Y');
                 $endYear = $currentYear + 1;
                 for ($y = $startYear; $y <= $endYear; $y++):
@@ -328,11 +338,12 @@
 
             // Plot Ormas
             ormas.forEach(o => {
-                if (matchDate(o.created_at, year, month)) {
+                let dateToMatch = o.tgl_sk_kepengurusan || o.created_at;
+                if (matchDate(dateToMatch, year, month)) {
                     filteredOrmasCount++;
                     let coords = (o.latitude && o.longitude) ? [parseFloat(o.latitude), parseFloat(o.longitude)] : getCoordinates(o.id, 'ormas');
                     let marker = L.marker(coords, {icon: ormasIcon}).addTo(ormasGroup)
-                        .bindPopup(`<b>Ormas: ${o.nama_ormas}</b><br>Alamat: ${o.alamat}<br>Status: <span class="badge bg-success">${o.status}</span><br>Terdaftar: ${o.created_at || '-'}`);
+                        .bindPopup(`<b>Ormas: ${o.nama_ormas}</b><br>Alamat: ${o.alamat}<br>Status: <span class="badge bg-success">${o.status}</span><br>Tgl SK Kepengurusan: ${o.tgl_sk_kepengurusan || '-'}`);
                     
                     marker.on('click', function(e) {
                         map.flyTo(e.latlng, 15, { animate: true, duration: 1.2 });

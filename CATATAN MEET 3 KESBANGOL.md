@@ -10,7 +10,7 @@
 10. buatkan berkas yang ingin di tanda tangani stelah login.. bukan di halaman publik(done) 
 11. untuk tambah parpol tambahkan titik peta(done)
 12. untuk parpol tampilkan periode anggota dewan dan levelnya,, misalnya ada yang terdaftar dan punya kursi di DPR terdaftar belum tentu punya kursi 
-13. buatkan 1 tabel untuk kepengurusan,, otomatis dari sk kepengurusannya, bukan manual 
+13. buatkan 1 tabel untuk kepengurusan,, otomatis dari sk kepengurusannya, bukan manual(done)
 14. pada peta gis, defaultnya 2026, khusus aduan dan rawan konflik buatkan filter tahunnya,, jadi tersimpan jadi arsip (done)
 15. buatkan fitur tambah bidang di menu pengaturan portal 
 16. hapus fitur spj(done)
