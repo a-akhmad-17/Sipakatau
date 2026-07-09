@@ -258,6 +258,7 @@ class User extends BaseController
                 $pengurusPhones = $this->request->getPost('pengurus_no_hp') ?: [];
                 $pengurusOldKtp = $this->request->getPost('pengurus_old_ktp') ?: [];
                 $pengurusOldPasfoto = $this->request->getPost('pengurus_old_pasfoto') ?: [];
+                $pengurusOldBiodata = $this->request->getPost('pengurus_old_biodata') ?: [];
                 
                 foreach ($pengurusNames as $index => $name) {
                     if (!empty($name)) {
@@ -275,6 +276,7 @@ class User extends BaseController
                             'no_hp'        => $pengurusPhones[$index] ?? '',
                             'file_ktp'     => $pengurusOldKtp[$index] ?? null,
                             'file_pasfoto' => $pengurusOldPasfoto[$index] ?? null,
+                            'file_biodata' => $pengurusOldBiodata[$index] ?? null,
                             'created_at'   => date('Y-m-d H:i:s'),
                             'updated_at'   => date('Y-m-d H:i:s'),
                         ]);
@@ -315,6 +317,7 @@ class User extends BaseController
                 $pengurusPhones = $this->request->getPost('pengurus_no_hp') ?: [];
                 $pengurusOldKtp = $this->request->getPost('pengurus_old_ktp') ?: [];
                 $pengurusOldPasfoto = $this->request->getPost('pengurus_old_pasfoto') ?: [];
+                $pengurusOldBiodata = $this->request->getPost('pengurus_old_biodata') ?: [];
 
                 foreach ($pengurusNames as $index => $name) {
                     if (!empty($name)) {
@@ -332,6 +335,7 @@ class User extends BaseController
                             'no_hp'        => $pengurusPhones[$index] ?? '',
                             'file_ktp'     => $pengurusOldKtp[$index] ?? null,
                             'file_pasfoto' => $pengurusOldPasfoto[$index] ?? null,
+                            'file_biodata' => $pengurusOldBiodata[$index] ?? null,
                             'created_at'   => date('Y-m-d H:i:s'),
                             'updated_at'   => date('Y-m-d H:i:s'),
                         ]);
@@ -383,10 +387,11 @@ class User extends BaseController
                 'updated_at'  => date('Y-m-d H:i:s')
             ]);
 
-            // Process Pengurus file uploads (KTP & Pasfoto) and Biodata (NIK, WA, TTL, Alamat)
+            // Process Pengurus file uploads (Biodata, KTP & Pasfoto) and Biodata (NIK, WA, TTL, Alamat)
             $pengurusIds = $this->request->getPost('pengurus_id') ?: [];
             $pengurusOldKtp = $this->request->getPost('pengurus_old_ktp') ?: [];
             $pengurusOldPasfoto = $this->request->getPost('pengurus_old_pasfoto') ?: [];
+            $pengurusOldBiodata = $this->request->getPost('pengurus_old_biodata') ?: [];
             $pengurusNiks = $this->request->getPost('pengurus_nik') ?: [];
             $pengurusHps = $this->request->getPost('pengurus_no_hp') ?: [];
             $pengurusTempatLahir = $this->request->getPost('pengurus_tempat_lahir') ?: [];
@@ -414,6 +419,16 @@ class User extends BaseController
                     $filePasfoto->move($destination, $pasfotoFilename);
                 }
 
+                $biodataFilename = $pengurusOldBiodata[$index] ?? null;
+                $fileBiodata = $this->request->getFile('pengurus_biodata_' . $index);
+                if ($fileBiodata && $fileBiodata->isValid() && !$fileBiodata->hasMoved()) {
+                    if ($biodataFilename) {
+                        @unlink($destination . '/' . $biodataFilename);
+                    }
+                    $biodataFilename = $fileBiodata->getRandomName();
+                    $fileBiodata->move($destination, $biodataFilename);
+                }
+
                 $this->db->table('mst_ormas_pengurus')
                          ->where('id', $pengurusId)
                          ->where('ormas_id', $ormasId)
@@ -425,6 +440,7 @@ class User extends BaseController
                              'alamat_ktp'    => $pengurusAlamatKtp[$index] ?? '',
                              'file_ktp'      => $ktpFilename,
                              'file_pasfoto'  => $pasfotoFilename,
+                             'file_biodata'  => $biodataFilename,
                              'updated_at'    => date('Y-m-d H:i:s')
                          ]);
             }
