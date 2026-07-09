@@ -41,5 +41,15 @@ abstract class BaseController extends Controller
 
         // Preload any models, libraries, etc, here.
         // $this->session = service('session');
+        
+        // Auto-detect and update inactive ormas status based on SK expiration date
+        try {
+            $db = \Config\Database::connect();
+            $today = date('Y-m-d');
+            $db->query("UPDATE mst_ormas SET status = 'Tidak Aktif', updated_at = NOW() WHERE tgl_sk_kedaluwarsa IS NOT NULL AND tgl_sk_kedaluwarsa < ?", [$today]);
+            $db->query("UPDATE mst_ormas SET status = 'Aktif', updated_at = NOW() WHERE (tgl_sk_kedaluwarsa IS NULL OR tgl_sk_kedaluwarsa >= ?) AND status = 'Tidak Aktif'", [$today]);
+        } catch (\Exception $e) {
+            // Silence database exceptions during setup/migrations
+        }
     }
 }

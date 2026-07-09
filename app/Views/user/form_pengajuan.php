@@ -274,7 +274,7 @@ $requirementsBerjenjang = [
                         <input type="date" name="tgl_sk_kepengurusan" id="tgl_sk_kepengurusan" class="form-control form-control-custom" value="<?= esc($tgl_sk) ?>">
                     </div>
                     <div class="col-md-6">
-                        <label for="tgl_sk_kedaluwarsa" class="form-label small text-muted">Tanggal Kedaluwarsa SK Kepengurusan</label>
+                        <label for="tgl_sk_kedaluwarsa" class="form-label small text-muted">Tanggal SK Tidak Aktif</label>
                         <input type="date" name="tgl_sk_kedaluwarsa" id="tgl_sk_kedaluwarsa" class="form-control form-control-custom" value="<?= esc($tgl_exp) ?>">
                     </div>
                     <div class="col-md-12">

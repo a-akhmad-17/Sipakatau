@@ -71,9 +71,9 @@
 <!-- Header -->
 <div class="exec-header d-flex justify-content-between align-items-center gap-3">
     <div>
-        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1.5 rounded-pill mb-2 font-heading" style="font-weight:600;"><i class="fa-solid fa-circle-exclamation me-1"></i>Status SK Kedaluwarsa</span>
-        <h2 class="text-white fw-bold mb-1">Ormas SK Merah</h2>
-        <p class="text-muted small mb-0">Daftar Organisasi Kemasyarakatan yang masa berlaku Surat Keterangan (SK) kepengurusannya telah habis • Hari ini: <b><?= date('d M Y') ?></b></p>
+        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1.5 rounded-pill mb-2 font-heading" style="font-weight:600;"><i class="fa-solid fa-circle-exclamation me-1"></i>Status SK Tidak Aktif</span>
+        <h2 class="text-white fw-bold mb-1">Ormas Tidak Aktif</h2>
+        <p class="text-muted small mb-0">Daftar Organisasi Kemasyarakatan yang status keaktifannya dinonaktifkan secara otomatis berdasarkan berakhirnya masa berlaku SK kepengurusan • Hari ini: <b><?= date('d M Y') ?></b></p>
     </div>
     <div class="d-flex gap-2">
         <a href="<?= site_url('eksekutif') ?>" class="btn btn-outline-secondary text-white">
@@ -92,14 +92,14 @@
     </div>
     <div>
         <h5 class="text-white fw-bold mb-1">Pemberitahuan Pembinaan Ormas</h5>
-        <p class="text-muted small mb-0">Organisasi di bawah ini terdeteksi memiliki SK Kepengurusan yang telah kedaluwarsa menurut database. Pimpinan merekomendasikan unit kerja terkait (Poldagri & Ormas) untuk segera melakukan koordinasi dan pembinaan agar pengurus melakukan pembaruan berkas administrasi layanan.</p>
+        <p class="text-muted small mb-0">Organisasi di bawah ini terdeteksi tidak aktif karena masa berlaku SK kepengurusannya telah berakhir menurut database. Pimpinan merekomendasikan unit kerja terkait (Poldagri & Ormas) untuk segera melakukan koordinasi dan pembinaan agar pengurus melakukan pembaruan berkas administrasi layanan.</p>
     </div>
 </div>
 
 <!-- Table Card -->
 <div class="glass-card p-4 animate-fade-up delay-1">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="text-white mb-0 font-heading"><i class="fa-solid fa-building-circle-exclamation text-danger me-2"></i>Daftar Ormas SK Merah (<?= count($expiredOrmas) ?> Terdeteksi)</h4>
+        <h4 class="text-white mb-0 font-heading"><i class="fa-solid fa-building-circle-exclamation text-danger me-2"></i>Daftar Ormas Tidak Aktif (<?= count($expiredOrmas) ?> Terdeteksi)</h4>
     </div>
 
     <div class="table-responsive">
@@ -109,7 +109,7 @@
                     <th width="5%" class="text-center">No</th>
                     <th width="35%">Nama Organisasi</th>
                     <th width="35%">Alamat & Detail Kontak</th>
-                    <th width="25%" class="text-center">Tanggal Kedaluwarsa SK</th>
+                    <th width="25%" class="text-center">Tanggal SK Tidak Aktif</th>
                 </tr>
             </thead>
             <tbody>
@@ -118,7 +118,7 @@
                         <td colspan="4" class="text-center text-muted py-5">
                             <i class="fa-solid fa-circle-check text-success fa-3x mb-3 d-block"></i>
                             <span class="fw-bold text-white d-block mb-1">Seluruh Ormas Aktif</span>
-                            <span class="small text-muted">Tidak ditemukan organisasi kemasyarakatan dengan SK kepengurusan yang kedaluwarsa.</span>
+                            <span class="small text-muted">Tidak ditemukan organisasi kemasyarakatan dengan SK kepengurusan yang tidak aktif.</span>
                         </td>
                     </tr>
                 <?php else: ?>

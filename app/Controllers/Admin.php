@@ -1739,9 +1739,10 @@ class Admin extends BaseController
         $alamat = $this->request->getPost('alamat');
         $email = $this->request->getPost('email');
         $telepon = $this->request->getPost('telepon');
-        $status = $this->request->getPost('status') ?? 'Aktif';
         $tglSk = $this->request->getPost('tgl_sk_kepengurusan') ?: null;
         $tglExp = $this->request->getPost('tgl_sk_kedaluwarsa') ?: null;
+        $today = date('Y-m-d');
+        $status = ($tglExp && $tglExp < $today) ? 'Tidak Aktif' : 'Aktif';
         $latitude = $this->request->getPost('latitude');
         $longitude = $this->request->getPost('longitude');
 
@@ -1813,9 +1814,10 @@ class Admin extends BaseController
         $alamat = $this->request->getPost('alamat');
         $email = $this->request->getPost('email');
         $telepon = $this->request->getPost('telepon');
-        $status = $this->request->getPost('status') ?? 'Aktif';
         $tglSk = $this->request->getPost('tgl_sk_kepengurusan') ?: null;
         $tglExp = $this->request->getPost('tgl_sk_kedaluwarsa') ?: null;
+        $today = date('Y-m-d');
+        $status = ($tglExp && $tglExp < $today) ? 'Tidak Aktif' : 'Aktif';
         $latitude = $this->request->getPost('latitude');
         $longitude = $this->request->getPost('longitude');
 

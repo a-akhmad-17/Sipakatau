@@ -239,14 +239,14 @@
     </table>
 
     <!-- Daftar Ormas SK Merah -->
-    <h4>IV. Organisasi Kemasyarakatan (SK Merah/Kedaluwarsa)</h4>
+    <h4>IV. Organisasi Kemasyarakatan (SK Tidak Aktif)</h4>
     <table>
         <thead>
             <tr>
                 <th width="5%" class="text-center">No</th>
                 <th width="40%">Nama Ormas / LSM</th>
                 <th width="35%">Alamat & Kontak</th>
-                <th width="20%">Tanggal Kedaluwarsa SK</th>
+                <th width="20%">Tanggal SK Tidak Aktif</th>
             </tr>
         </thead>
         <tbody>

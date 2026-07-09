@@ -210,7 +210,7 @@
     
     <div class="col-md-6 col-lg-4">
         <div class="glass-card p-3 text-start">
-            <div class="text-muted small">Ormas SK Merah</div>
+            <div class="text-muted small">Ormas Tidak Aktif</div>
             <h2 class="text-danger fw-bold mt-1 mb-0">
                 <?php
                     $expiredCount = 0;
@@ -220,7 +220,7 @@
                     echo $expiredCount;
                 ?>
             </h2>
-            <div class="small text-danger-light mt-2"><i class="fa-solid fa-circle-exclamation me-1"></i>Butuh Pembinaan SK</div>
+            <div class="small text-danger-light mt-2"><i class="fa-solid fa-circle-exclamation me-1"></i>Otomatis Mendeteksi SK</div>
         </div>
     </div>
 
@@ -318,7 +318,7 @@
                             <th>Nama Organisasi</th>
                             <th>Alamat & Kontak</th>
                             <th>Tgl SK Kepengurusan</th>
-                            <th>Tgl Kedaluwarsa SK</th>
+                            <th>Tgl SK Tidak Aktif</th>
                             <th>Status Keaktifan</th>
                             <th class="text-center" style="width: 25%;">Aksi</th>
                         </tr>
@@ -357,7 +357,7 @@
                                 <td>
                                     <?php if (!empty($o['tgl_sk_kedaluwarsa'])): ?>
                                         <?php if ($isExpired): ?>
-                                            <span class="badge badge-expired px-2.5 py-1.5"><i class="fa-solid fa-triangle-exclamation me-1"></i>Expired (<?= date('d/m/Y', strtotime($o['tgl_sk_kedaluwarsa'])) ?>)</span>
+                                            <span class="badge badge-expired px-2.5 py-1.5"><i class="fa-solid fa-triangle-exclamation me-1"></i>Tidak Aktif (<?= date('d/m/Y', strtotime($o['tgl_sk_kedaluwarsa'])) ?>)</span>
                                         <?php else: ?>
                                             <?= date('d M Y', strtotime($o['tgl_sk_kedaluwarsa'])) ?>
                                         <?php endif; ?>
@@ -392,14 +392,6 @@
                                                 title="Edit Detail Ormas">
                                             <i class="fa-solid fa-pencil"></i> Edit
                                         </button>
-                                        <form action="<?= base_url('admin/toggle-ormas/' . $o['id']) ?>" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin mengubah status keaktifan ormas ini?')">
-                                            <?= csrf_field() ?>
-                                            <?php if ($o['status'] === 'Aktif'): ?>
-                                                <button type="submit" class="btn btn-toggle-inactive btn-sm px-2.5 py-1.5 rounded" title="Nonaktifkan status"><i class="fa-solid fa-toggle-on"></i></button>
-                                            <?php else: ?>
-                                                <button type="submit" class="btn btn-toggle-active btn-sm px-2.5 py-1.5 rounded" title="Aktifkan status"><i class="fa-solid fa-toggle-off"></i></button>
-                                            <?php endif; ?>
-                                        </form>
                                         <form action="<?= base_url('admin/delete-ormas/' . $o['id']) ?>" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus Ormas ini secara permanen beserta semua data pendaftarannya?')">
                                             <?= csrf_field() ?>
                                             <button type="submit" class="btn btn-sm btn-outline-danger px-2.5 py-1.5 rounded" title="Hapus Ormas"><i class="fa-solid fa-trash"></i> Hapus</button>
@@ -1255,13 +1247,6 @@
                             <label for="edit_o_nama" class="form-label small text-muted">Nama Ormas / Organisasi <span class="text-danger fw-bold">*</span></label>
                             <input type="text" name="nama_ormas" id="edit_o_nama" class="form-control form-control-custom" required>
                         </div>
-                        <div class="col-md-6">
-                            <label for="edit_o_status" class="form-label small text-muted">Status Keaktifan <span class="text-danger fw-bold">*</span></label>
-                            <select name="status" id="edit_o_status" class="form-select form-control-custom" required>
-                                <option value="Aktif">Aktif</option>
-                                <option value="Tidak Aktif">Tidak Aktif</option>
-                            </select>
-                        </div>
                         <div class="col-md-12">
                             <label for="edit_o_alamat" class="form-label small text-muted">Alamat Sekretariat <span class="text-danger fw-bold">*</span></label>
                             <textarea name="alamat" id="edit_o_alamat" class="form-control form-control-custom" rows="2" required></textarea>
@@ -1279,7 +1264,7 @@
                             <input type="date" name="tgl_sk_kepengurusan" id="edit_o_tgl_sk" class="form-control form-control-custom">
                         </div>
                         <div class="col-md-6">
-                            <label for="edit_o_tgl_exp" class="form-label small text-muted">Tanggal Kedaluwarsa SK</label>
+                            <label for="edit_o_tgl_exp" class="form-label small text-muted">Tanggal SK Tidak Aktif</label>
                             <input type="date" name="tgl_sk_kedaluwarsa" id="edit_o_tgl_exp" class="form-control form-control-custom">
                         </div>
                         <div class="col-md-6">
