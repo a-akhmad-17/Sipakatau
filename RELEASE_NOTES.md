@@ -1,5 +1,9 @@
 # RELEASE NOTES - SIPAKATAU
 
+## [v2.9.13] - 2026-07-09
+### 🐛 Fixed
+- **Perbaikan Input Unggah Berkas Pengurus**: Memperbaiki kebocoran teks atribut `onchange` pada tombol unggah berkas biodata & KTP pengurus ([form_pengajuan.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/user/form_pengajuan.php)). Masalah ini diakibatkan oleh skrip injeksi warna asterisk wajib (`layouts/admin.php`) yang keliru memodifikasi `innerHTML` label karena adanya tanda bintang `*` di dalam atribut `accept="image/*"` pada input tersembunyi. Skrip kini telah diperbarui agar hanya menelusuri node teks (`TreeWalker`) secara aman dan mengecualikan elemen tombol.
+
 ## [v2.9.12] - 2026-07-08
 ### ✨ Added
 - **Sistem Input Lokasi Terpadu (Smart Location Input)**: Menambahkan input lokasi cerdas 3-in-1 yang mendeteksi input teks secara otomatis (Link Google Maps, koordinat desimal manual, atau pencarian nama jalan/tempat via OpenStreetMap Nominatim API) pada formulir.

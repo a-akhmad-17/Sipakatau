@@ -1252,11 +1252,35 @@
                 });
             }
 
-            // Required asterisks labeling color injection
-            document.querySelectorAll('label').forEach(label => {
-                if (label.innerHTML.includes('*')) {
-                    label.innerHTML = label.innerHTML.replace(/\s*\*/g, ' <span class="text-danger fw-bold">*</span>');
+            // Required asterisks labeling color injection (safely only targeting text nodes)
+            document.querySelectorAll('label:not(.btn)').forEach(label => {
+                const walk = document.createTreeWalker(label, NodeFilter.SHOW_TEXT, null, false);
+                let node;
+                const nodesToReplace = [];
+                while (node = walk.nextNode()) {
+                    if (node.nodeValue.includes('*')) {
+                        const parentTagName = node.parentNode.tagName.toLowerCase();
+                        if (parentTagName !== 'script' && parentTagName !== 'style') {
+                            nodesToReplace.push(node);
+                        }
+                    }
                 }
+                nodesToReplace.forEach(node => {
+                    const parent = node.parentNode;
+                    const parts = node.nodeValue.split('*');
+                    node.nodeValue = parts[0];
+                    let refNode = node;
+                    for (let i = 1; i < parts.length; i++) {
+                        const span = document.createElement('span');
+                        span.className = 'text-danger fw-bold';
+                        span.textContent = '*';
+                        parent.insertBefore(span, refNode.nextSibling);
+                        
+                        const textNode = document.createTextNode(parts[i]);
+                        parent.insertBefore(textNode, span.nextSibling);
+                        refNode = textNode;
+                    }
+                });
             });
 
             // --------------------------------------------------------------------------
