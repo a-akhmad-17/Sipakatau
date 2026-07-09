@@ -519,31 +519,39 @@ $requirementsBerjenjang = [
                                                     </div>
                                                 </td>
 
-                                                <!-- Column 4: Pasfoto 4x6 with Hover Overlay -->
-                                                <td class="py-2.5 text-center">
+                                                <!-- Column 4: Pasfoto 4x6 with Preview & Upload Button -->
+                                                <td class="py-2.5">
                                                     <input type="hidden" name="pengurus_old_pasfoto[]" value="<?= esc($p['file_pasfoto'] ?? '') ?>">
-                                                    <div class="d-flex align-items-center justify-content-center gap-3">
-                                                        <div class="position-relative" style="width: 40px; height: 50px; border-radius: 4px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03);">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <!-- Preview Avatar -->
+                                                        <div class="position-relative flex-shrink-0" style="width: 32px; height: 40px; border-radius: 4px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03);">
                                                             <?php if (!empty($p['file_pasfoto'])): ?>
                                                                 <img src="<?= base_url('uploads/ormas/' . $p['file_pasfoto']) ?>" id="avatar-preview-<?php echo $idx; ?>" alt="Foto" style="width: 100%; height: 100%; object-fit: cover;">
                                                             <?php else: ?>
                                                                 <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center text-muted text-opacity-30" id="avatar-placeholder-<?php echo $idx; ?>">
-                                                                    <i class="fa-solid fa-user-tie" style="font-size: 12px;"></i>
+                                                                    <i class="fa-solid fa-user-tie" style="font-size: 10px;"></i>
                                                                 </div>
                                                                 <img src="" id="avatar-preview-<?php echo $idx; ?>" alt="Foto" class="d-none" style="width: 100%; height: 100%; object-fit: cover;">
                                                             <?php endif; ?>
                                                             <!-- Hover camera trigger overlay -->
-                                                            <label class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-black bg-opacity-65 text-white opacity-0" style="cursor: pointer; transition: opacity 0.2s; font-size: 8px; margin-bottom: 0;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">
+                                                            <label class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-black bg-opacity-65 text-white opacity-0" style="cursor: pointer; transition: opacity 0.2s; font-size: 7px; margin-bottom: 0;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">
                                                                 <i class="fa-solid fa-camera"></i>
                                                                 <input type="file" name="pengurus_pasfoto_<?php echo $idx; ?>" class="d-none" accept="image/*" onchange="handlePasfotoChange(this, <?php echo $idx; ?>)">
                                                             </label>
                                                         </div>
-                                                        <div class="file-name-pasfoto-<?php echo $idx; ?> text-center" style="font-size: 0.68rem;">
-                                                            <?php if (!empty($p['file_pasfoto'])): ?>
-                                                                <span class="text-success fw-bold"><i class="fa-solid fa-circle-check text-success me-1"></i>Ada</span>
-                                                            <?php else: ?>
-                                                                <span class="text-muted text-opacity-40">Belum ada</span>
-                                                            <?php endif; ?>
+                                                        <!-- Upload button with text label -->
+                                                        <div class="d-flex align-items-center gap-1.5">
+                                                            <label class="btn btn-xs btn-outline-success mb-0 py-1 px-2.5 d-flex align-items-center gap-1.5" style="cursor: pointer; font-size: 0.68rem; border-color: rgba(40,167,69,0.3) !important;">
+                                                                <i class="fa-solid fa-image"></i> Pilih Foto
+                                                                <input type="file" name="pengurus_pasfoto_<?php echo $idx; ?>" class="d-none" accept="image/*" onchange="handlePasfotoChange(this, <?php echo $idx; ?>)">
+                                                            </label>
+                                                            <span class="file-name-pasfoto-<?php echo $idx; ?> small text-success text-truncate d-block" style="max-width: 80px; font-size: 0.68rem;">
+                                                                <?php if (!empty($p['file_pasfoto'])): ?>
+                                                                    <span class="text-success fw-bold"><i class="fa-solid fa-circle-check text-success"></i> Ada</span>
+                                                                <?php else: ?>
+                                                                    <span class="text-muted text-opacity-40">Belum ada</span>
+                                                                <?php endif; ?>
+                                                            </span>
                                                         </div>
                                                     </div>
                                                 </td>
