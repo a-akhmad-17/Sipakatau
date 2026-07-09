@@ -150,6 +150,7 @@
     .glow-ormas { background-color: #3b82f6 !important; box-shadow: 0 0 10px #3b82f6 !important; }
     .glow-parpol { background-color: #fbbf24 !important; box-shadow: 0 0 10px #fbbf24 !important; }
     .glow-pengaduan { background-color: #ef4444 !important; box-shadow: 0 0 10px #ef4444 !important; }
+    .glow-rekomendasi { background-color: #a855f7 !important; box-shadow: 0 0 10px #a855f7 !important; }
     .hotspot-item {
         transition: all 0.2s ease;
     }
@@ -667,7 +668,41 @@
             <div class="row g-4">
                 <!-- Map Area -->
                 <div class="col-lg-8">
-                    <div id="gis-map" style="height: 520px; border-radius: 12px; border: 1px solid var(--border-color); position: relative; overflow: hidden; width: 100%;"></div>
+                    <div class="d-flex align-items-center justify-content-between gap-2 mb-3 p-2.5 rounded" style="background: var(--input-bg); border: 1px solid var(--border-color);">
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="text-white small mb-0 fw-semibold" style="white-space: nowrap;"><i class="fa-solid fa-filter text-danger me-1"></i>Filter Peta:</label>
+                            
+                            <!-- Filter Tahun -->
+                            <select id="filter-tahun" class="form-select form-control-custom py-1 px-2.5 text-white bg-dark border-secondary border-opacity-25" style="border-radius: 6px; width: 95px; cursor: pointer; font-size: 0.75rem; background-color: rgba(0,0,0,0.5);">
+                                <option value="all">Semua Thn</option>
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                                <option value="2026" selected>2026</option>
+                                <option value="2027">2027</option>
+                            </select>
+                            
+                            <!-- Filter Bulan -->
+                            <select id="filter-bulan" class="form-select form-control-custom py-1 px-2.5 text-white bg-dark border-secondary border-opacity-25" style="border-radius: 6px; width: 110px; cursor: pointer; font-size: 0.75rem; background-color: rgba(0,0,0,0.5);">
+                                <option value="all" selected>Semua Bln</option>
+                                <option value="1">Januari</option>
+                                <option value="2">Februari</option>
+                                <option value="3">Maret</option>
+                                <option value="4">April</option>
+                                <option value="5">Mei</option>
+                                <option value="6">Juni</option>
+                                <option value="7">Juli</option>
+                                <option value="8">Agustus</option>
+                                <option value="9">September</option>
+                                <option value="10">Oktober</option>
+                                <option value="11">November</option>
+                                <option value="12">Desember</option>
+                            </select>
+                        </div>
+                        <div class="small text-muted d-none d-sm-block" style="font-size: 0.7rem;">
+                            Ormas/Parpol global &bull; Aduan/Rawan/Kegiatan terfilter
+                        </div>
+                    </div>
+                    <div id="gis-map" style="height: 470px; border-radius: 12px; border: 1px solid var(--border-color); position: relative; overflow: hidden; width: 100%;"></div>
                 </div>
                 
                 <!-- Sidebar Control & Input -->
@@ -1817,46 +1852,98 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // 4. Pengaduan Markers
+    // 4. Pengaduan, Rekomendasi & Hotspots data
     const pengaduan = <?= json_encode($pengaduan ?? []) ?>;
-    pengaduan.forEach(p => {
-        try {
-            let coords = getCoordinates(p.id, 'pengaduan');
-            let marker = L.marker(coords, {icon: pengaduanIcon}).addTo(pengaduanGroup)
-                .bindPopup(`<b>Aduan: ${p.judul || 'Tanpa Judul'}</b><br>Kategori: ${p.kategori || 'Lainnya'}<br>Tujuan: ${p.nama_bidang || 'Umum'}`);
-            
-            marker.on('click', function(e) {
-                map.flyTo(e.latlng, 15, {
-                    animate: true,
-                    duration: 1.2
-                });
-            });
-        } catch(e) {}
-    });
-
-    // 5. Hotspot Markers (Official conflict zones)
+    const rekomendasi = <?= json_encode($rekomendasi ?? []) ?>;
     const hotspots = <?= json_encode($settings['titik_kerawanan'] ?? []) ?>;
     const hotspotMarkers = {};
-    hotspots.forEach(h => {
-        let marker = L.marker([h.latitude, h.longitude], {icon: getHotspotIcon(h.level)}).addTo(hotspotGroup)
-            .bindPopup(`<b>Titik Konflik: ${h.nama}</b><br>Tingkat Kerawanan: <span class="badge bg-danger">${h.level}</span><br>Detail: ${h.deskripsi}`);
-        
-        hotspotMarkers[h.id] = marker;
+    const rekomendasiIcon = createGlowIcon('glow-rekomendasi', 12);
+    let rekomendasiGroup = L.layerGroup().addTo(map);
 
-        marker.on('click', function(e) {
-            map.flyTo(e.latlng, 15, {
-                animate: true,
-                duration: 1.2
-            });
+    function renderFilteredData(year, month) {
+        pengaduanGroup.clearLayers();
+        hotspotGroup.clearLayers();
+        rekomendasiGroup.clearLayers();
+        for (let key in hotspotMarkers) {
+            delete hotspotMarkers[key];
+        }
+
+        // Helper function to match year & month
+        function matchDate(dateStr, selYear, selMonth) {
+            if (!dateStr) return false;
+            const dateObj = new Date(dateStr);
+            if (isNaN(dateObj.getTime())) return false;
+            
+            const yearMatch = (selYear === 'all') || (dateObj.getFullYear() == selYear);
+            const monthMatch = (selMonth === 'all') || ((dateObj.getMonth() + 1) == selMonth);
+            return yearMatch && monthMatch;
+        }
+
+        // Plot Pengaduan
+        pengaduan.forEach(p => {
+            if (matchDate(p.created_at, year, month)) {
+                let coords = getCoordinates(p.id, 'pengaduan');
+                let marker = L.marker(coords, {icon: pengaduanIcon}).addTo(pengaduanGroup)
+                    .bindPopup(`<b>Aduan: ${p.judul || 'Tanpa Judul'}</b><br>Kategori: ${p.kategori || 'Lainnya'}<br>Tujuan: ${p.nama_bidang || 'Umum'}<br>Tanggal: ${p.created_at}`);
+                
+                marker.on('click', function(e) {
+                    map.flyTo(e.latlng, 15, { animate: true, duration: 1.2 });
+                });
+            }
         });
-    });
+
+        // Plot Hotspots
+        hotspots.forEach(h => {
+            if (matchDate(h.created_at, year, month)) {
+                let marker = L.marker([h.latitude, h.longitude], {icon: getHotspotIcon(h.level)}).addTo(hotspotGroup)
+                    .bindPopup(`<b>Titik Konflik: ${h.nama}</b><br>Tingkat Kerawanan: <span class="badge bg-danger">${h.level}</span><br>Detail: ${h.deskripsi}<br>Tanggal: ${h.created_at || '-'}`);
+                
+                hotspotMarkers[h.id] = marker;
+                marker.on('click', function(e) {
+                    map.flyTo(e.latlng, 15, { animate: true, duration: 1.2 });
+                });
+            }
+        });
+
+        // Plot Rekomendasi
+        rekomendasi.forEach(r => {
+            if (matchDate(r.created_at, year, month)) {
+                let coords = getCoordinates(r.id, 'rekomendasi');
+                let marker = L.marker(coords, {icon: rekomendasiIcon}).addTo(rekomendasiGroup)
+                    .bindPopup(`<b>Rekomendasi: ${r.nama_kegiatan}</b><br>Pemohon: ${r.pemohon}<br>Lokasi: ${r.lokasi_kegiatan || '-'}<br>Waktu: ${r.tgl_mulai} s/d ${r.tgl_selesai}<br>Status: <span class="badge" style="background-color: #a855f7; color: #fff;">${r.status_rekomendasi}</span>`);
+                
+                marker.on('click', function(e) {
+                    map.flyTo(e.latlng, 15, { animate: true, duration: 1.2 });
+                });
+            }
+        });
+    }
+
+    // Initial filter values trigger
+    const filterTahunSelect = document.getElementById('filter-tahun');
+    const filterBulanSelect = document.getElementById('filter-bulan');
+
+    function triggerFilter() {
+        const yr = filterTahunSelect ? filterTahunSelect.value : '2026';
+        const mn = filterBulanSelect ? filterBulanSelect.value : 'all';
+        renderFilteredData(yr, mn);
+    }
+
+    if (filterTahunSelect && filterBulanSelect) {
+        triggerFilter();
+        filterTahunSelect.addEventListener('change', triggerFilter);
+        filterBulanSelect.addEventListener('change', triggerFilter);
+    } else {
+        renderFilteredData('2026', 'all');
+    }
 
     // Add Layer Filter Control
     let overlayMaps = {
         "<span style='color: var(--text-main); font-weight: 500;'><i class='fa-solid fa-building-shield text-danger me-1'></i> Kantor Kesbangpol</span>": officeGroup,
         "<span style='color: var(--text-main); font-weight: 500;'><i class='fa-solid fa-users text-primary me-1'></i> Organisasi Ormas</span>": ormasGroup,
         "<span style='color: var(--text-main); font-weight: 500;'><i class='fa-solid fa-building-flag text-warning me-1'></i> Partai Politik</span>": parpolGroup,
-        "<span style='color: var(--text-main); font-weight: 500;'><i class='fa-solid fa-bullhorn text-danger me-1'></i> Aduan Masyarakat</span>": pengaduanGroup,
+        "<span style='color: var(--text-main); font-weight: 500;'><i class='fa-solid fa-bullhorn text-danger me-1'></i> Laporan Pengaduan</span>": pengaduanGroup,
+        "<span style='color: var(--text-main); font-weight: 500;'><i class='fa-solid fa-calendar-check me-1' style='color:#a855f7;'></i> Rekomendasi Kegiatan</span>": rekomendasiGroup,
         "<span style='color: var(--text-main); font-weight: 500;'><i class='fa-solid fa-triangle-exclamation text-warning me-1 animate-pulse'></i> Titik Rawan Konflik</span>": hotspotGroup
     };
     L.control.layers(baseMaps, overlayMaps, { collapsed: false, position: 'topright' }).addTo(map);

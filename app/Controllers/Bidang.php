@@ -42,6 +42,11 @@ class Bidang extends BaseController
                 ->getResultArray();
         }
 
+        $rekomendasi = $db->table('trn_rekomendasi')
+                          ->orderBy('created_at', 'DESC')
+                          ->get()
+                          ->getResultArray();
+
         $data = [
             'title'       => 'Dashboard Bidang - SIPAKATAU',
             'namaBidang'  => $namaBidang,
@@ -49,6 +54,7 @@ class Bidang extends BaseController
             'parpol'      => $parpol,
             'pengaduan'   => $pengaduan,
             'hotspots'    => $hotspots,
+            'rekomendasi' => $rekomendasi,
             'today'       => date('Y-m-d'),
             'isPoldagri'  => $isPoldagri,
             'pendaftaran' => $pendaftaran,
