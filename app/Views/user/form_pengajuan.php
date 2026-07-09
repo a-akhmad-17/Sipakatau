@@ -450,125 +450,101 @@ $requirementsBerjenjang = [
                     </div>
                 </div>
 
-                <!-- Berkas & Biodata Pengurus (Tabel Minimalis & Kreatif) -->
+                <!-- Berkas Pengurus (Tabel Minimalis & Kreatif) -->
                 <div class="card mb-4 border-0" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden;">
                     <div class="card-header py-3 px-4" style="background: rgba(13, 202, 240, 0.15); border-bottom: 1px solid var(--border-color);">
-                        <h5 class="mb-0 text-white fw-bold font-heading" style="font-size: 1.05rem;"><i class="fa-solid fa-users me-2 text-info"></i>Biodata & Berkas Identitas Pengurus</h5>
+                        <h5 class="mb-0 text-white fw-bold font-heading" style="font-size: 1.05rem;"><i class="fa-solid fa-users me-2 text-info"></i>Unggah Berkas Identitas Pengurus</h5>
                     </div>
                     <div class="card-body p-3">
-                        <p class="text-muted small mb-3"><i class="fa-solid fa-circle-info text-info me-1"></i>Lengkapi biodata teks dan unggah berkas pengurus langsung pada tabel di bawah ini.</p>
+                        <p class="text-muted small mb-3"><i class="fa-solid fa-circle-info text-info me-1"></i>Silakan unggah berkas Biodata (CV/Form), KTP, dan Pasfoto 4x6 resmi untuk masing-masing pengurus.</p>
                         
                         <div class="table-responsive">
                             <table class="table table-bordered border-secondary border-opacity-10 text-white align-middle mb-0" style="font-size: 0.82rem; background: rgba(255,255,255,0.01);">
                                 <thead>
                                     <tr style="background: rgba(255, 255, 255, 0.03);">
-                                        <th style="width: 20%;">Pengurus</th>
-                                        <th style="width: 25%;">Data NIK & Kontak</th>
-                                        <th style="width: 30%;">TTL & Alamat KTP</th>
-                                        <th style="width: 15%;">Unggah Berkas</th>
-                                        <th style="width: 10%;" class="text-center">Pasfoto 4x6</th>
+                                        <th style="width: 35%;">Nama & Jabatan Pengurus</th>
+                                        <th style="width: 25%;">Unggah Berkas Biodata (PDF/Word)</th>
+                                        <th style="width: 25%;">Unggah Berkas KTP (PDF/Gambar)</th>
+                                        <th style="width: 15%;" class="text-center">Pasfoto 4x6 (Latar Merah)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php if (empty($pengurus)): ?>
                                         <tr>
-                                            <td colspan="5" class="text-center text-muted py-4 small">Belum ada data pengurus diisi di Langkah 1.</td>
+                                            <td colspan="4" class="text-center text-muted py-4 small">Belum ada data pengurus diisi di Langkah 1.</td>
                                         </tr>
                                     <?php else: ?>
                                         <?php foreach ($pengurus as $idx => $p): ?>
                                             <tr style="border-bottom: 1px solid rgba(255,255,255,0.03);">
                                                 <!-- Column 1: Nama & Jabatan -->
-                                                <td class="align-top py-2.5">
+                                                <td class="py-2.5">
                                                     <input type="hidden" name="pengurus_id[]" value="<?= esc($p['id']) ?>">
                                                     <div class="fw-bold text-main" style="font-size: 0.88rem;"><?= esc($p['nama']) ?></div>
                                                     <span class="badge bg-info text-white font-normal mt-1" style="font-size: 0.68rem;"><?= esc($p['jabatan']) ?></span>
                                                 </td>
 
-                                                <!-- Column 2: NIK & No. HP -->
-                                                <td class="align-top py-2.5">
-                                                    <div class="mb-1.5">
-                                                        <input type="text" name="pengurus_nik[]" class="form-control form-control-custom form-control-sm" maxlength="16" placeholder="Masukkan NIK 16 digit" value="<?= esc($p['nik'] ?? '') ?>" style="font-size: 0.78rem; padding: 4px 8px; background: rgba(0,0,0,0.2) !important;">
-                                                    </div>
-                                                    <div>
-                                                        <input type="text" name="pengurus_no_hp[]" class="form-control form-control-custom form-control-sm" placeholder="No. HP / WhatsApp" value="<?= esc($p['no_hp'] ?? '') ?>" style="font-size: 0.78rem; padding: 4px 8px; background: rgba(0,0,0,0.2) !important;">
-                                                    </div>
-                                                </td>
-
-                                                <!-- Column 3: TTL & Alamat KTP -->
-                                                <td class="align-top py-2.5">
-                                                    <div class="row g-1.5 mb-1.5">
-                                                        <div class="col-6">
-                                                            <input type="text" name="pengurus_tempat_lahir[]" class="form-control form-control-custom form-control-sm" placeholder="Tempat Lahir" value="<?= esc($p['tempat_lahir'] ?? '') ?>" style="font-size: 0.78rem; padding: 4px 8px; background: rgba(0,0,0,0.2) !important;">
-                                                        </div>
-                                                        <div class="col-6">
-                                                            <input type="date" name="pengurus_tanggal_lahir[]" class="form-control form-control-custom form-control-sm" value="<?= esc($p['tanggal_lahir'] ?? '') ?>" style="font-size: 0.78rem; padding: 3px 8px; background: rgba(0,0,0,0.2) !important;">
-                                                        </div>
-                                                    </div>
-                                                    <div>
-                                                        <input type="text" name="pengurus_alamat_ktp[]" class="form-control form-control-custom form-control-sm" placeholder="Alamat lengkap sesuai KTP..." value="<?= esc($p['alamat_ktp'] ?? '') ?>" style="font-size: 0.78rem; padding: 4px 8px; background: rgba(0,0,0,0.2) !important;">
-                                                    </div>
-                                                </td>
-
-                                                <!-- Column 4: Berkas Uploads -->
-                                                <td class="align-top py-2.5">
-                                                    <!-- BIODATA UPLOAD -->
+                                                <!-- Column 2: BIODATA UPLOAD -->
+                                                <td class="py-2.5">
                                                     <input type="hidden" name="pengurus_old_biodata[]" value="<?= esc($p['file_biodata'] ?? '') ?>">
-                                                    <div class="d-flex align-items-center gap-1.5 mb-1.5">
-                                                        <label class="btn btn-xs btn-outline-warning mb-0 py-0.5 px-2 d-flex align-items-center gap-1" style="cursor: pointer; font-size: 0.68rem; border-color: rgba(234,179,8,0.3) !important;">
-                                                            <i class="fa-solid fa-file-pdf"></i> Biodata
+                                                    <div class="d-flex align-items-center gap-1.5">
+                                                        <label class="btn btn-xs btn-outline-warning mb-0 py-1 px-2.5 d-flex align-items-center gap-1.5" style="cursor: pointer; font-size: 0.68rem; border-color: rgba(234,179,8,0.3) !important;">
+                                                            <i class="fa-solid fa-file-pdf"></i> Pilih Berkas
                                                             <input type="file" name="pengurus_biodata_<?= $idx ?>" class="d-none" accept=".pdf,.doc,.docx,image/*" onchange="handlePengurusFileChange(this, 'biodata', <?= $idx ?>)">
                                                         </label>
-                                                        <span class="file-name-biodata-<?= $idx ?> small text-success text-truncate d-block" style="max-width: 60px; font-size: 0.68rem;">
+                                                        <span class="file-name-biodata-<?= $idx ?> small text-success text-truncate d-block" style="max-width: 100px; font-size: 0.68rem;">
                                                             <?php if (!empty($p['file_biodata'])): ?>
                                                                 <a href="<?= base_url('uploads/ormas/' . $p['file_biodata']) ?>" target="_blank" class="text-info text-decoration-none" title="Buka Biodata"><i class="fa-solid fa-circle-check text-success"></i> Ada</a>
                                                             <?php else: ?>
-                                                                <span class="text-muted text-opacity-40">-</span>
-                                                            <?php endif; ?>
-                                                        </span>
-                                                    </div>
-
-                                                    <!-- KTP UPLOAD -->
-                                                    <input type="hidden" name="pengurus_old_ktp[]" value="<?= esc($p['file_ktp'] ?? '') ?>">
-                                                    <div class="d-flex align-items-center gap-1.5">
-                                                        <label class="btn btn-xs btn-outline-info mb-0 py-0.5 px-2 d-flex align-items-center gap-1" style="cursor: pointer; font-size: 0.68rem; border-color: rgba(13,202,240,0.3) !important;">
-                                                            <i class="fa-solid fa-id-card"></i> KTP
-                                                            <input type="file" name="pengurus_ktp_<?= $idx ?>" class="d-none" accept=".pdf,image/*" onchange="handlePengurusFileChange(this, 'ktp', <?= $idx ?>)">
-                                                        </label>
-                                                        <span class="file-name-ktp-<?= $idx ?> small text-success text-truncate d-block" style="max-width: 60px; font-size: 0.68rem;">
-                                                            <?php if (!empty($p['file_ktp'])): ?>
-                                                                <a href="<?= base_url('uploads/ormas/' . $p['file_ktp']) ?>" target="_blank" class="text-info text-decoration-none" title="Buka KTP"><i class="fa-solid fa-circle-check text-success"></i> Ada</a>
-                                                            <?php else: ?>
-                                                                <span class="text-muted text-opacity-40">-</span>
+                                                                <span class="text-muted text-opacity-40">Belum ada</span>
                                                             <?php endif; ?>
                                                         </span>
                                                     </div>
                                                 </td>
 
-                                                <!-- Column 5: Pasfoto 4x6 with Hover Overlay -->
-                                                <td class="align-top py-2.5 text-center">
-                                                    <input type="hidden" name="pengurus_old_pasfoto[]" value="<?= esc($p['file_pasfoto'] ?? '') ?>">
-                                                    <div class="position-relative mx-auto" style="width: 48px; height: 60px; border-radius: 4px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03);">
-                                                        <?php if (!empty($p['file_pasfoto'])): ?>
-                                                            <img src="<?= base_url('uploads/ormas/' . $p['file_pasfoto']) ?>" id="avatar-preview-<?= $idx ?>" alt="Foto" style="width: 100%; height: 100%; object-fit: cover;">
-                                                        <?php else: ?>
-                                                            <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center text-muted text-opacity-30" id="avatar-placeholder-<?= $idx ?>">
-                                                                <i class="fa-solid fa-user-tie" style="font-size: 14px;"></i>
-                                                                <span style="font-size: 6px;" class="mt-0.5">4x6</span>
-                                                            </div>
-                                                            <img src="" id="avatar-preview-<?= $idx ?>" alt="Foto" class="d-none" style="width: 100%; height: 100%; object-fit: cover;">
-                                                        <?php endif; ?>
-                                                        <!-- Hover camera trigger overlay -->
-                                                        <label class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-black bg-opacity-65 text-white opacity-0" style="cursor: pointer; transition: opacity 0.2s; font-size: 10px; margin-bottom: 0;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">
-                                                            <i class="fa-solid fa-camera"></i>
-                                                            <input type="file" name="pengurus_pasfoto_<?= $idx ?>" class="d-none" accept="image/*" onchange="handlePasfotoChange(this, <?= $idx ?>)">
+                                                <!-- Column 3: KTP UPLOAD -->
+                                                <td class="py-2.5">
+                                                    <input type="hidden" name="pengurus_old_ktp[]" value="<?= esc($p['file_ktp'] ?? '') ?>">
+                                                    <div class="d-flex align-items-center gap-1.5">
+                                                        <label class="btn btn-xs btn-outline-info mb-0 py-1 px-2.5 d-flex align-items-center gap-1.5" style="cursor: pointer; font-size: 0.68rem; border-color: rgba(13,202,240,0.3) !important;">
+                                                            <i class="fa-solid fa-id-card"></i> Pilih KTP
+                                                            <input type="file" name="pengurus_ktp_<?= $idx ?>" class="d-none" accept=".pdf,image/*" onchange="handlePengurusFileChange(this, 'ktp', <?= $idx ?>)">
                                                         </label>
+                                                        <span class="file-name-ktp-<?= $idx ?> small text-success text-truncate d-block" style="max-width: 100px; font-size: 0.68rem;">
+                                                            <?php if (!empty($p['file_ktp'])): ?>
+                                                                <a href="<?= base_url('uploads/ormas/' . $p['file_ktp']) ?>" target="_blank" class="text-info text-decoration-none" title="Buka KTP"><i class="fa-solid fa-circle-check text-success"></i> Ada</a>
+                                                            <?php else: ?>
+                                                                <span class="text-muted text-opacity-40">Belum ada</span>
+                                                            <?php endif; ?>
+                                                        </span>
                                                     </div>
-                                                    <div class="file-name-pasfoto-<?= $idx ?> text-center mt-1" style="font-size: 9px; line-height: 1.1;">
-                                                        <?php if (!empty($p['file_pasfoto'])): ?>
-                                                            <span class="text-success fw-bold">Ada</span>
-                                                        <?php else: ?>
-                                                            <span class="text-muted text-opacity-40">-</span>
-                                                        <?php endif; ?>
+                                                </td>
+
+                                                <!-- Column 4: Pasfoto 4x6 with Hover Overlay -->
+                                                <td class="py-2.5 text-center">
+                                                    <input type="hidden" name="pengurus_old_pasfoto[]" value="<?= esc($p['file_pasfoto'] ?? '') ?>">
+                                                    <div class="d-flex align-items-center justify-content-center gap-3">
+                                                        <div class="position-relative" style="width: 40px; height: 50px; border-radius: 4px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03);">
+                                                            <?php if (!empty($p['file_pasfoto'])): ?>
+                                                                <img src="<?= base_url('uploads/ormas/' . $p['file_pasfoto']) ?>" id="avatar-preview-<?= $idx ?>" alt="Foto" style="width: 100%; height: 100%; object-fit: cover;">
+                                                            <?php else: ?>
+                                                                <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center text-muted text-opacity-30" id="avatar-placeholder-<?= $idx ?>">
+                                                                    <i class="fa-solid fa-user-tie" style="font-size: 12px;"></i>
+                                                                </div>
+                                                                <img src="" id="avatar-preview-<?= $idx ?>" alt="Foto" class="d-none" style="width: 100%; height: 100%; object-fit: cover;">
+                                                            <?php endif; ?>
+                                                            <!-- Hover camera trigger overlay -->
+                                                            <label class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-black bg-opacity-65 text-white opacity-0" style="cursor: pointer; transition: opacity 0.2s; font-size: 8px; margin-bottom: 0;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">
+                                                                <i class="fa-solid fa-camera"></i>
+                                                                <input type="file" name="pengurus_pasfoto_<?= $idx ?>" class="d-none" accept="image/*" onchange="handlePasfotoChange(this, <?= $idx ?>)">
+                                                            </label>
+                                                        </div>
+                                                        <div class="file-name-pasfoto-<?= $idx ?> text-center" style="font-size: 0.68rem;">
+                                                            <?php if (!empty($p['file_pasfoto'])): ?>
+                                                                <span class="text-success fw-bold"><i class="fa-solid fa-circle-check text-success me-1"></i>Ada</span>
+                                                            <?php else: ?>
+                                                                <span class="text-muted text-opacity-40">Belum ada</span>
+                                                            <?php endif; ?>
+                                                        </div>
                                                     </div>
                                                 </td>
                                             </tr>

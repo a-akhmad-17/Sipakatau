@@ -1481,9 +1481,8 @@
                                         <table class="table table-sm table-bordered border-secondary border-opacity-10 text-white mb-0" style="font-size: 0.85rem; background: rgba(255,255,255,0.02);">
                                             <thead>
                                                 <tr style="background: rgba(255, 255, 255, 0.03);">
-                                                    <th style="width: 15%;">Jabatan</th>
-                                                    <th style="width: 25%;">Nama / NIK</th>
-                                                    <th style="width: 30%;">TTL & Alamat KTP</th>
+                                                    <th style="width: 25%;">Jabatan</th>
+                                                    <th style="width: 45%;">Nama Lengkap & Kontak WA</th>
                                                     <th class="text-center" style="width: 30%;">Dokumen Pengurus</th>
                                                 </tr>
                                             </thead>
@@ -2472,16 +2471,11 @@ document.addEventListener('DOMContentLoaded', function() {
                           tr.innerHTML = `
                               <td class="text-white align-top fw-semibold text-warning">${p.jabatan}</td>
                               <td class="text-white align-top">
-                                  <div class="fw-bold">${p.nama}</div>
-                                  <div class="text-muted" style="font-size: 11px;">NIK: ${p.nik || '-'}</div>
-                                  <div class="text-muted" style="font-size: 11px;">WA: ${p.no_hp || '-'}</div>
-                              </td>
-                              <td class="text-white align-top small">
-                                  <div><strong>TTL:</strong> ${ttl}</div>
-                                  <div class="text-muted mt-1" style="font-size: 11px; white-space: normal; word-break: break-word;"><strong>Alamat:</strong> ${alamat}</div>
+                                  <div class="fw-bold" style="font-size: 0.88rem;">${p.nama}</div>
+                                  <div class="text-muted small mt-0.5"><i class="fa-brands fa-whatsapp text-success me-1"></i>${p.no_hp || '-'}</div>
                               </td>
                               <td class="align-top text-center">
-                                  <div class="d-flex flex-column gap-1 align-items-center justify-content-center">
+                                  <div class="d-flex gap-1.5 align-items-center justify-content-center flex-wrap">
                                       ${biodataLink}
                                       ${ktpLink}
                                       ${pasfotoLink}
