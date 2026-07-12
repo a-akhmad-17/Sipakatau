@@ -28,12 +28,22 @@ class Home extends BaseController
         $totalOrmas = $this->db->table('mst_ormas')->countAllResults();
         $totalRekomendasi = $this->db->table('trn_rekomendasi')->where('status_rekomendasi', 'Approved')->countAllResults();
 
+        // Ambil 3 berita terbaru untuk slider Beranda
+        $beritaModel = new \App\Models\BeritaModel();
+        $latestNews = $beritaModel->select('mst_berita.*, sys_users.username as author')
+                                  ->join('sys_users', 'sys_users.id = mst_berita.created_by', 'left')
+                                  ->where('mst_berita.status', 'Published')
+                                  ->orderBy('mst_berita.created_at', 'DESC')
+                                  ->limit(3)
+                                  ->findAll();
+
         $data = [
             'title'            => 'Portal Layanan Kesbangpol',
             'bidang'           => $bidang,
             'firstVideo'       => $firstVideo,
             'totalOrmas'       => $totalOrmas,
-            'totalRekomendasi' => $totalRekomendasi
+            'totalRekomendasi' => $totalRekomendasi,
+            'latestNews'       => $latestNews
         ];
         return view('home/index', $data);
     }

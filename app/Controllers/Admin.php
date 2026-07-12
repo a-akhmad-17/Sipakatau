@@ -2645,6 +2645,19 @@ class Admin extends BaseController
             $gambarName = convert_to_webp($fileGambar, $destination, 'berita_' . time());
         }
 
+        // Pembersihan gambar konten yang dihapus oleh admin dari editor
+        $oldImages = $this->getUploadedContentImages($beforeData['konten'] ?? '');
+        $newImages = $this->getUploadedContentImages($konten);
+        $deletedImages = array_diff($oldImages, $newImages);
+        if (!empty($deletedImages)) {
+            $contentDir = ROOTPATH . 'public/uploads/berita/content/';
+            foreach ($deletedImages as $imgName) {
+                if (file_exists($contentDir . $imgName)) {
+                    @unlink($contentDir . $imgName);
+                }
+            }
+        }
+
         $updateData = [
             'judul'    => $judul,
             'slug'     => $slug,
@@ -2677,6 +2690,34 @@ class Admin extends BaseController
         log_activity('HAPUS_BERITA_ADMIN', $berita, array_merge($berita, ['deleted_at' => date('Y-m-d H:i:s')]), 'mst_berita', $id);
 
         return redirect()->to('admin/settings/berita')->with('success', 'Berita "' . $berita['judul'] . '" berhasil dihapus.');
+    }
+
+    public function uploadBeritaImage()
+    {
+        helper('app');
+        $file = $this->request->getFile('file');
+        if ($file && $file->isValid() && !$file->hasMoved()) {
+            $destination = ROOTPATH . 'public/uploads/berita/content';
+            if (!is_dir($destination)) {
+                mkdir($destination, 0755, true);
+            }
+            $webpName = convert_to_webp($file, $destination, 'content_' . time());
+            if ($webpName) {
+                return $this->response->setJSON([
+                    'url' => base_url('uploads/berita/content/' . $webpName)
+                ]);
+            }
+        }
+        return $this->response->setStatusCode(400)->setJSON([
+            'error' => 'Gagal mengunggah gambar'
+        ]);
+    }
+
+    private function getUploadedContentImages(string $content): array
+    {
+        $pattern = '/uploads\/berita\/content\/([a-zA-Z0-9_\-\.]+\.webp)/i';
+        preg_match_all($pattern, $content, $matches);
+        return $matches[1] ?? [];
     }
 }
 

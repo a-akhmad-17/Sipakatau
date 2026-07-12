@@ -82,12 +82,19 @@
     .social-brand-icon:hover {
         transform: scale(1.1);
     }
-    .wa-link {
-        transition: all 0.2s ease;
+    /* Carousel styling */
+    .carousel-indicators [data-bs-target] {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin: 0 4px;
+        background-color: rgba(255, 255, 255, 0.4);
+        border: none;
+        transition: all 0.2s;
     }
-    .wa-link:hover {
-        text-decoration: underline !important;
-        opacity: 0.85;
+    .carousel-indicators .active {
+        background-color: #e11d48;
+        transform: scale(1.2);
     }
 </style>
 <?= $this->endSection() ?>
@@ -151,6 +158,67 @@
         </div>
     </div>
 </div>
+
+<?php if (!empty($latestNews)): ?>
+<!-- Slider Berita Utama -->
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="glass-card p-2" style="border-color: rgba(255,255,255,0.08); overflow: hidden; border-radius: 16px;">
+            <div id="beritaCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="6000">
+                <!-- Indicators -->
+                <div class="carousel-indicators mb-2">
+                    <?php foreach ($latestNews as $key => $n): ?>
+                        <button type="button" data-bs-target="#beritaCarousel" data-bs-slide-to="<?= $key ?>" class="<?= ($key === 0) ? 'active' : '' ?>" aria-current="<?= ($key === 0) ? 'true' : 'false' ?>"></button>
+                    <?php endforeach; ?>
+                </div>
+                
+                <!-- Carousel Items -->
+                <div class="carousel-inner" style="border-radius: 12px; overflow: hidden;">
+                    <?php foreach ($latestNews as $key => $n): ?>
+                        <div class="carousel-item <?= ($key === 0) ? 'active' : '' ?>">
+                            <div class="position-relative bg-dark" style="height: 380px;">
+                                <!-- Background Cover Image with dim overlay -->
+                                <?php if (!empty($n['gambar'])): ?>
+                                    <img src="<?= base_url('uploads/berita/' . $n['gambar']) ?>" class="d-block w-100 h-100" style="object-fit: cover; opacity: 0.45; filter: blur(1px);">
+                                <?php else: ?>
+                                    <div class="w-100 h-100" style="background: linear-gradient(135deg, #1e293b, #0f172a); opacity: 0.65;"></div>
+                                <?php endif; ?>
+                                
+                                <!-- Content Overlay Card (Glassmorphic) -->
+                                <div class="position-absolute bottom-0 start-0 w-100 h-100 p-4 p-md-5 d-flex flex-column justify-content-end align-items-start" style="background: linear-gradient(to top, rgba(0,0,0,0.85) 40%, rgba(0,0,0,0));">
+                                    <div class="mb-2">
+                                        <span class="badge bg-danger px-2.5 py-1.5" style="font-size: 0.72rem; font-weight: 600; letter-spacing: 0.5px; border-radius: 6px; border: 1px solid rgba(225, 29, 72, 0.3); background: rgba(225, 29, 72, 0.3) !important; color: #fda4af !important;"><?= esc($n['kategori']) ?></span>
+                                    </div>
+                                    <h3 class="text-white fw-bold mb-2 font-heading" style="font-size: 1.6rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; max-width: 85%;">
+                                        <?= esc($n['judul']) ?>
+                                    </h3>
+                                    <p class="text-white-50 small mb-3 d-none d-md-block" style="max-width: 75%; text-shadow: 0 1px 2px rgba(0,0,0,0.5); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.6;">
+                                        <?= esc(mb_strimwidth(strip_tags($n['konten']), 0, 180, '...')) ?>
+                                    </p>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <a href="<?= site_url('informasi/berita/' . $n['slug']) ?>" class="btn btn-sm btn-portal px-4 py-2 font-heading" style="font-size: 0.82rem;"><i class="fa-solid fa-book-open me-1.5"></i>Baca Berita</a>
+                                        <span class="small text-white-50" style="font-size: 0.75rem;"><i class="fa-regular fa-clock me-1 text-primary"></i>Diterbitkan: <?= date('d M Y', strtotime($n['created_at'])) ?></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                
+                <!-- Controls -->
+                <button class="carousel-control-prev" type="button" data-bs-target="#beritaCarousel" data-bs-slide="prev" style="width: 50px;">
+                    <span class="carousel-control-prev-icon" aria-hidden="true" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#beritaCarousel" data-bs-slide="next" style="width: 50px;">
+                    <span class="carousel-control-next-icon" aria-hidden="true" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
 
 <!-- Tracking Section -->
 <div class="row mb-5 justify-content-center">

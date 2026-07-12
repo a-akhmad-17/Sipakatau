@@ -97,6 +97,7 @@ $routes->group('admin', ['filter' => 'auth:admin'], function($routes) {
     $routes->post('settings/berita/tambah', 'Admin::tambahBerita');
     $routes->post('settings/berita/update', 'Admin::updateBerita');
     $routes->post('settings/berita/delete/(:any)', 'Admin::deleteBerita/$1');
+    $routes->post('settings/berita/upload-image', 'Admin::uploadBeritaImage');
 
 });
 

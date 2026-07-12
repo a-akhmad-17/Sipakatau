@@ -287,6 +287,35 @@
 <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
 <script>
     $(document).ready(function() {
+        // Function to upload Summernote image via AJAX
+        function uploadContentImage(file, editor) {
+            var data = new FormData();
+            data.append("file", file);
+            var csrfName = '<?= csrf_token() ?>';
+            var csrfHash = '<?= csrf_hash() ?>';
+            data.append(csrfName, csrfHash);
+
+            $.ajax({
+                url: "<?= site_url('admin/settings/berita/upload-image') ?>",
+                cache: false,
+                contentType: false,
+                processData: false,
+                data: data,
+                type: "POST",
+                success: function(response) {
+                    if (response.url) {
+                        $(editor).summernote('insertImage', response.url);
+                    } else {
+                        alert(response.error || "Gagal mengunggah gambar.");
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error(textStatus, errorThrown);
+                    alert("Terjadi kesalahan saat mengunggah gambar.");
+                }
+            });
+        }
+
         // Initialize Summernote Rich Text Editor
         $('.summernote').summernote({
             placeholder: 'Tuliskan isi berita di sini...',
@@ -305,6 +334,9 @@
                 onInit: function() {
                     // Adjust Summernote colors for dark theme context dynamically if needed
                     $('.note-editable').css('color', 'var(--text-main)');
+                },
+                onImageUpload: function(files) {
+                    uploadContentImage(files[0], this);
                 }
             }
         });
