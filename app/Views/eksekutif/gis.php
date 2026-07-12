@@ -356,8 +356,9 @@
                 if (matchDate(p.created_at, year, month)) {
                     filteredParpolCount++;
                     let coords = (p.latitude && p.longitude) ? [parseFloat(p.latitude), parseFloat(p.longitude)] : getCoordinates(p.id, 'parpol');
+                    let dewanInfo = p.has_kursi == 1 ? `<br>Representasi: Punya Kursi DPRD (${p.level_dewan || '-'} • Periode ${p.periode_dewan || '-'})` : '<br>Representasi: Tidak Ada Kursi';
                     let marker = L.marker(coords, {icon: parpolIcon}).addTo(parpolGroup)
-                        .bindPopup(`<b>Parpol: ${p.nama_parpol}</b><br>Ketua: ${p.ketua}<br>Kontak: ${p.telepon}<br>Terdaftar: ${p.created_at || '-'}`);
+                        .bindPopup(`<b>Parpol: ${p.nama_parpol}</b><br>Ketua: ${p.ketua}<br>Kontak: ${p.telepon}${dewanInfo}<br>Terdaftar: ${p.created_at || '-'}`);
                     
                     marker.on('click', function(e) {
                         map.flyTo(e.latlng, 15, { animate: true, duration: 1.2 });

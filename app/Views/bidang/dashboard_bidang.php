@@ -111,13 +111,13 @@
     <div class="col-6 col-md-3">
         <div class="glass-card p-3 text-center">
             <div class="fs-2 fw-bold text-primary"><?= $perluSkt ?></div>
-            <div class="text-muted small mt-1"><i class="fa-solid fa-stamp text-primary me-1"></i>Siap Terbitkan SKT</div>
+            <div class="text-muted small mt-1"><i class="fa-solid fa-stamp text-primary me-1"></i>Siap Terbitkan Dokumen</div>
         </div>
     </div>
     <div class="col-6 col-md-3">
         <div class="glass-card p-3 text-center">
             <div class="fs-2 fw-bold text-success"><?= $selesai ?></div>
-            <div class="text-muted small mt-1"><i class="fa-solid fa-circle-check text-success me-1"></i>SKT Diterbitkan</div>
+            <div class="text-muted small mt-1"><i class="fa-solid fa-circle-check text-success me-1"></i>Dokumen Diterbitkan</div>
         </div>
     </div>
 </div>
@@ -128,8 +128,8 @@
         <div class="glass-card p-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div>
-                    <h5 class="text-white mb-1 font-heading"><i class="fa-solid fa-file-signature text-primary me-2"></i>Kelola Pendaftaran SKT Ormas</h5>
-                    <p class="text-muted small mb-0">Verifikasi berkas, validasi, dan penerbitan Surat Keterangan Terdaftar (SKT).</p>
+                    <h5 class="text-white mb-1 font-heading"><i class="fa-solid fa-file-signature text-primary me-2"></i>Kelola Pendaftaran Ormas</h5>
+                    <p class="text-muted small mb-0">Verifikasi berkas, validasi, dan penerbitan Laporan Tanggapan Keberadaan atau Surat Keberadaan.</p>
                 </div>
             </div>
 
@@ -167,6 +167,7 @@
                     <?php foreach ($pendaftaran as $i => $p):
                         $status    = $p['status_verifikasi'] ?? 'New';
                         $progress  = (int)($p['progress_percentage'] ?? 0);
+                        $isLokal   = (($p['tipe_ormas'] ?? 'Lokal') === 'Lokal');
                         $badgeClass = match(true) {
                             $progress === 100              => 'skt-badge-done',
                             $status === 'Rejected'         => 'skt-badge-rejected',
@@ -174,9 +175,9 @@
                             default                        => 'skt-badge-pending',
                         };
                         $statusLabel = match(true) {
-                            $progress === 100              => 'SKT Diterbitkan',
+                            $progress === 100              => $isLokal ? 'Tanggapan Diterbitkan' : 'Surat Keberadaan Diterbitkan',
                             $status === 'Rejected'         => 'Ditolak',
-                            $status === 'Approved' && $progress >= 75 => 'Siap Terbitkan SKT',
+                            $status === 'Approved' && $progress >= 75 => $isLokal ? 'Siap Terbit Tanggapan' : 'Siap Terbit Surat Keberadaan',
                             $progress >= 50                => 'Validasi Bidang',
                             default                        => 'Menunggu',
                         };
@@ -202,16 +203,16 @@
                                 </span>
                             </td>
                             <td class="text-muted" style="font-size:12px;"><?= date('d M Y', strtotime($p['created_at'])) ?></td>
-                            <td class="text-center">
+                             <td class="text-center">
                                 <?php if ($progress === 100 || $status === 'Rejected'): ?>
                                     <!-- Selesai / Ditolak — no action -->
                                     <span class="text-muted" style="font-size:11px;">—</span>
 
                                 <?php elseif ($status === 'Approved' && $progress === 75): ?>
                                     <!-- Terbitkan SKT -->
-                                    <button class="btn btn-sm btn-primary" onclick="openModalSkt('<?= $p['id'] ?>', '<?= esc($p['nama_ormas']) ?>')"
+                                    <button class="btn btn-sm btn-primary" onclick="openModalSkt('<?= $p['id'] ?>', '<?= esc($p['nama_ormas']) ?>', '<?= esc($p['tipe_ormas'] ?? 'Lokal') ?>')"
                                         style="font-size:12px; padding:4px 10px;">
-                                        <i class="fa-solid fa-stamp me-1"></i>Terbitkan SKT
+                                        <i class="fa-solid fa-stamp me-1"></i>Terbitkan <?= $isLokal ? 'Tanggapan' : 'Surat Keberadaan' ?>
                                     </button>
                                     <button class="btn btn-sm btn-outline-danger ms-1" onclick="openModalTolak('<?= $p['id'] ?>', '<?= esc($p['nama_ormas']) ?>')"
                                         style="font-size:12px; padding:4px 10px;">
@@ -222,7 +223,7 @@
                                     <!-- Validasi Berkas -->
                                     <form method="POST" action="<?= base_url('bidang/proses-pendaftaran/' . $p['id'] . '/approve_bidang') ?>"
                                         style="display:inline;"
-                                        onsubmit="return confirm('Validasi berkas ormas ini ke tahap penerbitan SKT?')">
+                                        onsubmit="return confirm('Validasi berkas ormas ini ke tahap penerbitan <?= $isLokal ? 'Laporan Tanggapan' : 'Surat Keberadaan' ?>?')">
                                         <?= csrf_field() ?>
                                         <button type="submit" class="btn btn-sm btn-success" style="font-size:12px; padding:4px 10px;">
                                             <i class="fa-solid fa-check me-1"></i>Validasi
@@ -243,7 +244,7 @@
 
                                 <?php if (!empty($p['pdf_tte_path'])): ?>
                                     <a href="<?= base_url('uploads/rekomendasi_ormas/' . $p['pdf_tte_path']) ?>" target="_blank"
-                                        class="btn btn-sm ms-1" style="font-size:12px; padding:4px 8px; background:rgba(99,102,241,.12); color:#818cf8;" title="Unduh SKT">
+                                        class="btn btn-sm ms-1" style="font-size:12px; padding:4px 8px; background:rgba(99,102,241,.12); color:#818cf8;" title="Unduh <?= $isLokal ? 'Laporan Tanggapan' : 'Surat Keberadaan' ?>">
                                         <i class="fa-solid fa-file-arrow-down"></i>
                                     </a>
                                 <?php endif; ?>
@@ -263,15 +264,15 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="background:var(--card-bg); border:1px solid var(--border-color);">
             <div class="modal-header border-0">
-                <h5 class="modal-title text-white font-heading" id="modalSktLabel"><i class="fa-solid fa-stamp text-primary me-2"></i>Terbitkan SKT</h5>
+                <h5 class="modal-title text-white font-heading" id="modalSktLabel"><i class="fa-solid fa-stamp text-primary me-2"></i><span id="sktLabelText">Terbitkan Dokumen</span></h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form id="formTerbitkanSkt" method="POST" enctype="multipart/form-data">
                 <?= csrf_field() ?>
                 <div class="modal-body">
-                    <p class="text-muted small mb-3">Unggah dokumen <b>Surat Keterangan Terdaftar (SKT)</b> yang telah ditandatangani untuk ormas: <span id="sktNamaOrmas" class="text-white fw-semibold"></span></p>
+                    <p class="text-muted small mb-3">Unggah dokumen <b id="sktDocName">Surat Keterangan</b> resmi yang telah ditandatangani untuk ormas: <span id="sktNamaOrmas" class="text-white fw-semibold"></span></p>
                     <div class="mb-3">
-                        <label class="form-label text-muted small">File SKT (PDF/Gambar) <span class="text-danger">*</span></label>
+                        <label class="form-label text-muted small" id="sktFileInputLabel">File Dokumen (PDF/Gambar) <span class="text-danger">*</span></label>
                         <input type="file" name="berkas_skt" id="berkas_skt" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.webp" required
                             style="background:var(--input-bg); border:1px solid var(--border-color); color:var(--text-main);">
                         <div class="form-text text-muted">Maks. 5MB. Format: PDF, JPG, PNG, WebP.</div>
@@ -377,7 +378,11 @@
 <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
 <script>
     // ===== Modal Helpers =====
-    function openModalSkt(id, namaOrmas) {
+    function openModalSkt(id, namaOrmas, tipe) {
+        const docTitle = (tipe === 'Lokal') ? 'Laporan Tanggapan Keberadaan' : 'Surat Keberadaan';
+        document.getElementById('sktLabelText').textContent = 'Terbitkan ' + docTitle;
+        document.getElementById('sktDocName').textContent = docTitle;
+        document.getElementById('sktFileInputLabel').textContent = 'File ' + docTitle + ' (PDF/Gambar)';
         document.getElementById('sktNamaOrmas').textContent = namaOrmas;
         document.getElementById('formTerbitkanSkt').action = `<?= base_url('bidang/proses-pendaftaran/') ?>${id}/terbitkan_skt`;
         new bootstrap.Modal(document.getElementById('modalTerbitkanSkt')).show();
@@ -492,8 +497,9 @@
             parpol.forEach(p => {
                 if (matchDate(p.created_at, year, month)) {
                     let coords = (p.latitude && p.longitude) ? [parseFloat(p.latitude), parseFloat(p.longitude)] : getCoordinates(p.id);
+                    let dewanInfo = p.has_kursi == 1 ? `<br>Representasi: Punya Kursi DPRD (${p.level_dewan || '-'} • Periode ${p.periode_dewan || '-'})` : '<br>Representasi: Tidak Ada Kursi';
                     L.marker(coords, {icon: parpolIcon}).addTo(parpolGroup)
-                        .bindPopup(`<b>Parpol: ${p.nama_parpol}</b><br>Ketua: ${p.ketua}<br>Kontak: ${p.telepon}<br>Terdaftar: ${p.created_at || '-'}`)
+                        .bindPopup(`<b>Parpol: ${p.nama_parpol}</b><br>Ketua: ${p.ketua}<br>Kontak: ${p.telepon}${dewanInfo}<br>Terdaftar: ${p.created_at || '-'}`)
                         .on('click', e => map.flyTo(e.latlng, 15, {animate: true, duration: 1.2}));
                 }
             });

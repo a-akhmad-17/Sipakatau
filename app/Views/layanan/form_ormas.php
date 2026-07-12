@@ -100,7 +100,7 @@
                 <div class="col-md-12">
                     <label for="tipe_ormas" class="form-label small text-muted">Tipe Organisasi *</label>
                     <select class="form-select form-control-custom py-3" id="tipe_ormas" name="tipe_ormas" required onchange="toggleOrmasRequirements(this.value)">
-                        <option value="Lokal">Ormas Lokal (Penerbitan SKT)</option>
+                        <option value="Lokal">Ormas Lokal (Penerbitan Laporan Tanggapan Keberadaan)</option>
                         <option value="Berjenjang">Ormas Berjenjang (Penerbitan Surat Keberadaan)</option>
                     </select>
                 </div>

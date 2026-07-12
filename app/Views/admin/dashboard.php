@@ -423,6 +423,7 @@
                             <th>Ketua Pengurus</th>
                             <th>Alamat Kantor Cabang</th>
                             <th>Telepon / Kontak</th>
+                            <th class="text-center">Representasi Dewan</th>
                             <th class="text-center">Berkas SK</th>
                             <th class="text-center" style="width: 25%;">Aksi</th>
                         </tr>
@@ -449,6 +450,18 @@
                                 <td><i class="fa-solid fa-location-dot text-muted me-1"></i><?= esc($p['alamat']) ?></td>
                                 <td><?= esc($p['telepon']) ?></td>
                                 <td class="text-center">
+                                    <?php if ($p['has_kursi'] == 1): ?>
+                                        <span class="badge bg-success-subtle text-success border border-success border-opacity-25 px-2.5 py-1" style="border-radius:6px; font-size:11px; display:inline-block; line-height:1.3;">
+                                            <i class="fa-solid fa-chair me-1"></i>Punya Kursi<br>
+                                            <small class="text-muted" style="font-size: 10px;"><?= esc($p['level_dewan']) ?> (<?= esc($p['periode_dewan']) ?>)</small>
+                                        </span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary-subtle text-muted border border-secondary border-opacity-25 px-2.5 py-1" style="border-radius:6px; font-size:11px;">
+                                            Tidak Ada Kursi
+                                        </span>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="text-center">
                                     <?php if (!empty($p['file_sk'])): ?>
                                         <a href="<?= base_url('uploads/parpol/' . $p['file_sk']) ?>" target="_blank" class="btn btn-sm btn-outline-info px-3 py-1.5 rounded">
                                             <i class="fa-solid fa-file-shield me-1"></i> Buka Berkas SK
@@ -473,7 +486,10 @@
                                                 data-alamat="<?= esc($p['alamat']) ?>"
                                                 data-telepon="<?= esc($p['telepon']) ?>"
                                                 data-latitude="<?= $p['latitude'] ?? '' ?>"
-                                                data-longitude="<?= $p['longitude'] ?? '' ?>">
+                                                data-longitude="<?= $p['longitude'] ?? '' ?>"
+                                                data-has-kursi="<?= $p['has_kursi'] ?>"
+                                                data-periode-dewan="<?= esc($p['periode_dewan']) ?>"
+                                                data-level-dewan="<?= esc($p['level_dewan']) ?>">
                                             <i class="fa-solid fa-pencil"></i> Edit
                                         </button>
                                         <form action="<?= base_url('admin/delete-parpol/' . $p['id']) ?>" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus partai politik ini?')">
@@ -1348,6 +1364,20 @@
                             <label for="p_sk" class="form-label small text-muted">SK Kepengurusan Kemenkumham (ZIP/PDF)</label>
                             <input type="file" name="file_sk" id="p_sk" class="form-control form-control-custom" accept=".zip,.pdf">
                         </div>
+                        <div class="col-md-12">
+                            <div class="form-check form-switch p-3 rounded" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color);">
+                                <input class="form-check-input ms-0 me-2" type="checkbox" name="has_kursi" id="p_has_kursi" value="1" onchange="toggleDewanFields(this, 'tambah')">
+                                <label class="form-check-label small text-white fw-bold" for="p_has_kursi">Memiliki Kursi Anggota Dewan (DPRD)?</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 d-none" id="group_p_periode">
+                            <label for="p_periode" class="form-label small text-muted">Periode Anggota Dewan</label>
+                            <input type="text" name="periode_dewan" id="p_periode" class="form-control form-control-custom" placeholder="Contoh: 2024-2029">
+                        </div>
+                        <div class="col-md-6 d-none" id="group_p_level">
+                            <label for="p_level" class="form-label small text-muted">Tingkatan / Level Dewan</label>
+                            <input type="text" name="level_dewan" id="p_level" class="form-control form-control-custom" placeholder="Contoh: DPRD Kabupaten Sinjai">
+                        </div>
                     </div>
                     <div class="modal-footer border-0 px-0 pb-0 mt-4">
                         <button type="button" class="btn btn-secondary text-white" data-bs-dismiss="modal">Batal</button>
@@ -1403,6 +1433,20 @@
                         <div class="col-md-6">
                             <label for="edit_p_sk" class="form-label small text-muted">SK Kepengurusan Kemenkumham (Unggah untuk Ganti)</label>
                             <input type="file" name="file_sk" id="edit_p_sk" class="form-control form-control-custom" accept=".zip,.pdf">
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-check form-switch p-3 rounded" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color);">
+                                <input class="form-check-input ms-0 me-2" type="checkbox" name="has_kursi" id="edit_p_has_kursi" value="1" onchange="toggleDewanFields(this, 'edit')">
+                                <label class="form-check-label small text-white fw-bold" for="edit_p_has_kursi">Memiliki Kursi Anggota Dewan (DPRD)?</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 d-none" id="group_edit_p_periode">
+                            <label for="edit_p_periode" class="form-label small text-muted">Periode Anggota Dewan</label>
+                            <input type="text" name="periode_dewan" id="edit_p_periode" class="form-control form-control-custom" placeholder="Contoh: 2024-2029">
+                        </div>
+                        <div class="col-md-6 d-none" id="group_edit_p_level">
+                            <label for="edit_p_level" class="form-label small text-muted">Tingkatan / Level Dewan</label>
+                            <input type="text" name="level_dewan" id="edit_p_level" class="form-control form-control-custom" placeholder="Contoh: DPRD Kabupaten Sinjai">
                         </div>
                     </div>
                     <div class="modal-footer border-0 px-0 pb-0 mt-4">
@@ -1721,6 +1765,21 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
 <script>
+window.toggleDewanFields = function(el, mode) {
+    const prefix = mode === 'edit' ? 'edit_p_' : 'p_';
+    const groupPeriode = document.getElementById('group_' + prefix + 'periode');
+    const groupLevel = document.getElementById('group_' + prefix + 'level');
+    if (el.checked) {
+        groupPeriode.classList.remove('d-none');
+        groupLevel.classList.remove('d-none');
+    } else {
+        groupPeriode.classList.add('d-none');
+        groupLevel.classList.add('d-none');
+        document.getElementById(prefix + 'periode').value = '';
+        document.getElementById(prefix + 'level').value = '';
+    }
+};
+
 document.addEventListener('DOMContentLoaded', function() {
     // Staf Photo size validation
     const stafPhoto = document.getElementById('staf_photo');
@@ -1870,8 +1929,9 @@ document.addEventListener('DOMContentLoaded', function() {
         parpol.forEach(p => {
             if (matchDate(p.created_at, year, month)) {
                 let coords = (p.latitude && p.longitude) ? [parseFloat(p.latitude), parseFloat(p.longitude)] : getCoordinates(p.id, 'parpol');
+                let dewanInfo = p.has_kursi == 1 ? `<br>Representasi: Punya Kursi DPRD (${p.level_dewan || '-'} • Periode ${p.periode_dewan || '-'})` : '<br>Representasi: Tidak Ada Kursi';
                 let marker = L.marker(coords, {icon: parpolIcon}).addTo(parpolGroup)
-                    .bindPopup(`<b>Parpol: ${p.nama_parpol}</b><br>Ketua: ${p.ketua}<br>Kontak: ${p.telepon}<br>Terdaftar: ${p.created_at || '-'}`);
+                    .bindPopup(`<b>Parpol: ${p.nama_parpol}</b><br>Ketua: ${p.ketua}<br>Kontak: ${p.telepon}${dewanInfo}<br>Terdaftar: ${p.created_at || '-'}`);
                 
                 marker.on('click', function(e) {
                     map.flyTo(e.latlng, 15, { animate: true, duration: 1.2 });
@@ -2296,6 +2356,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const teleponVal = this.getAttribute('data-telepon');
             const latVal = this.getAttribute('data-latitude');
             const lngVal = this.getAttribute('data-longitude');
+            const hasKursiVal = this.getAttribute('data-has-kursi');
+            const periodeVal = this.getAttribute('data-periode-dewan');
+            const levelVal = this.getAttribute('data-level-dewan');
 
             document.getElementById('edit_p_id').value = parpolId;
             document.getElementById('edit_p_nama').value = parpolNama;
@@ -2304,6 +2367,13 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('edit_p_telepon').value = teleponVal;
             document.getElementById('edit_p_lat').value = latVal || '';
             document.getElementById('edit_p_lng').value = lngVal || '';
+            
+            const hasKursiCheck = document.getElementById('edit_p_has_kursi');
+            hasKursiCheck.checked = (hasKursiVal == '1');
+            window.toggleDewanFields(hasKursiCheck, 'edit');
+            
+            document.getElementById('edit_p_periode').value = periodeVal || '';
+            document.getElementById('edit_p_level').value = levelVal || '';
 
             modalEditParpol.show();
         });

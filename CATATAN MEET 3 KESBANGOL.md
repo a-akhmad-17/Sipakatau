@@ -4,23 +4,21 @@
 4. buat detail permohonan di halaman admin(tracking berkas...) tombol disetujui setelah dokumen lengkp bru ada validasi (done)
 5. buat halaman bahwasanya surat sedang dikirim ke pusat untuk penerbitan SKT(done)
 6. untuk validasi bidang di akun kabid... tidak di admin(done)
-7. untuk ormas lokal hanya laporan tanggapan.
+7. untuk ormas lokal hanya laporan tanggapan.(done)
 8. aplikasi buatkan output surat permohonan setelah diajukan ormas baru.yang akan diajukan ke kemendagri (done)
-9. untuk rekomendasi kegiatan outputnya surat rekomendasi
+9. untuk rekomendasi kegiatan outputnya surat rekomendasi 
 10. buatkan berkas yang ingin di tanda tangani stelah login.. bukan di halaman publik(done) 
 11. untuk tambah parpol tambahkan titik peta(done)
-12. untuk parpol tampilkan periode anggota dewan dan levelnya,, misalnya ada yang terdaftar dan punya kursi di DPR terdaftar belum tentu punya kursi 
+12. untuk parpol tampilkan periode anggota dewan dan levelnya,, misalnya ada yang terdaftar dan punya kursi di DPR terdaftar belum tentu punya kursi (done)
 13. buatkan 1 tabel untuk kepengurusan,, otomatis dari sk kepengurusannya, bukan manual(done)
 14. pada peta gis, defaultnya 2026, khusus aduan dan rawan konflik buatkan filter tahunnya,, jadi tersimpan jadi arsip (done)
-15. buatkan fitur tambah bidang di menu pengaturan portal 
+15. buatkan fitur tambah bidang di menu pengaturan portal (done)
 16. hapus fitur spj(done)
-17. tambahkan untuk rekomendasi kegiatan. hanya yang menggunkan fasilitas pemerintah
-18. Spj di buatkan dengan aplikasi lain agar bisa berhubungan langsung dengan kaban
- selesai ...
+
 
 lanjut ke penambahan dan komentar 
-1. untuk galeri hapus saja durasi konten dan url link 
-2. lokasi kegiatan di tambahkan pada bagian rekomendasi kegiatan
+1. untuk galeri hapus saja durasi konten dan url link (done)
+2. lokasi kegiatan di tambahkan pada bagian rekomendasi kegiatan (done)
 3. pada bagian no telpon mau di tambahkan sesuai dengan yang piket (mau menambhakan nomornya)
 4. pada bagian ttd ada 2 variabel untuk srikandi
 

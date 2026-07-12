@@ -1,5 +1,20 @@
 # RELEASE NOTES - SIPAKATAU
 
+## [v2.9.15] - 2026-07-09
+### ✨ Added
+- **Pemisahan Tombol Tambah Video/Dokumentasi**: Memisahkan tombol tambah konten dan modal tambah menjadi dua tombol terpisah secara mandiri untuk Video Edukasi dan Dokumentasi Kegiatan. Desain baru menggunakan hover gradient premium untuk meningkatkan pengalaman pengguna (UX).
+
+---
+
+## [v2.9.14] - 2026-07-09
+### ✨ Added
+- **Integrasi Representasi Dewan Parpol (Poin 12)**: Menambahkan input penanda `has_kursi`, `periode_dewan`, dan `level_dewan` ke modal tambah dan edit Partai Politik di dasbor admin. Data ini terintegrasi ke dalam tabel data Parpol di dasbor admin (disertai indikator badge yang informatif) serta ditampilkan langsung dalam balon informasi (pop-up marker) Leaflet pada peta GIS di dasbor Admin, Bidang, dan Eksekutif.
+
+### 🔄 Changed
+- **Penyelarasan Istilah Ormas Lokal vs Berjenjang (Poin 7)**: Menyesuaikan sebutan dokumen akhir hasil verifikasi Bakesbangpol di tingkat daerah secara dinamis. Ormas Lokal memproses **"Laporan Tanggapan Keberadaan"** (menggantikan istilah SKT yang merupakan wewenang pusat) sedangkan Ormas Berjenjang memproses **"Surat Keberadaan"**. Istilah diselaraskan secara kondisional pada formulir registrasi publik, informasi panduan layanan, dasbor pengajuan user, tombol aksi & modal dasbor Kabid, pesan notifikasi sistem (flash messages), hingga halaman pelacakan berkas publik.
+
+---
+
 ## [v2.9.13] - 2026-07-09
 ### 🐛 Fixed
 - **Perbaikan Input Unggah Berkas Pengurus**: Memperbaiki kebocoran teks atribut `onchange` pada tombol unggah berkas biodata & KTP pengurus ([form_pengajuan.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/user/form_pengajuan.php)). Masalah ini diakibatkan oleh skrip injeksi warna asterisk wajib (`layouts/admin.php`) yang keliru memodifikasi `innerHTML` label karena adanya tanda bintang `*` di dalam atribut `accept="image/*"` pada input tersembunyi. Skrip kini telah diperbarui agar hanya menelusuri node teks (`TreeWalker`) secara aman dan mengecualikan elemen tombol.

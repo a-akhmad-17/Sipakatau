@@ -102,7 +102,7 @@ class Bidang extends BaseController
                 'progress_percentage' => 75,
                 'updated_at'          => date('Y-m-d H:i:s'),
             ];
-            $msg = 'Berkas pendaftaran berhasil divalidasi oleh Bidang Poldagri & Ormas. Siap untuk penerbitan SKT.';
+            $msg = 'Berkas pendaftaran berhasil divalidasi oleh Bidang Poldagri & Ormas. Siap untuk penerbitan dokumen resmi.';
         } elseif ($action === 'terbitkan_skt') {
             // Upload SKT / dokumen final
             $file = $this->request->getFile('berkas_skt');
@@ -115,7 +115,7 @@ class Bidang extends BaseController
                 $fileName = $file->getRandomName();
                 $file->move($uploadPath, $fileName);
             } else {
-                return redirect()->back()->with('error', 'Gagal mengunggah SKT. Pastikan file PDF/gambar valid.');
+                return redirect()->back()->with('error', 'Gagal mengunggah dokumen. Pastikan file PDF/gambar valid.');
             }
 
             $updateData = [
@@ -124,7 +124,7 @@ class Bidang extends BaseController
                 'pdf_tte_path'        => $fileName,
                 'updated_at'          => date('Y-m-d H:i:s'),
             ];
-            $msg = 'SKT berhasil diterbitkan dan dikirim ke pemohon. Proses registrasi ormas selesai!';
+            $msg = 'Dokumen resmi berhasil diterbitkan dan dikirim ke pemohon. Proses registrasi ormas selesai!';
         } elseif ($action === 'reject') {
             $alasan = $this->request->getPost('alasan_ditolak');
             $updateData = [

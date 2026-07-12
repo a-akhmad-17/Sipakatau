@@ -213,7 +213,7 @@ $requirementsBerjenjang = [
                 </div>
                 <div class="col-4 step-indicator" id="step-ind-3">
                     <div class="step-num bg-secondary text-white rounded-circle d-inline-flex align-items-center justify-content-center fw-bold mb-1" style="width: 32px; height: 32px; font-size: 0.9rem;">3</div>
-                    <div class="small fw-semibold d-block text-muted" id="step-lbl-3">Status Pengajuan & SKT</div>
+                    <div class="small fw-semibold d-block text-muted" id="step-lbl-3">Status Pengajuan & Dokumen</div>
                 </div>
             </div>
         </div>
@@ -243,7 +243,7 @@ $requirementsBerjenjang = [
                     <div class="col-md-6">
                         <label for="tipe_ormas" class="form-label small text-muted">Tipe Organisasi <span class="text-danger fw-bold">*</span></label>
                         <select class="form-select form-control-custom" id="tipe_ormas" name="tipe_ormas" required onchange="toggleOrmasRequirements(this.value)">
-                            <option value="Lokal" <?= ($tipe === 'Lokal') ? 'selected' : '' ?>>Ormas Lokal (Penerbitan SKT)</option>
+                            <option value="Lokal" <?= ($tipe === 'Lokal') ? 'selected' : '' ?>>Ormas Lokal (Penerbitan Laporan Tanggapan Keberadaan)</option>
                             <option value="Berjenjang" <?= ($tipe === 'Berjenjang') ? 'selected' : '' ?>>Ormas Berjenjang (Penerbitan Surat Keberadaan)</option>
                         </select>
                     </div>
@@ -719,7 +719,7 @@ $requirementsBerjenjang = [
                                         <div class="timeline-icon" style="width:30px; height:30px; font-size:0.75rem;">
                                             <?php if ($step4_class === 'completed'): ?><i class="fa-solid fa-check"></i><?php else: ?>4<?php endif; ?>
                                         </div>
-                                        <div class="timeline-label" style="font-size:0.68rem; margin-top:5px; line-height:1.2;">Selesai / SKT Terbit</div>
+                                        <div class="timeline-label" style="font-size:0.68rem; margin-top:5px; line-height:1.2;">Selesai / Dokumen Terbit</div>
                                     </div>
                                 </div>
                             </div>
@@ -747,7 +747,7 @@ $requirementsBerjenjang = [
                                 <?php elseif ($progress == 75): ?>
                                     Validasi Bidang & TTE Kabid sedang diproses. Silakan menunggu...
                                 <?php elseif ($progress == 100): ?>
-                                    Pendaftaran selesai! SKT telah diterbitkan. Silakan unduh dokumen resmi Anda di bawah.
+                                    Pendaftaran selesai! <?= ($tipe === 'Lokal') ? 'Laporan Tanggapan Keberadaan' : 'Surat Keberadaan' ?> Anda telah diterbitkan. Silakan unduh dokumen resmi Anda di bawah.
                                 <?php endif; ?>
                             </p>
                         </div>
@@ -757,10 +757,10 @@ $requirementsBerjenjang = [
                         <div class="mt-4 pt-3 border-top border-secondary border-opacity-10 d-flex justify-content-center">
                             <?php if (!empty($pendaftaran['pdf_tte_path'])): ?>
                                 <a href="<?= base_url($pendaftaran['pdf_tte_path']) ?>" target="_blank" class="btn btn-success fw-bold text-white px-4 py-2.5">
-                                    <i class="fa-solid fa-cloud-download me-1"></i> Unduh Surat Keterangan Terdaftar (SKT) Resmi (TTE)
+                                    <i class="fa-solid fa-cloud-download me-1"></i> Unduh <?= ($tipe === 'Lokal') ? 'Laporan Tanggapan Keberadaan' : 'Surat Keberadaan' ?> Resmi (TTE)
                                 </a>
                             <?php else: ?>
-                                <span class="badge bg-secondary text-white p-3"><i class="fa-solid fa-circle-info me-2"></i>SKT Sedang disinkronisasi oleh Admin.</span>
+                                <span class="badge bg-secondary text-white p-3"><i class="fa-solid fa-circle-info me-2"></i>Dokumen resmi sedang disinkronisasi oleh Admin.</span>
                             <?php endif; ?>
                         </div>
                     <?php endif; ?>

@@ -8,9 +8,49 @@
             <h3 class="mb-1 font-heading" style="color: var(--text-main);"><i class="fa-solid fa-video text-danger me-2"></i>Video & Dokumentasi Kegiatan</h3>
             <p class="small mb-0" style="color: var(--text-muted);">Kelola koleksi video edukasi kebangsaan dan galeri video dokumentasi kegiatan Kesbangpol.</p>
         </div>
-        <div>
-            <button type="button" class="btn btn-danger text-white fw-bold btn-portal" data-bs-toggle="modal" data-bs-target="#modalTambahVideo">
-                <i class="fa-solid fa-plus me-1.5"></i>Tambah Konten Video/Dokumentasi 
+        <style>
+            .btn-portal-edukasi {
+                background: linear-gradient(135deg, #f59e0b, #d97706);
+                border: none;
+                color: #1e293b !important;
+                font-weight: 600;
+                padding: 10px 20px;
+                border-radius: 10px;
+                transition: var(--transition-smooth);
+                box-shadow: 0 4px 15px rgba(245, 158, 11, 0.25);
+            }
+            .btn-portal-edukasi:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(245, 158, 11, 0.45);
+                background: linear-gradient(135deg, #d97706, #b45309);
+                color: #ffffff !important;
+            }
+            .btn-portal-dokumentasi {
+                background: linear-gradient(135deg, #06b6d4, #0891b2);
+                border: none;
+                color: #ffffff !important;
+                font-weight: 600;
+                padding: 10px 20px;
+                border-radius: 10px;
+                transition: var(--transition-smooth);
+                box-shadow: 0 4px 15px rgba(6, 182, 212, 0.25);
+            }
+            .btn-portal-dokumentasi:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(6, 182, 212, 0.45);
+                background: linear-gradient(135deg, #0891b2, #0e7490);
+                color: #ffffff !important;
+            }
+            html[data-theme="dark"] .btn-portal-edukasi {
+                color: #ffffff !important;
+            }
+        </style>
+        <div class="d-flex gap-2">
+            <button type="button" class="btn-portal-edukasi" data-bs-toggle="modal" data-bs-target="#modalTambahVideoEdukasi">
+                <i class="fa-solid fa-graduation-cap me-1.5"></i>Tambah Video Edukasi
+            </button>
+            <button type="button" class="btn-portal-dokumentasi" data-bs-toggle="modal" data-bs-target="#modalTambahDokumentasi">
+                <i class="fa-solid fa-images me-1.5"></i>Tambah Dokumentasi
             </button>
         </div>
     </div>
@@ -117,47 +157,31 @@
     </div>
 </div>
 
-<!-- Modal Tambah Video -->
-<div class="modal fade" id="modalTambahVideo" tabindex="-1" aria-labelledby="modalTambahVideoLabel" aria-hidden="true">
+<!-- Modal Tambah Video Edukasi -->
+<div class="modal fade" id="modalTambahVideoEdukasi" tabindex="-1" aria-labelledby="modalTambahVideoEdukasiLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content glass-card-modal" style="background: var(--bg-color) !important; border: 1px solid var(--border-color) !important; color: var(--text-main) !important; border-radius: 16px;">
             <div class="modal-header border-secondary border-opacity-25" style="border-bottom: 1px solid var(--border-color) !important;">
-                <h5 class="modal-title font-heading" id="modalTambahVideoLabel" style="color: var(--text-main);"><i class="fa-solid fa-plus text-warning me-2"></i>Tambah Konten Video/Dokumentasi</h5>
+                <h5 class="modal-title font-heading" id="modalTambahVideoEdukasiLabel" style="color: var(--text-main);"><i class="fa-solid fa-graduation-cap text-warning me-2"></i>Tambah Video Edukasi</h5>
                 <button type="button" class="btn-close" style="filter: var(--btn-close-filter, invert(1) grayscale(100%) brightness(200%));" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="<?= base_url('admin/settings/video/tambah') ?>" method="POST" enctype="multipart/form-data">
+            <form action="<?= base_url('admin/settings/video/tambah') ?>" method="POST">
                 <?= csrf_field() ?>
+                <input type="hidden" name="type" value="edukasi">
                 <div class="modal-body">
                     <div class="row g-3">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="add_vid_title" class="form-label small" style="color: var(--text-muted);">Judul Video / Dokumentasi *</label>
-                                <input type="text" name="title" id="add_vid_title" class="form-control form-control-custom" placeholder="Contoh: Liputan Kunjungan Kerja Kaban" required>
+                                <label for="add_edu_title" class="form-label small" style="color: var(--text-muted);">Judul Video Edukasi *</label>
+                                <input type="text" name="title" id="add_edu_title" class="form-control form-control-custom" placeholder="Contoh: Pengenalan Wawasan Kebangsaan" required>
                             </div>
                             <div class="mb-3">
-                                <label for="add_vid_type" class="form-label small" style="color: var(--text-muted);">Tipe Konten *</label>
-                                <select name="type" id="add_vid_type" class="form-select form-control-custom" required>
-                                    <option value="edukasi" selected>Video Edukasi</option>
-                                    <option value="dokumentasi">Dokumentasi Kegiatan</option>
-                                </select>
+                                <label for="add_edu_youtube" class="form-label small" style="color: var(--text-muted);">URL YouTube / Video ID <span class="text-danger">*</span></label>
+                                <input type="text" name="youtube_id" id="add_edu_youtube" class="form-control form-control-custom" placeholder="Contoh: https://www.youtube.com/watch?v=dQw4w9WgXcQ atau dQw4w9WgXcQ" required>
                             </div>
-                            <div class="mb-3" id="add_youtube_id_group">
-                                <label for="add_vid_youtube" class="form-label small" style="color: var(--text-muted);">URL YouTube / Video ID <span id="add_youtube_req" class="text-danger">*</span></label>
-                                <input type="text" name="youtube_id" id="add_vid_youtube" class="form-control form-control-custom" placeholder="Contoh: https://www.youtube.com/watch?v=dQw4w9WgXcQ atau dQw4w9WgXcQ">
-                            </div>
-                            <div class="mb-3 d-none" id="add_image_group">
-                                <label for="add_vid_image" class="form-label small" style="color: var(--text-muted);">Gambar Sampul Dokumentasi <span id="add_image_req" class="text-danger">*</span></label>
-                                <input type="file" name="image" id="add_vid_image" class="form-control form-control-custom mb-2" accept="image/*">
-                                
-                                <label for="add_vid_gallery" class="form-label small d-block" style="color: var(--text-muted);">Foto Dokumentasi Tambahan (Bisa memilih beberapa foto)</label>
-                                <input type="file" name="image_gallery[]" id="add_vid_gallery" class="form-control form-control-custom" accept="image/*" multiple>
-                                <span class="small d-block mt-1" style="color: var(--text-muted); font-size: 0.72rem;">Format: JPG, PNG, WEBP. Maks 2MB per file.</span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="add_vid_category" class="form-label small" style="color: var(--text-muted);">Kategori Konten</label>
-                                <select name="category" id="add_vid_category" class="form-select form-control-custom">
+                                <label for="add_edu_category" class="form-label small" style="color: var(--text-muted);">Kategori Konten</label>
+                                <select name="category" id="add_edu_category" class="form-select form-control-custom">
                                     <option value="Umum" selected>Umum</option>
                                     <option value="Wawasan Kebangsaan">Wawasan Kebangsaan</option>
                                     <option value="Ketahanan Nasional">Ketahanan Nasional</option>
@@ -165,26 +189,87 @@
                                     <option value="Sosial Budaya">Sosial Budaya</option>
                                 </select>
                             </div>
+                        </div>
+                        <div class="col-md-6">
                             <div class="row g-2 mb-3">
-                                <div class="col-sm-6" id="add_duration_group">
-                                    <label for="add_vid_dur" class="form-label small" style="color: var(--text-muted);">Durasi Konten</label>
-                                    <input type="text" name="duration" id="add_vid_dur" class="form-control form-control-custom" placeholder="Contoh: 10:25 atau -">
+                                <div class="col-sm-6">
+                                    <label for="add_edu_dur" class="form-label small" style="color: var(--text-muted);">Durasi Konten</label>
+                                    <input type="text" name="duration" id="add_edu_dur" class="form-control form-control-custom" placeholder="Contoh: 10:25 atau -">
                                 </div>
-                                <div class="col-sm-6" id="add_source_group">
-                                    <label for="add_vid_src" class="form-label small" style="color: var(--text-muted);">Kreator / Sumber</label>
-                                    <input type="text" name="source" id="add_vid_src" class="form-control form-control-custom" value="Kesbangpol Sinjai">
+                                <div class="col-sm-6">
+                                    <label for="add_edu_src" class="form-label small" style="color: var(--text-muted);">Kreator / Sumber</label>
+                                    <input type="text" name="source" id="add_edu_src" class="form-control form-control-custom" value="Kesbangpol Sinjai">
                                 </div>
                             </div>
                             <div class="mb-3">
-                                <label for="add_vid_desc" class="form-label small" style="color: var(--text-muted);">Deskripsi Singkat</label>
-                                <textarea name="description" id="add_vid_desc" class="form-control form-control-custom" rows="2" placeholder="Deskripsi mengenai isi konten..."></textarea>
+                                <label for="add_edu_desc" class="form-label small" style="color: var(--text-muted);">Deskripsi Singkat</label>
+                                <textarea name="description" id="add_edu_desc" class="form-control form-control-custom" rows="4" placeholder="Deskripsi mengenai isi video edukasi..."></textarea>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer border-0">
                     <button type="button" class="btn btn-secondary" style="color: var(--text-main);" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-warning fw-bold" style="color: #1e293b; background: #eab308; border: none; padding: 8px 20px; border-radius: 8px;"><i class="fa-solid fa-floppy-disk me-1"></i> Simpan Konten</button>
+                    <button type="submit" class="btn btn-warning fw-bold" style="color: #1e293b; background: #eab308; border: none; padding: 8px 20px; border-radius: 8px;"><i class="fa-solid fa-floppy-disk me-1"></i> Simpan Video</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Tambah Dokumentasi Kegiatan -->
+<div class="modal fade" id="modalTambahDokumentasi" tabindex="-1" aria-labelledby="modalTambahDokumentasiLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content glass-card-modal" style="background: var(--bg-color) !important; border: 1px solid var(--border-color) !important; color: var(--text-main) !important; border-radius: 16px;">
+            <div class="modal-header border-secondary border-opacity-25" style="border-bottom: 1px solid var(--border-color) !important;">
+                <h5 class="modal-title font-heading" id="modalTambahDokumentasiLabel" style="color: var(--text-main);"><i class="fa-solid fa-images text-info me-2"></i>Tambah Dokumentasi Kegiatan</h5>
+                <button type="button" class="btn-close" style="filter: var(--btn-close-filter, invert(1) grayscale(100%) brightness(200%));" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="<?= base_url('admin/settings/video/tambah') ?>" method="POST" enctype="multipart/form-data">
+                <?= csrf_field() ?>
+                <input type="hidden" name="type" value="dokumentasi">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="add_doc_title" class="form-label small" style="color: var(--text-muted);">Judul Dokumentasi Kegiatan *</label>
+                                <input type="text" name="title" id="add_doc_title" class="form-control form-control-custom" placeholder="Contoh: Liputan Kunjungan Kerja Kaban" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="add_doc_image" class="form-label small" style="color: var(--text-muted);">Gambar Sampul Dokumentasi <span class="text-danger">*</span></label>
+                                <input type="file" name="image" id="add_doc_image" class="form-control form-control-custom mb-2" accept="image/*" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="add_doc_gallery" class="form-label small d-block" style="color: var(--text-muted);">Foto Dokumentasi Tambahan (Bisa memilih beberapa foto)</label>
+                                <input type="file" name="image_gallery[]" id="add_doc_gallery" class="form-control form-control-custom" accept="image/*" multiple>
+                                <span class="small d-block mt-1" style="color: var(--text-muted); font-size: 0.72rem;">Format: JPG, PNG, WEBP. Maks 2MB per file.</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="add_doc_category" class="form-label small" style="color: var(--text-muted);">Kategori Konten</label>
+                                <select name="category" id="add_doc_category" class="form-select form-control-custom">
+                                    <option value="Umum" selected>Umum</option>
+                                    <option value="Wawasan Kebangsaan">Wawasan Kebangsaan</option>
+                                    <option value="Ketahanan Nasional">Ketahanan Nasional</option>
+                                    <option value="Politik Dalam Negeri">Politik Dalam Negeri</option>
+                                    <option value="Sosial Budaya">Sosial Budaya</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="add_doc_src" class="form-label small" style="color: var(--text-muted);">Kreator / Sumber</label>
+                                <input type="text" name="source" id="add_doc_src" class="form-control form-control-custom" value="Kesbangpol Sinjai">
+                            </div>
+                            <div class="mb-3">
+                                <label for="add_doc_desc" class="form-label small" style="color: var(--text-muted);">Deskripsi Singkat</label>
+                                <textarea name="description" id="add_doc_desc" class="form-control form-control-custom" rows="2" placeholder="Deskripsi mengenai isi dokumentasi kegiatan..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary" style="color: var(--text-main);" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-info text-white fw-bold" style="border: none; padding: 8px 20px; border-radius: 8px;"><i class="fa-solid fa-floppy-disk me-1"></i> Simpan Dokumentasi</button>
                 </div>
             </form>
         </div>
@@ -328,8 +413,8 @@
         // Helper to toggle inputs based on content type
         const handleTypeChange = (typeSelect, youtubeGroup, youtubeInput, youtubeReq, imageGroup, imageInput, imageReq, isEditMode = false, imagePath = '') => {
             const val = typeSelect.value;
-            const durationGroup = isEditMode ? document.getElementById('edit_duration_group') : document.getElementById('add_duration_group');
-            const sourceCol = isEditMode ? document.getElementById('edit_source_group') : document.getElementById('add_source_group');
+            const durationGroup = isEditMode ? document.getElementById('edit_duration_group') : null;
+            const sourceCol = isEditMode ? document.getElementById('edit_source_group') : null;
 
             if (val === 'edukasi') {
                 youtubeGroup.classList.remove('d-none');
@@ -378,20 +463,7 @@
             }
         };
 
-        // Tambah Modal Dynamic Select
-        const addType = document.getElementById('add_vid_type');
-        const addYoutubeGroup = document.getElementById('add_youtube_id_group');
-        const addYoutubeInput = document.getElementById('add_vid_youtube');
-        const addYoutubeReq = document.getElementById('add_youtube_req');
-        const addImageGroup = document.getElementById('add_image_group');
-        const addImageInput = document.getElementById('add_vid_image');
-        const addImageReq = document.getElementById('add_image_req');
-
-        addType.addEventListener('change', () => {
-            handleTypeChange(addType, addYoutubeGroup, addYoutubeInput, addYoutubeReq, addImageGroup, addImageInput, addImageReq);
-        });
-        // Initial run for Tambah
-        handleTypeChange(addType, addYoutubeGroup, addYoutubeInput, addYoutubeReq, addImageGroup, addImageInput, addImageReq);
+        // Tambah modal elements are separate, no dynamic toggle needed.
 
         // Edit Modal Dynamic Select
         const editYoutubeGroup = document.getElementById('edit_youtube_id_group');

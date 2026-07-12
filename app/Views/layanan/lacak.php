@@ -206,8 +206,11 @@
                 <?php if ($berkas['status_verifikasi'] === 'Approved'): ?>
                     <?php if ($tipe === 'rekomendasi'): ?>
                         <i class="fa-solid fa-circle-check text-success me-2"></i><strong>Pengajuan Rekomendasi Selesai!</strong> Surat Rekomendasi resmi ber-TTE telah berhasil diterbitkan oleh Badan Kesbangpol Kabupaten Sinjai. Silakan unduh berkas digital di bawah ini.
-                    <?php else: ?>
-                        <i class="fa-solid fa-circle-check text-success me-2"></i><strong>Pendaftaran Selesai!</strong> Berkas pendaftaran Ormas Anda telah diverifikasi dan disetujui. Surat Keterangan Terdaftar (SKT) resmi ber-TTE telah diterbitkan. Silakan konfirmasi berkas fisik di loket Kesbangpol MPP Sinjai.
+                    <?php else: 
+                        $isLokal = (($berkas['tipe_ormas'] ?? 'Lokal') === 'Lokal');
+                        $docTitle = $isLokal ? 'Laporan Tanggapan Keberadaan' : 'Surat Keberadaan';
+                    ?>
+                        <i class="fa-solid fa-circle-check text-success me-2"></i><strong>Pendaftaran Selesai!</strong> Berkas pendaftaran Ormas Anda telah diverifikasi dan disetujui. <?= $docTitle ?> resmi ber-TTE telah diterbitkan. Silakan konfirmasi berkas fisik di loket Kesbangpol MPP Sinjai.
                     <?php endif; ?>
                 <?php elseif ($berkas['status_verifikasi'] === 'Rejected'): ?>
                     <i class="fa-solid fa-circle-xmark text-danger me-2"></i><strong>Pengajuan Ditolak.</strong> Terdapat beberapa berkas administrasi yang tidak sesuai persyaratan. Silakan hubungi admin di nomor 
@@ -248,7 +251,7 @@
                     <?php elseif ($tipe === 'ormas' && !empty($berkas['pdf_tte_path'])): ?>
                         <div class="mt-3 text-center border-top pt-3" style="border-color: rgba(255,255,255,0.06) !important;">
                             <a href="<?= base_url('uploads/rekomendasi_ormas/' . $berkas['pdf_tte_path']) ?>" target="_blank" class="btn btn-success px-4 py-2 text-white fw-bold text-decoration-none">
-                                <i class="fa-solid fa-file-arrow-down me-2"></i> Unduh Surat Rekomendasi Resmi
+                                <i class="fa-solid fa-file-arrow-down me-2"></i> Unduh <?= $docTitle ?> Resmi (TTE)
                             </a>
                         </div>
                     <?php endif; ?>

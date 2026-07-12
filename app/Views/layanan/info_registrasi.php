@@ -13,7 +13,7 @@
     <ul class="nav nav-pills nav-fill mb-4 p-2 rounded" style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color);" id="ormasTab" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active fw-bold py-3" id="lokal-tab" data-bs-toggle="tab" data-bs-target="#lokal" type="button" role="tab" aria-controls="lokal" aria-selected="true">
-                <i class="fa-solid fa-house-user me-2"></i>Ormas Lokal (Penerbitan SKT)
+                <i class="fa-solid fa-house-user me-2"></i>Ormas Lokal (Penerbitan Laporan Tanggapan Keberadaan)
             </button>
         </li>
         <li class="nav-item" role="presentation">
@@ -54,8 +54,8 @@
                             <div class="rounded-circle bg-success-subtle text-success d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">
                                 <strong>3</strong>
                             </div>
-                            <h5 class="text-white mb-2">Surat Keterangan Terdaftar</h5>
-                            <p class="text-muted small mb-0">Surat Keterangan Terdaftar (SKT) resmi berformat PDF ber-TTE diterbitkan dan dikirim secara digital kepada pemohon.</p>
+                            <h5 class="text-white mb-2">Laporan Tanggapan Keberadaan</h5>
+                            <p class="text-muted small mb-0">Surat Laporan Tanggapan Keberadaan resmi berformat PDF ber-TTE diterbitkan dan dikirim secara digital kepada pemohon.</p>
                         </div>
                     </div>
                 </div>
