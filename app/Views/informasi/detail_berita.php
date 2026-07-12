@@ -66,18 +66,28 @@
         align-items: center;
         justify-content: center;
         border: 1px solid var(--border-color);
-        background: rgba(255, 255, 255, 0.02);
-        color: var(--text-muted) !important;
+        background: rgba(127, 127, 127, 0.05);
         transition: var(--transition-smooth);
     }
+    .share-fb { color: #3b5998 !important; border-color: rgba(59, 89, 152, 0.25) !important; }
+    .share-tw { color: var(--text-main) !important; border-color: var(--border-color) !important; }
+    .share-wa { color: #25d366 !important; border-color: rgba(37, 211, 102, 0.25) !important; }
+    
+    html[data-theme="dark"] .share-fb { color: #8b9dc3 !important; border-color: rgba(139, 157, 195, 0.25) !important; }
+    html[data-theme="dark"] .share-wa { color: #4ade80 !important; border-color: rgba(74, 222, 128, 0.25) !important; }
+    
     .share-btn:hover {
         transform: scale(1.1) translateY(-2px);
         color: #ffffff !important;
         border-color: transparent !important;
     }
-    .share-fb:hover { background: #3b5998; }
-    .share-tw:hover { background: #1da1f2; }
-    .share-wa:hover { background: #25d366; }
+    .share-fb:hover { background: #3b5998 !important; color: #ffffff !important; }
+    .share-tw:hover { background: #1da1f2 !important; color: #ffffff !important; }
+    .share-wa:hover { background: #25d366 !important; color: #ffffff !important; }
+
+    .hover-red:hover {
+        color: #e11d48 !important;
+    }
 </style>
 <?= $this->endSection() ?>
 

@@ -6,6 +6,7 @@
   - **Summernote AJAX Upload**: Mengganti penyimpanan gambar default Base64 di Summernote dengan unggahan AJAX latar belakang. Gambar otomatis dikonversi ke format WebP dan disimpan sebagai berkas fisik di `uploads/berita/content/`.
   - **Pembersihan Gambar Konten (Auto-Cleanup)**: Menambahkan algoritma pembersihan disk otomatis. Sistem akan menganalisis konten berita lama vs baru saat update, kemudian menghapus file gambar konten fisik dari server jika tidak lagi digunakan.
   - **Slider Berita Utama Glassmorphic**: Menampilkan 3 berita terbaru berstatus `Published` dalam bentuk slider banner premium bertema glassmorphism di halaman Beranda sebelum Tracking Section.
+  - **Perbaikan Kontras CSS (Bug Fix)**: Memperbaiki kontras teks slider berita di Beranda agar tetap berwarna putih cerah di Light Mode (tidak bertabrakan dengan background gelap slider) serta mewarnai ikon tombol bagikan (Facebook, Twitter, WhatsApp) pada halaman detail berita agar memiliki visibilitas tinggi dan tidak memudar.
 
 ---
 

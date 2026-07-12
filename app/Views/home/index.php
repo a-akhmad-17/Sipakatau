@@ -96,6 +96,22 @@
         background-color: #e11d48;
         transform: scale(1.2);
     }
+    
+    /* Force slider text and icons to remain white/light in light theme because the slide background is always dark */
+    #beritaCarousel h3,
+    #beritaCarousel p,
+    #beritaCarousel span,
+    #beritaCarousel .text-white-50,
+    #beritaCarousel .carousel-control-prev-icon,
+    #beritaCarousel .carousel-control-next-icon {
+        color: #ffffff !important;
+    }
+    #beritaCarousel .text-white-50 {
+        color: rgba(255, 255, 255, 0.7) !important;
+    }
+    #beritaCarousel .text-primary {
+        color: #fda4af !important;
+    }
 </style>
 <?= $this->endSection() ?>
 

@@ -95,6 +95,9 @@
         border-color: transparent !important;
         box-shadow: 0 4px 10px rgba(225, 29, 72, 0.3);
     }
+    .hover-red:hover {
+        color: #e11d48 !important;
+    }
 </style>
 <?= $this->endSection() ?>
 
