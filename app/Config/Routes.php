@@ -92,6 +92,12 @@ $routes->group('admin', ['filter' => 'auth:admin'], function($routes) {
     $routes->post('settings/video/update', 'Admin::updateVideo');
     $routes->post('settings/video/delete/(:any)', 'Admin::deleteVideo/$1');
 
+    // Berita Settings Routes
+    $routes->get('settings/berita', 'Admin::settingsBerita');
+    $routes->post('settings/berita/tambah', 'Admin::tambahBerita');
+    $routes->post('settings/berita/update', 'Admin::updateBerita');
+    $routes->post('settings/berita/delete/(:any)', 'Admin::deleteBerita/$1');
+
 });
 
 // Bidang Dashboard Routes (Protected by auth filter - role: kabid)
@@ -124,6 +130,8 @@ $routes->get('layanan/info-registrasi', 'Home::infoRegistrasi');
 $routes->get('layanan/info-rekomendasi', 'Home::infoRekomendasi');
 $routes->get('informasi/video', 'Home::video');
 $routes->get('informasi/dokumentasi', 'Home::dokumentasi');
+$routes->get('informasi/berita', 'Home::berita');
+$routes->get('informasi/berita/(:any)', 'Home::beritaDetail/$1');
 $routes->get('informasi/pengaduan', 'Home::pengaduan');
 $routes->post('informasi/pengaduan', 'Home::simpanPengaduan');
 $routes->get('layanan/lacak', 'Home::lacakBerkas');

@@ -834,5 +834,80 @@ class Home extends BaseController
 
         return view('layanan/cetak_permohonan', $data);
     }
+
+    // ==========================================
+    // PUBLIC BERITA METHODS
+    // ==========================================
+
+    public function berita(): string
+    {
+        $beritaModel = new \App\Models\BeritaModel();
+
+        $kategori = $this->request->getVar('kategori');
+        $q = $this->request->getVar('q');
+
+        $query = $beritaModel->select('mst_berita.*, sys_users.username as author')
+                             ->join('sys_users', 'sys_users.id = mst_berita.created_by', 'left')
+                             ->where('mst_berita.status', 'Published');
+
+        if (!empty($kategori)) {
+            $query->where('mst_berita.kategori', $kategori);
+        }
+
+        if (!empty($q)) {
+            $query->groupStart()
+                  ->like('mst_berita.judul', $q)
+                  ->orLike('mst_berita.konten', $q)
+                  ->groupEnd();
+        }
+
+        $beritaList = $query->orderBy('mst_berita.created_at', 'DESC')
+                            ->paginate(9, 'berita');
+
+        $data = [
+            'title'      => 'Berita Kesbangpol - SIPAKATAU',
+            'berita'     => $beritaList,
+            'pager'      => $beritaModel->pager,
+            'kategori'   => $kategori,
+            'q'          => $q
+        ];
+
+        return view('informasi/berita', $data);
+    }
+
+    public function beritaDetail(string $slug): string
+    {
+        $beritaModel = new \App\Models\BeritaModel();
+
+        $berita = $beritaModel->select('mst_berita.*, sys_users.username as author')
+                              ->join('sys_users', 'sys_users.id = mst_berita.created_by', 'left')
+                              ->where('mst_berita.slug', $slug)
+                              ->where('mst_berita.status', 'Published')
+                              ->first();
+
+        if (!$berita) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Berita tidak ditemukan.");
+        }
+
+        // Increment view count
+        $beritaModel->update($berita['id'], [
+            'view_count' => $berita['view_count'] + 1
+        ]);
+
+        // Get 5 recent news (excluding current one)
+        $recentBerita = $beritaModel->where('status', 'Published')
+                                    ->where('id !=', $berita['id'])
+                                    ->orderBy('created_at', 'DESC')
+                                    ->limit(5)
+                                    ->findAll();
+
+        $data = [
+            'title'        => esc($berita['judul']) . ' - Kesbangpol Sinjai',
+            'berita'       => $berita,
+            'recentBerita' => $recentBerita
+        ];
+
+        return view('informasi/detail_berita', $data);
+    }
 }
 

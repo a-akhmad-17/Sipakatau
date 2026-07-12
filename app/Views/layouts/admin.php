@@ -1004,6 +1004,9 @@
                         <a href="<?= site_url('admin/settings/video') ?>" class="sidebar-link ps-5 <?= ($uriString === 'admin/settings/video') ? 'active' : '' ?>">
                             <i class="fa-solid fa-video" style="font-size: 0.8rem;"></i> Video & Dokumentasi
                         </a>
+                        <a href="<?= site_url('admin/settings/berita') ?>" class="sidebar-link ps-5 <?= ($uriString === 'admin/settings/berita') ? 'active' : '' ?>">
+                            <i class="fa-solid fa-newspaper" style="font-size: 0.8rem;"></i> Kelola Berita
+                        </a>
                         <a href="<?= site_url('admin/settings/users') ?>" class="sidebar-link ps-5 <?= ($uriString === 'admin/settings/users') ? 'active' : '' ?>">
                             <i class="fa-solid fa-users-gear" style="font-size: 0.8rem;"></i> Kelola Pengguna
                         </a>

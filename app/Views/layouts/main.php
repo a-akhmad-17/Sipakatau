@@ -1119,6 +1119,7 @@
                             Informasi
                         </a>
                         <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="<?= site_url('informasi/berita') ?>">Berita Kesbangpol</a></li>
                             <li><a class="dropdown-item" href="<?= site_url('informasi/video') ?>">Video Edukasi</a></li>
                             <li><a class="dropdown-item" href="<?= site_url('informasi/dokumentasi') ?>">Dokumentasi Kegiatan</a></li>
                             <li><a class="dropdown-item" href="<?= site_url('informasi/pengaduan') ?>">Portal Pengaduan</a></li>

@@ -2521,5 +2521,162 @@ class Admin extends BaseController
 
         return redirect()->to('admin/settings/users')->with('success', 'Akun pengguna "' . $user['username'] . '" berhasil dihapus.');
     }
+
+    // ==========================================
+    // BERITA CRUD METHODS
+    // ==========================================
+
+    public function settingsBerita(): string
+    {
+        $beritaModel = new \App\Models\BeritaModel();
+        $berita = $beritaModel->select('mst_berita.*, sys_users.username as author')
+                              ->join('sys_users', 'sys_users.id = mst_berita.created_by', 'left')
+                              ->orderBy('mst_berita.created_at', 'DESC')
+                              ->findAll();
+
+        $data = [
+            'title'  => 'Kelola Berita Kesbangpol - SIPAKATAU',
+            'berita' => $berita
+        ];
+
+        return view('admin/settings_berita', $data);
+    }
+
+    public function tambahBerita()
+    {
+        helper(['app', 'text']);
+        $beritaModel = new \App\Models\BeritaModel();
+
+        $judul = trim($this->request->getPost('judul') ?? '');
+        $konten = trim($this->request->getPost('konten') ?? '');
+        $kategori = trim($this->request->getPost('kategori') ?? 'Berita Utama');
+        $status = trim($this->request->getPost('status') ?? 'Draft');
+
+        if (empty($judul) || empty($konten)) {
+            return redirect()->back()->withInput()->with('error', 'Judul dan Konten berita wajib diisi.');
+        }
+
+        // Generate UUID
+        $id = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x', 
+            mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff), 
+            mt_rand(0, 0x0fff) | 0x4000, mt_rand(0, 0x3fff) | 0x8000, 
+            mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+        );
+
+        // Generate unique slug
+        $slug = url_title($judul, '-', true);
+        $check = $beritaModel->where('slug', $slug)->first();
+        if ($check) {
+            $slug = $slug . '-' . time();
+        }
+
+        // Upload Cover Image
+        $fileGambar = $this->request->getFile('gambar');
+        $gambarName = null;
+        if ($fileGambar && $fileGambar->isValid() && !$fileGambar->hasMoved()) {
+            $destination = ROOTPATH . 'public/uploads/berita';
+            if (!is_dir($destination)) {
+                mkdir($destination, 0755, true);
+            }
+            $gambarName = convert_to_webp($fileGambar, $destination, 'berita_' . time());
+        }
+
+        $insertData = [
+            'id'         => $id,
+            'judul'      => $judul,
+            'slug'       => $slug,
+            'konten'     => $konten,
+            'gambar'     => $gambarName,
+            'kategori'   => $kategori,
+            'status'     => $status,
+            'view_count' => 0,
+            'created_by' => session()->get('user_id'),
+        ];
+
+        $beritaModel->insert($insertData);
+
+        log_activity('TAMBAH_BERITA_ADMIN', [], $insertData, 'mst_berita', $id);
+
+        return redirect()->to('admin/settings/berita')->with('success', 'Berita "' . $judul . '" berhasil diterbitkan/disimpan.');
+    }
+
+    public function updateBerita()
+    {
+        helper(['app', 'text']);
+        $beritaModel = new \App\Models\BeritaModel();
+
+        $id = $this->request->getPost('id');
+        $judul = trim($this->request->getPost('judul') ?? '');
+        $konten = trim($this->request->getPost('konten') ?? '');
+        $kategori = trim($this->request->getPost('kategori') ?? 'Berita Utama');
+        $status = trim($this->request->getPost('status') ?? 'Draft');
+
+        $berita = $beritaModel->find($id);
+        if (!$berita) {
+            return redirect()->to('admin/settings/berita')->with('error', 'Berita tidak ditemukan.');
+        }
+
+        if (empty($judul) || empty($konten)) {
+            return redirect()->back()->withInput()->with('error', 'Judul dan Konten berita wajib diisi.');
+        }
+
+        $beforeData = $berita;
+        $slug = $berita['slug'];
+        if ($berita['judul'] !== $judul) {
+            $slug = url_title($judul, '-', true);
+            $check = $beritaModel->where('slug', $slug)->where('id !=', $id)->first();
+            if ($check) {
+                $slug = $slug . '-' . time();
+            }
+        }
+
+        // Upload Cover Image (jika ada yang baru)
+        $fileGambar = $this->request->getFile('gambar');
+        $gambarName = $berita['gambar'];
+        if ($fileGambar && $fileGambar->isValid() && !$fileGambar->hasMoved()) {
+            $destination = ROOTPATH . 'public/uploads/berita';
+            if (!is_dir($destination)) {
+                mkdir($destination, 0755, true);
+            }
+            // Hapus gambar lama jika ada
+            if (!empty($berita['gambar']) && file_exists($destination . '/' . $berita['gambar'])) {
+                @unlink($destination . '/' . $berita['gambar']);
+            }
+            $gambarName = convert_to_webp($fileGambar, $destination, 'berita_' . time());
+        }
+
+        $updateData = [
+            'judul'    => $judul,
+            'slug'     => $slug,
+            'konten'   => $konten,
+            'gambar'   => $gambarName,
+            'kategori' => $kategori,
+            'status'   => $status,
+        ];
+
+        $beritaModel->update($id, $updateData);
+
+        $afterData = $beritaModel->find($id);
+        log_activity('UPDATE_BERITA_ADMIN', $beforeData, $afterData, 'mst_berita', $id);
+
+        return redirect()->to('admin/settings/berita')->with('success', 'Berita "' . $judul . '" berhasil diperbarui.');
+    }
+
+    public function deleteBerita(string $id)
+    {
+        $beritaModel = new \App\Models\BeritaModel();
+        helper('app');
+
+        $berita = $beritaModel->find($id);
+        if (!$berita) {
+            return redirect()->to('admin/settings/berita')->with('error', 'Berita tidak ditemukan.');
+        }
+
+        $beritaModel->delete($id);
+
+        log_activity('HAPUS_BERITA_ADMIN', $berita, array_merge($berita, ['deleted_at' => date('Y-m-d H:i:s')]), 'mst_berita', $id);
+
+        return redirect()->to('admin/settings/berita')->with('success', 'Berita "' . $berita['judul'] . '" berhasil dihapus.');
+    }
 }
 

@@ -1,5 +1,15 @@
 # RELEASE NOTES - SIPAKATAU
 
+## [v2.9.16] - 2026-07-12
+### ✨ Added
+- **Fitur Berita Kesbangpol (Modul Baru)**: Menambahkan modul Berita Kesbangpol lengkap yang terintegrasi dengan database `mst_berita`:
+  - **Panel CRUD Admin**: Menyediakan halaman pengaturan berita di sisi admin dengan Rich Text Editor (Summernote Lite) dan konversi format cover otomatis ke WebP.
+  - **Halaman Berita Publik**: Menyediakan grid daftar berita publik yang dilengkapi filter kategori, fitur pencarian kata kunci, serta paginasi dinamis.
+  - **Halaman Detail Artikel**: Menampilkan isi berita terformat dengan metrik jumlah tayangan, breadcrumbs, tombol bagikan sosial media (Facebook, WhatsApp, Twitter), serta rekomendasi berita terbaru.
+  - **Navigasi Terintegrasi**: Memasang tautan baru pada menu navigasi sidebar admin ("Kelola Berita") dan header menu dropdown informasi publik ("Berita Kesbangpol").
+
+---
+
 ## [v2.9.15] - 2026-07-09
 ### ✨ Added
 - **Pemisahan Tombol Tambah Video/Dokumentasi**: Memisahkan tombol tambah konten dan modal tambah menjadi dua tombol terpisah secara mandiri untuk Video Edukasi dan Dokumentasi Kegiatan. Desain baru menggunakan hover gradient premium untuk meningkatkan pengalaman pengguna (UX).
