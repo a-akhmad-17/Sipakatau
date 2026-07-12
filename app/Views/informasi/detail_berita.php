@@ -70,11 +70,11 @@
         transition: var(--transition-smooth);
     }
     .share-fb { color: #3b5998 !important; border-color: rgba(59, 89, 152, 0.25) !important; }
-    .share-tw { color: #1da1f2 !important; border-color: rgba(29, 161, 242, 0.25) !important; }
+    .share-tw { color: #0f172a !important; border-color: rgba(15, 23, 42, 0.25) !important; }
     .share-wa { color: #25d366 !important; border-color: rgba(37, 211, 102, 0.25) !important; }
     
     html[data-theme="dark"] .share-fb { color: #8b9dc3 !important; border-color: rgba(139, 157, 195, 0.25) !important; }
-    html[data-theme="dark"] .share-tw { color: #38bdf8 !important; border-color: rgba(56, 189, 248, 0.25) !important; }
+    html[data-theme="dark"] .share-tw { color: #ffffff !important; border-color: rgba(255, 255, 255, 0.25) !important; }
     html[data-theme="dark"] .share-wa { color: #4ade80 !important; border-color: rgba(74, 222, 128, 0.25) !important; }
     
     .share-btn:hover {
@@ -83,7 +83,7 @@
         border-color: transparent !important;
     }
     .share-fb:hover { background: #3b5998 !important; color: #ffffff !important; }
-    .share-tw:hover { background: #1da1f2 !important; color: #ffffff !important; }
+    .share-tw:hover { background: #000000 !important; color: #ffffff !important; }
     .share-wa:hover { background: #25d366 !important; color: #ffffff !important; }
 
     .hover-red:hover {
@@ -141,7 +141,7 @@
                         $shareText = urlencode($berita['judul']);
                         ?>
                         <a href="https://www.facebook.com/sharer/sharer.php?u=<?= $shareUrl ?>" target="_blank" class="share-btn share-fb" title="Bagikan ke Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-                        <a href="https://twitter.com/intent/tweet?url=<?= $shareUrl ?>&text=<?= $shareText ?>" target="_blank" class="share-btn share-tw" title="Bagikan ke Twitter / X"><i class="fa-brands fa-twitter"></i></a>
+                        <a href="https://twitter.com/intent/tweet?url=<?= $shareUrl ?>&text=<?= $shareText ?>" target="_blank" class="share-btn share-tw" title="Bagikan ke Twitter / X"><i class="fa-brands fa-x-twitter"></i></a>
                         <a href="https://api.whatsapp.com/send?text=<?= $shareText ?>%20<?= $shareUrl ?>" target="_blank" class="share-btn share-wa" title="Bagikan ke WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
                     </div>
                     <a href="<?= site_url('informasi/berita') ?>" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-arrow-left-long me-1"></i> Kembali ke Berita</a>
