@@ -181,14 +181,7 @@
             <div class="glass-card p-4">
                 <h5 class="font-heading mb-3" style="color: var(--text-main); font-size: 1.15rem;"><i class="fa-solid fa-headset text-warning me-2"></i>Layanan Piket</h5>
                 <p class="small text-muted mb-3">Ada kendala, keluhan, atau butuh informasi lebih lanjut mengenai layanan Kesbangpol? Silakan hubungi petugas piket kami via WhatsApp.</p>
-                <?php
-                // Fetch piket phone from sys_settings
-                $db = \Config\Database::connect();
-                $piketRow = $db->table('sys_settings')->where('key', 'piket_phone')->get()->getRowArray();
-                $phone = $piketRow ? $piketRow['value'] : '0811-7671-545';
-                $waLink = 'https://wa.me/' . str_replace(['-', ' ', '+'], '', $phone);
-                ?>
-                <a href="<?= $waLink ?>" target="_blank" class="btn btn-portal w-100 fw-semibold text-center" style="background: linear-gradient(135deg, #22c55e, #16a34a); box-shadow: 0 4px 15px rgba(34, 197, 94, 0.25);">
+                <a href="https://wa.me/<?= get_piket_phone_clean() ?>" target="_blank" class="btn btn-portal w-100 fw-semibold text-center" style="background: linear-gradient(135deg, #22c55e, #16a34a); box-shadow: 0 4px 15px rgba(34, 197, 94, 0.25);">
                     <i class="fa-brands fa-whatsapp me-2"></i> WhatsApp Piket
                 </a>
             </div>

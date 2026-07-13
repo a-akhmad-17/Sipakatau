@@ -47,8 +47,8 @@
             <hr class="my-3 border-primary-subtle">
             <p class="mb-0 fw-semibold text-white">
                 <i class="fa-solid fa-phone-volume me-2"></i>Silahkan konfirmasi melalui whatsapp apabila mengalami kendala: 
-                <a href="https://wa.me/628117671545?text=Halo%20Kesbangpol%20Sinjai,%20saya%20mengalami%20kendala%20saat%20mengisi%20formulir%20rekomendasi%20kegiatan." target="_blank" class="text-success text-decoration-none fw-bold wa-link">
-                    Kesbangpol Sinjai (0811-7671-545) <i class="fa-brands fa-whatsapp ms-1"></i>
+                <a href="https://wa.me/<?= get_piket_phone_clean() ?>?text=Halo%20Kesbangpol%20Sinjai,%20saya%20mengalami%20kendala%20saat%20mengisi%20formulir%20rekomendasi%20kegiatan." target="_blank" class="text-success text-decoration-none fw-bold wa-link">
+                    Kesbangpol Sinjai (<?= esc(get_piket_phone()) ?>) <i class="fa-brands fa-whatsapp ms-1"></i>
                 </a>
             </p>
         </div>

@@ -1,5 +1,14 @@
 # RELEASE NOTES - SIPAKATAU
 
+## [v2.9.18] - 2026-07-13
+### ✨ Added
+- **Integrasi Nomor WhatsApp Piket Dinamis**:
+  - **Helper Global `get_piket_phone()` & `get_piket_phone_clean()`**: Membuat fungsi bantu global untuk mengambil data nomor WhatsApp piket resmi secara terpusat dari pengaturan portal (`sys_settings`) dan memformat tautan API WhatsApp.
+  - **Pembaruan View**: Mengubah seluruh nomor WhatsApp piket statis/hardcoded di halaman Beranda, Lacak Berkas, Detail Berita, Form Rekomendasi (Publik & User), dan Footer Layout agar diambil secara dinamis dari database.
+  - **Autoload Helper**: Mendaftarkan helper `app` secara global di BaseController agar semua controller dan views memiliki akses langsung tanpa load manual.
+
+---
+
 ## [v2.9.17] - 2026-07-12
 ### ✨ Added
 - **Peningkatan Modul Berita (Optimasi Media & Slider)**:

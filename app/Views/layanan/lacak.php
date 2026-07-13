@@ -215,8 +215,8 @@
                 <?php elseif ($berkas['status_verifikasi'] === 'Rejected'): ?>
                     <i class="fa-solid fa-circle-xmark text-danger me-2"></i><strong>Pengajuan Ditolak.</strong> Terdapat beberapa berkas administrasi yang tidak sesuai persyaratan. Silakan hubungi admin di nomor 
                     <?php if ($tipe === 'rekomendasi'): ?>
-                        <a href="https://wa.me/628117671545?text=Halo%20Kesbangpol%20Sinjai,%20pengajuan%20rekomendasi%20kegiatan%20saya%20dengan%20nomor%20registrasi%20<?= esc($nomor) ?>%20ditolak.%20Mohon%20informasi%20perbaikan%20berkas." target="_blank" class="text-success text-decoration-none fw-bold wa-link">
-                            WhatsApp Kesbangpol Sinjai (0811-7671-545) <i class="fa-brands fa-whatsapp ms-1"></i>
+                        <a href="https://wa.me/<?= get_piket_phone_clean() ?>?text=Halo%20Kesbangpol%20Sinjai,%20pengajuan%20rekomendasi%20kegiatan%20saya%20dengan%20nomor%20registrasi%20<?= esc($nomor) ?>%20ditolak.%20Mohon%20informasi%20perbaikan%20berkas." target="_blank" class="text-success text-decoration-none fw-bold wa-link">
+                            WhatsApp Kesbangpol Sinjai (<?= esc(get_piket_phone()) ?>) <i class="fa-brands fa-whatsapp ms-1"></i>
                         </a>
                     <?php else: ?>
                         <a href="https://wa.me/6281280799020?text=Halo%20Bapak%20Endang,%20pengajuan%20registrasi%20ormas%20saya%20dengan%20nomor%20registrasi%20<?= esc($nomor) ?>%20ditolak.%20Mohon%20informasi%20perbaikan%20berkas." target="_blank" class="text-success text-decoration-none fw-bold wa-link">

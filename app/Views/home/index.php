@@ -410,8 +410,8 @@
         </div>
         <h5 class="text-white fw-bold mb-2">HUBUNGI</h5>
         <p class="text-muted small">WhatsApp (Chat Only): 
-            <a href="https://wa.me/628117671545?text=Halo%20Kesbangpol%20Sinjai,%20saya%20ingin%20bertanya%20mengenai%20layanan%20SIPAKATAU." target="_blank" class="text-success fw-bold text-decoration-none wa-link">
-                0811-7671-545 <i class="fa-brands fa-whatsapp ms-1"></i>
+            <a href="https://wa.me/<?= get_piket_phone_clean() ?>?text=Halo%20Kesbangpol%20Sinjai,%20saya%20ingin%20bertanya%20mengenai%20layanan%20SIPAKATAU." target="_blank" class="text-success fw-bold text-decoration-none wa-link">
+                <?= esc(get_piket_phone()) ?> <i class="fa-brands fa-whatsapp ms-1"></i>
             </a>
         </p>
     </div>

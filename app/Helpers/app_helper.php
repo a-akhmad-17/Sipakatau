@@ -117,3 +117,28 @@ if (!function_exists('convert_to_webp')) {
         return $success ? $finalFilename : false;
     }
 }
+
+if (!function_exists('get_piket_phone')) {
+    function get_piket_phone()
+    {
+        try {
+            $db = \Config\Database::connect();
+            $setting = $db->table('sys_settings')->where('key', 'piket_phone')->get()->getRowArray();
+            return $setting ? $setting['value'] : '0811-7671-545';
+        } catch (\Exception $e) {
+            return '0811-7671-545';
+        }
+    }
+}
+
+if (!function_exists('get_piket_phone_clean')) {
+    function get_piket_phone_clean()
+    {
+        $phone = get_piket_phone();
+        $clean = preg_replace('/[^0-9]/', '', $phone);
+        if (strpos($clean, '0') === 0) {
+            $clean = '62' . substr($clean, 1);
+        }
+        return $clean;
+    }
+}
