@@ -707,19 +707,19 @@ $requirementsBerjenjang = [
                                         <div class="timeline-icon" style="width:30px; height:30px; font-size:0.75rem;">
                                             <?php if ($step2_class === 'completed'): ?><i class="fa-solid fa-check"></i><?php else: ?>2<?php endif; ?>
                                         </div>
-                                        <div class="timeline-label" style="font-size:0.68rem; margin-top:5px; line-height:1.2;">Diajukan ke Kemendagri</div>
+                                        <div class="timeline-label" style="font-size:0.68rem; margin-top:5px; line-height:1.2;">Validasi Bidang</div>
                                     </div>
                                     <div class="timeline-step <?= $step3_class ?>">
                                         <div class="timeline-icon" style="width:30px; height:30px; font-size:0.75rem;">
                                             <?php if ($step3_class === 'completed'): ?><i class="fa-solid fa-check"></i><?php else: ?>3<?php endif; ?>
                                         </div>
-                                        <div class="timeline-label" style="font-size:0.68rem; margin-top:5px; line-height:1.2;">Validasi & TTE Kabid</div>
+                                        <div class="timeline-label" style="font-size:0.68rem; margin-top:5px; line-height:1.2;">Diajukan ke Kemendagri</div>
                                     </div>
                                     <div class="timeline-step <?= $step4_class ?>">
                                         <div class="timeline-icon" style="width:30px; height:30px; font-size:0.75rem;">
                                             <?php if ($step4_class === 'completed'): ?><i class="fa-solid fa-check"></i><?php else: ?>4<?php endif; ?>
                                         </div>
-                                        <div class="timeline-label" style="font-size:0.68rem; margin-top:5px; line-height:1.2;">Selesai / Dokumen Terbit</div>
+                                        <div class="timeline-label" style="font-size:0.68rem; margin-top:5px; line-height:1.2;">Selesai</div>
                                     </div>
                                 </div>
                             </div>
@@ -743,9 +743,9 @@ $requirementsBerjenjang = [
                                 <?php if ($progress == 25): ?>
                                     Berkas pendaftaran sedang dalam proses verifikasi oleh admin Kesbangpol. Silakan menunggu...
                                 <?php elseif ($progress == 50): ?>
-                                    Dokumen yang telah diunggah telah diajukan ke kemendagri, silahkan menunggu...
+                                    Validasi bidang oleh Kepala Bidang sedang diproses. Silakan menunggu...
                                 <?php elseif ($progress == 75): ?>
-                                    Validasi Bidang & TTE Kabid sedang diproses. Silakan menunggu...
+                                    Dokumen telah disetujui bidang dan sedang diajukan ke Kemendagri untuk penerbitan SKT. Silakan menunggu...
                                 <?php elseif ($progress == 100): ?>
                                     Pendaftaran selesai! <?= ($tipe === 'Lokal') ? 'Laporan Tanggapan Keberadaan' : 'Surat Keberadaan' ?> Anda telah diterbitkan. Silakan unduh dokumen resmi Anda di bawah.
                                 <?php endif; ?>
@@ -757,7 +757,7 @@ $requirementsBerjenjang = [
                         <div class="mt-4 pt-3 border-top border-secondary border-opacity-10 d-flex justify-content-center">
                             <?php if (!empty($pendaftaran['pdf_tte_path'])): ?>
                                 <a href="<?= base_url($pendaftaran['pdf_tte_path']) ?>" target="_blank" class="btn btn-success fw-bold text-white px-4 py-2.5">
-                                    <i class="fa-solid fa-cloud-download me-1"></i> Unduh <?= ($tipe === 'Lokal') ? 'Laporan Tanggapan Keberadaan' : 'Surat Keberadaan' ?> Resmi (TTE)
+                                    <i class="fa-solid fa-cloud-download me-1"></i> Unduh <?= ($tipe === 'Lokal') ? 'Laporan Tanggapan Keberadaan' : 'Surat Keberadaan' ?> Resmi
                                 </a>
                             <?php else: ?>
                                 <span class="badge bg-secondary text-white p-3"><i class="fa-solid fa-circle-info me-2"></i>Dokumen resmi sedang disinkronisasi oleh Admin.</span>

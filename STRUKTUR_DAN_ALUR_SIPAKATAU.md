@@ -63,13 +63,14 @@ Halaman khusus dengan tampilan mobile-friendly untuk Kepala Badan Kesbangpol gun
   * **Jika Disetujui:** Mengunduh berkas PDF Surat Keberadaan Ormas resmi langsung dari Dashboard User.
 
 #### 2. Peran Admin / Petugas Kesbangpol:
-* **Periksa Kelengkapan:** Menerima berkas masuk di menu Verifikasi Pendaftaran, memeriksa keaslian dan kelengkapan 12 dokumen persyaratan.
+* **Periksa Kelengkapan:** Menerima berkas masuk di menu Verifikasi Pendaftaran, memeriksa keaslian dan kelengkapan dokumen persyaratan.
 * **Tolak Berkas:** Jika dokumen salah/kurang, mengklik "Tolak", lalu menulis catatan alasan detail agar bisa dibaca pemohon.
-* **Teruskan Berkas:** Jika dokumen lengkap dan valid, meneruskan status berkas ke proses verifikasi bidang (Kabid).
+* **Teruskan Berkas:** Jika dokumen lengkap dan valid, meloloskan berkas ke tahap selanjutnya yaitu **Validasi Bidang** (Progres 50%).
+* **Unggah Dokumen Pusat:** Setelah surat/SKT terbit dari Kemendagri, mengunggah berkas tersebut untuk menyelesaikan pengajuan (Progres 100%).
 
 #### 3. Peran Kepala Bidang (Kabid):
-* **Review Kelayakan:** Meninjau usulan ormas baru yang telah diloloskan oleh admin.
-* **Persetujuan Akhir:** Klik "Setujui" untuk meresmikan ormas dan menerbitkan Surat Keberadaan Ormas PDF yang sah.
+* **Review Kelayakan:** Meninjau usulan ormas baru yang telah diloloskan oleh admin pada tahap Validasi Bidang.
+* **Persetujuan Bidang:** Klik "Setujui" untuk memvalidasi dan menandai berkas sedang **Diajukan ke Kemendagri** (Progres 75%).
 
 #### 4. Peran Kepala Badan (Kaban/Eksekutif):
 * **Pantau Ormas:** Memantau seluruh ormas aktif di Kabupaten Sinjai lewat Dashboard Eksekutif.

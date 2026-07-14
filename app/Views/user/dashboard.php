@@ -406,13 +406,13 @@
                             <div class="timeline-icon" style="width:30px; height:30px; font-size:0.75rem;">
                                 <?php if ($progress > 50): ?><i class="fa-solid fa-check"></i><?php else: ?>2<?php endif; ?>
                             </div>
-                            <div class="timeline-label" style="font-size:0.68rem; margin-top:5px; line-height:1.2;">Ke Kemendagri</div>
+                            <div class="timeline-label" style="font-size:0.68rem; margin-top:5px; line-height:1.2;">Validasi Bidang</div>
                         </div>
                         <div class="timeline-step <?= ($progress >= 75) ? (($progress > 75) ? 'completed' : 'active') : '' ?>">
                             <div class="timeline-icon" style="width:30px; height:30px; font-size:0.75rem;">
                                 <?php if ($progress > 75): ?><i class="fa-solid fa-check"></i><?php else: ?>3<?php endif; ?>
                             </div>
-                            <div class="timeline-label" style="font-size:0.68rem; margin-top:5px; line-height:1.2;">Validasi Bidang</div>
+                            <div class="timeline-label" style="font-size:0.68rem; margin-top:5px; line-height:1.2;">Ke Kemendagri</div>
                         </div>
                         <div class="timeline-step <?= ($progress == 100) ? 'completed' : '' ?>">
                             <div class="timeline-icon" style="width:30px; height:30px; font-size:0.75rem;">
@@ -793,13 +793,13 @@
                             <div class="timeline-icon" style="width:30px; height:30px; font-size:0.75rem;">
                                 ${step2 === 'completed' ? '<i class="fa-solid fa-check"></i>' : '2'}
                             </div>
-                            <div class="timeline-label" style="font-size:0.68rem; margin-top:5px; line-height:1.2;">Ke Kemendagri</div>
+                            <div class="timeline-label" style="font-size:0.68rem; margin-top:5px; line-height:1.2;">Validasi Bidang</div>
                         </div>
                         <div class="timeline-step ${step3}">
                             <div class="timeline-icon" style="width:30px; height:30px; font-size:0.75rem;">
                                 ${step3 === 'completed' ? '<i class="fa-solid fa-check"></i>' : '3'}
                             </div>
-                            <div class="timeline-label" style="font-size:0.68rem; margin-top:5px; line-height:1.2;">Validasi Bidang</div>
+                            <div class="timeline-label" style="font-size:0.68rem; margin-top:5px; line-height:1.2;">Ke Kemendagri</div>
                         </div>
                         <div class="timeline-step ${step4}">
                             <div class="timeline-icon" style="width:30px; height:30px; font-size:0.75rem;">

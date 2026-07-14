@@ -1630,15 +1630,15 @@
                         </div>
                         <div class="form-check mb-0">
                             <input class="form-check-input progress-checkbox" type="checkbox" id="modal-step2" data-id="" data-value="50" onclick="updateTrackingProgress(this)">
-                            <label class="form-check-label small" style="cursor:pointer; color: var(--text-main) !important;" for="modal-step2">2. Ke Kemendagri (50%)</label>
+                            <label class="form-check-label small" style="cursor:pointer; color: var(--text-main) !important;" for="modal-step2">2. Validasi Bidang (50%)</label>
                         </div>
                         <div class="form-check mb-0">
                             <input class="form-check-input progress-checkbox" type="checkbox" id="modal-step3" data-id="" data-value="75" onclick="updateTrackingProgress(this)">
-                            <label class="form-check-label small" style="cursor:pointer; color: var(--text-main) !important;" for="modal-step3">3. Validasi Bidang (75%)</label>
+                            <label class="form-check-label small" style="cursor:pointer; color: var(--text-main) !important;" for="modal-step3">3. Ke Kemendagri (75%)</label>
                         </div>
                         <div class="form-check mb-0">
                             <input class="form-check-input progress-checkbox" type="checkbox" id="modal-step4" data-id="" data-value="100" onclick="updateTrackingProgress(this)">
-                            <label class="form-check-label small" style="cursor:pointer; color: var(--text-main) !important;" for="modal-step4">4. Selesai / TTE (100%)</label>
+                            <label class="form-check-label small" style="cursor:pointer; color: var(--text-main) !important;" for="modal-step4">4. Selesai (100%)</label>
                         </div>
                     </div>
                 </div>
