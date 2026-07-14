@@ -1294,6 +1294,10 @@
                             <input type="date" name="tgl_sk_kedaluwarsa" id="edit_o_tgl_exp" class="form-control form-control-custom">
                         </div>
                         <div class="col-md-6">
+                            <label for="edit_o_status" class="form-label small text-muted">Status Keaktifan (Otomatis)</label>
+                            <input type="text" id="edit_o_status" class="form-control form-control-custom" readonly style="opacity: 0.85;">
+                        </div>
+                        <div class="col-md-6">
                             <label for="edit_o_lat" class="form-label small text-muted">Latitude</label>
                             <input type="number" step="any" name="latitude" id="edit_o_lat" class="form-control form-control-custom">
                         </div>
