@@ -1,5 +1,21 @@
 # RELEASE NOTES - SIPAKATAU
 
+## [v2.9.31] - 2026-07-15
+### 🔄 Changed
+- **Penghapusan Cetak Permohonan Mandiri oleh User**:
+  - Menghapus tombol cetak "Permohonan" pada tabel riwayat ormas di [dashboard.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/user/dashboard.php). Dokumen resmi sekarang murni dari inputan/unggahan resmi dari Kabid Kesbangpol untuk menjaga keabsahan surat.
+
+### 🐛 Fixed
+- **Scroll Menu Sidebar "Penerbitan SKT / Tanggapan" di Kabid**:
+  - Menambahkan `id="validasi-skt"` ke elemen kontainer tabel pendaftaran di [dashboard_bidang.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/bidang/dashboard_bidang.php) agar menu navigasi sidebar dapat mendeteksi anchor scroll dengan benar saat diklik.
+
+### ✨ Added
+- **Modal Peninjauan Berkas oleh Kabid (Sebelum Validasi)**:
+  - Mengubah aksi tombol "Lihat Berkas" pada tabel pendaftaran Kabid di [dashboard_bidang.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/bidang/dashboard_bidang.php) untuk membuka modal daftar dokumen persyaratan (`modalLihatBerkas`) interaktif.
+  - Kabid kini dapat menguji dan memeriksa kesesuaian berkas satu per satu (14 berkas untuk ormas lokal, 10 berkas untuk ormas berjenjang) sebelum memutuskan untuk melakukan validasi atau penolakan.
+
+---
+
 ## [v2.9.30] - 2026-07-15
 ### 🐛 Fixed
 - **Tombol Terbitkan SKT/Tanggapan di Kabid Poldagri tidak bisa diklik**:

@@ -632,12 +632,6 @@ $requirementsBerjenjang = [
                                                 </a>
                                             <?php endif; ?>
                                             
-                                            <?php if ($item['status_verifikasi'] !== 'Draft'): ?>
-                                                <a href="<?= base_url('layanan/cetak-permohonan/' . $item['id']) ?>" target="_blank" class="btn btn-sm btn-outline-info py-1 px-2.5" title="Cetak Surat Permohonan Kemendagri">
-                                                    <i class="fa-solid fa-print me-1"></i> Permohonan
-                                                </a>
-                                            <?php endif; ?>
-
                                             <?php if ($item['status_verifikasi'] === 'Approved' && $item['progress_percentage'] == 100 && !empty($item['pdf_tte_path'])): ?>
                                                 <a href="<?= base_url('uploads/rekomendasi_ormas/' . $item['pdf_tte_path']) ?>" target="_blank" class="btn btn-sm btn-outline-success py-1 px-2.5 text-decoration-none" title="Unduh Surat Rekomendasi Resmi">
                                                     <i class="fa-solid fa-download me-1"></i> Unduh

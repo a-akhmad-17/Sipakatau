@@ -148,7 +148,7 @@
 </div>
 
 <!-- Tabel Pendaftaran SKT -->
-<div class="row g-4 mb-4">
+<div class="row g-4 mb-4" id="validasi-skt">
     <div class="col-12">
         <div class="glass-card p-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -262,10 +262,10 @@
                                 <?php endif; ?>
 
                                 <?php if (!empty($p['file_berkas'])): ?>
-                                    <a href="<?= base_url('uploads/berkas_ormas/' . $p['file_berkas']) ?>" target="_blank"
-                                        class="btn btn-sm ms-1" style="font-size:12px; padding:4px 8px; background:rgba(255,255,255,.06); color:var(--text-muted);" title="Lihat Berkas">
+                                    <button type="button" class="btn btn-sm ms-1" style="font-size:12px; padding:4px 8px; background:rgba(255,255,255,.06); color:var(--text-muted);" 
+                                        onclick="openModalLihatBerkas('<?= esc($p['file_berkas'], 'attr') ?>', '<?= esc($p['tipe_ormas'] ?? 'Lokal') ?>')" title="Lihat Berkas">
                                         <i class="fa-solid fa-eye"></i>
-                                    </a>
+                                    </button>
                                 <?php endif; ?>
 
                                 <?php if (!empty($p['pdf_tte_path'])): ?>
@@ -340,6 +340,38 @@
     </div>
 </div>
 <?php endif; ?>
+
+<!-- Modal Lihat Berkas -->
+<div class="modal fade" id="modalLihatBerkas" tabindex="-1" aria-labelledby="modalLihatBerkasLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="background:var(--card-bg); border:1px solid var(--border-color);">
+            <div class="modal-header border-0">
+                <h5 class="modal-title text-white font-heading" id="modalLihatBerkasLabel"><i class="fa-solid fa-folder-open text-info me-2"></i>Berkas Persyaratan Ormas</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-custom mb-0 text-white" style="font-size: 0.85rem;">
+                        <thead>
+                            <tr style="background: rgba(255, 255, 255, 0.02);">
+                                <th class="text-center" style="width: 5%;">#</th>
+                                <th style="width: 55%;">Jenis Dokumen</th>
+                                <th class="text-center" style="width: 15%;">Ukuran</th>
+                                <th class="text-center" style="width: 25%;">Tautan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="berkas-list-container">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Peta GIS & Sebaran Wilayah -->
 <div class="row g-4">
@@ -421,6 +453,77 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
 <script>
+    // ===== Requirements Lists for Berkas Modal =====
+    const requirementsLokal = [
+        { name: "Surat Permohonan", desc: "Surat Permohonan ditujukan kepada Menteri (Cq. Kaban Kesbangpol)" },
+        { name: "AD & ART", desc: "Anggaran Dasar (AD) & Anggaran Rumah Tangga (ART)" },
+        { name: "Akta Notaris", desc: "Akta Pendirian Notaris" },
+        { name: "Surat Pernyataan Keabsahan", desc: "Surat Pernyataan Keabsahan Dokumen (Meterai Rp 10.000)" },
+        { name: "Program & Struktur Kerja", desc: "Program Kerja Organisasi & Struktur Organisasi Resmi" },
+        { name: "Domisili Kantor", desc: "Surat Keterangan Domisili Kantor Sekretariat" },
+        { name: "NPWP Organisasi", desc: "NPWP atas nama Organisasi" },
+        { name: "Formulir Isian Data Ormas", desc: "Formulir Isian Data Ormas (Ketua & Sekretaris)" },
+        { name: "Rekomendasi Kementerian", desc: "Surat Rekomendasi Kementerian Agama (Ormas Agama) / Kebudayaan" },
+        { name: "Biodata & KTP Pengurus", desc: "Biodata & KTP Pengurus", isPengurus: true },
+        { name: "Pasfoto Pengurus", desc: "Pasfoto Pengurus 4x6 cm 2 Lembar (Latar Merah)", isPengurus: true },
+        { name: "SK & Foto Sekretariat", desc: "SK Pengurus & Foto Sekretariat (Papan Nama)" },
+        { name: "Kontrak/Izin Pakai Gedung", desc: "Surat Perjanjian Kontrak/Izin Pakai Gedung Sekretariat" },
+        { name: "Rekening & Logo Organisasi", desc: "Nomor Rekening Organisasi & File Logo Organisasi" }
+    ];
+
+    const requirementsBerjenjang = [
+        { name: "Surat Permohonan", desc: "Surat Permohonan ditujukan kepada Kepala Badan Kesbangpol Kab. Sinjai" },
+        { name: "Surat Pernyataan Resmi", desc: "Surat Pernyataan Resmi (Memuat 6 poin pernyataan, Meterai Rp 10.000)" },
+        { name: "SK Kemenkumham", desc: "Surat Keputusan (SK) Kemenkumham RI" },
+        { name: "Surat Keterangan Domisili", desc: "Surat Keterangan Domisili (Alamat domisili kop surat & sekretariat)" },
+        { name: "Formulir Isian Data Ormas", desc: "Formulir Isian Data Ormas" },
+        { name: "Pasfoto Pengurus", desc: "Pasfoto Pengurus ukuran 4x6 cm sebanyak 2 lembar", isPengurus: true },
+        { name: "Fotokopi KTP Pengurus", desc: "Fotokopi KTP Pengurus", isPengurus: true },
+        { name: "Surat Keputusan (SK) Pengurus", desc: "Surat Keputusan (SK) Pengurus Organisasi" },
+        { name: "Foto Sekretariat", desc: "Foto Sekretariat (Tampak depan menampilkan Papan Nama resmi)" },
+        { name: "Dokumen Pendukung Tambahan", desc: "Dokumen pendukung legalitas tambahan lainnya (ZIP/PDF)" }
+    ];
+
+    function openModalLihatBerkas(fileBerkasJson, tipe) {
+        let files = {};
+        try {
+            const txt = document.createElement("textarea");
+            txt.innerHTML = fileBerkasJson;
+            files = JSON.parse(txt.value || '{}');
+        } catch (e) {
+            console.error("Error parsing berkas JSON", e);
+        }
+        
+        const activeReqs = tipe === 'Lokal' ? requirementsLokal : requirementsBerjenjang;
+        const listContainer = document.getElementById('berkas-list-container');
+        listContainer.innerHTML = '';
+
+        activeReqs.forEach((req, idx) => {
+            if (req.isPengurus) return; // Skip pengurus berkas
+            const fileIdx = idx + 1;
+            const fileInfo = files[fileIdx];
+            
+            const tr = document.createElement('tr');
+            let fileActionHtml = '<span class="text-danger small"><i class="fa-solid fa-circle-xmark me-1"></i> Belum Diunggah</span>';
+            if (fileInfo && fileInfo.filename) {
+                fileActionHtml = `<a href="<?= base_url('uploads/ormas/') ?>/${fileInfo.filename}" target="_blank" class="btn btn-xs btn-outline-info text-white"><i class="fa-solid fa-eye me-1"></i> Buka File</a>`;
+            }
+
+            tr.innerHTML = `
+                <td class="text-center align-middle">${fileIdx}</td>
+                <td class="align-middle">
+                    <div class="fw-bold text-white small">${req.name}</div>
+                    <div class="text-muted" style="font-size: 0.72rem;">${req.desc}</div>
+                </td>
+                <td class="text-center align-middle small text-muted">${fileInfo ? fileInfo.size : '-'}</td>
+                <td class="text-center align-middle">${fileActionHtml}</td>
+            `;
+            listContainer.appendChild(tr);
+        });
+
+        new bootstrap.Modal(document.getElementById('modalLihatBerkas')).show();
+    }
+
     // ===== Modal Helpers =====
     function openModalSkt(id, namaOrmas, tipe) {
         const docTitle = (tipe === 'Lokal') ? 'Laporan Tanggapan Keberadaan' : 'Surat Keberadaan';
