@@ -87,8 +87,9 @@ class Bidang extends BaseController
         }
 
         $pendaftaran = $db->table('trn_pendaftaran')
-            ->select('trn_pendaftaran.*, mst_ormas.nama_ormas, mst_ormas.alamat, mst_ormas.email, mst_ormas.telepon, mst_ormas.file_berkas, mst_ormas.tgl_sk_kepengurusan, mst_ormas.tgl_sk_kedaluwarsa')
+            ->select('trn_pendaftaran.*, mst_ormas.nama_ormas, mst_ormas.alamat, mst_ormas.email, mst_ormas.telepon, mst_ormas.file_berkas, mst_ormas.tgl_sk_kepengurusan, mst_ormas.tgl_sk_kedaluwarsa, sys_users.username AS username_pengirim, sys_users.email AS email_pengirim')
             ->join('mst_ormas', 'mst_ormas.id = trn_pendaftaran.ormas_id', 'left')
+            ->join('sys_users', 'sys_users.id = trn_pendaftaran.user_id', 'left')
             ->orderBy('trn_pendaftaran.created_at', 'DESC')
             ->get()
             ->getResultArray();

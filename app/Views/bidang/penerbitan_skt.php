@@ -192,8 +192,16 @@
                                     </button>
                                 <?php endif; ?>
 
-                                <button type="button" class="btn btn-sm ms-1" style="font-size:12px; padding:4px 8px; background:rgba(255,255,255,.06); color:var(--text-muted);" 
-                                    onclick="openModalLihatBerkas('<?= esc($p['file_berkas'] ?? '{}', 'attr') ?>', '<?= esc($p['tipe_ormas'] ?? 'Lokal') ?>')" title="Lihat Berkas">
+                                <button type="button" class="btn btn-sm btn-lihat-berkas ms-1" style="font-size:12px; padding:4px 8px; background:rgba(255,255,255,.06); color:var(--text-muted);" 
+                                    data-file="<?= esc($p['file_berkas'] ?? '{}', 'attr') ?>"
+                                    data-tipe="<?= esc($p['tipe_ormas'] ?? 'Lokal', 'attr') ?>"
+                                    data-nama="<?= esc($p['nama_ormas'], 'attr') ?>"
+                                    data-alamat="<?= esc($p['alamat'] ?? '-', 'attr') ?>"
+                                    data-email="<?= esc($p['email'] ?? '-', 'attr') ?>"
+                                    data-telepon="<?= esc($p['telepon'] ?? '-', 'attr') ?>"
+                                    data-pengirim="<?= esc(($p['username_pengirim'] ?? '-') . ' (' . ($p['email_pengirim'] ?? '-') . ')', 'attr') ?>"
+                                    data-tanggal="<?= date('d M Y H:i', strtotime($p['created_at'])) ?>"
+                                    title="Lihat Berkas & Detail">
                                     <i class="fa-solid fa-eye"></i>
                                 </button>
 
@@ -287,7 +295,40 @@
                 <h5 class="modal-title text-white font-heading" id="modalLihatBerkasLabel"><i class="fa-solid fa-folder-open text-info me-2"></i>Berkas Persyaratan Ormas</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body p-0">
+            <div class="modal-body p-4">
+                <!-- Informasi Pendaftaran & Pengirim -->
+                <div class="mb-4">
+                    <h6 class="small fw-bold mb-3 text-warning"><i class="fa-solid fa-circle-info me-2"></i>Informasi Pengirim & Ormas</h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered border-secondary border-opacity-25 text-white mb-0" style="font-size: 0.85rem; background: rgba(255,255,255,0.01);">
+                            <tbody>
+                                <tr>
+                                    <th style="width: 35%; background: rgba(255,255,255,0.03);" class="text-muted">Nama Ormas</th>
+                                    <td id="info-nama-ormas" class="fw-bold text-warning">-</td>
+                                </tr>
+                                <tr>
+                                    <th style="background: rgba(255,255,255,0.03);" class="text-muted">Alamat Sekretariat</th>
+                                    <td id="info-alamat-ormas">-</td>
+                                </tr>
+                                <tr>
+                                    <th style="background: rgba(255,255,255,0.03);" class="text-muted">Kontak Ormas</th>
+                                    <td id="info-kontak-ormas">-</td>
+                                </tr>
+                                <tr>
+                                    <th style="background: rgba(255,255,255,0.03);" class="text-muted">Akun Pengirim (User)</th>
+                                    <td id="info-pengirim-ormas" class="text-info fw-bold">-</td>
+                                </tr>
+                                <tr>
+                                    <th style="background: rgba(255,255,255,0.03);" class="text-muted">Tanggal Pengajuan</th>
+                                    <td id="info-tanggal-ormas">-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Detail Kelengkapan Berkas -->
+                <h6 class="small fw-bold mb-3 text-warning"><i class="fa-solid fa-folder-open me-2"></i>Berkas Persyaratan Ormas</h6>
                 <div class="table-responsive">
                     <table class="table table-custom mb-0 text-white" style="font-size: 0.85rem;">
                         <thead>
@@ -346,45 +387,64 @@
         { name: "Dokumen Pendukung Tambahan", desc: "Dokumen pendukung legalitas tambahan lainnya (ZIP/PDF)" }
     ];
 
-    function openModalLihatBerkas(fileBerkasJson, tipe) {
-        let files = {};
-        try {
-            const txt = document.createElement("textarea");
-            txt.innerHTML = fileBerkasJson;
-            files = JSON.parse(txt.value || '{}');
-        } catch (e) {
-            console.error("Error parsing berkas JSON", e);
-        }
-        
-        const activeReqs = tipe === 'Lokal' ? requirementsLokal : requirementsBerjenjang;
-        const listContainer = document.getElementById('berkas-list-container');
-        listContainer.innerHTML = '';
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll('.btn-lihat-berkas').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const fileBerkasJson = this.getAttribute('data-file');
+                const tipe = this.getAttribute('data-tipe');
+                const nama = this.getAttribute('data-nama');
+                const alamat = this.getAttribute('data-alamat');
+                const email = this.getAttribute('data-email');
+                const telepon = this.getAttribute('data-telepon');
+                const pengirim = this.getAttribute('data-pengirim');
+                const tanggal = this.getAttribute('data-tanggal');
 
-        activeReqs.forEach((req, idx) => {
-            if (req.isPengurus) return; // Skip pengurus berkas
-            const fileIdx = idx + 1;
-            const fileInfo = files[fileIdx];
-            
-            const tr = document.createElement('tr');
-            let fileActionHtml = '<span class="text-danger small"><i class="fa-solid fa-circle-xmark me-1"></i> Belum Diunggah</span>';
-            if (fileInfo && fileInfo.filename) {
-                fileActionHtml = `<a href="<?= base_url('uploads/ormas/') ?>/${fileInfo.filename}" target="_blank" class="btn btn-xs btn-outline-info text-white"><i class="fa-solid fa-eye me-1"></i> Buka File</a>`;
-            }
+                document.getElementById('info-nama-ormas').innerText = nama;
+                document.getElementById('info-alamat-ormas').innerText = alamat;
+                document.getElementById('info-kontak-ormas').innerText = `${email} / ${telepon}`;
+                document.getElementById('info-pengirim-ormas').innerText = pengirim;
+                document.getElementById('info-tanggal-ormas').innerText = tanggal;
 
-            tr.innerHTML = `
-                <td class="text-center align-middle">${fileIdx}</td>
-                <td class="align-middle">
-                    <div class="fw-bold text-white small">${req.name}</div>
-                    <div class="text-muted" style="font-size: 0.72rem;">${req.desc}</div>
-                </td>
-                <td class="text-center align-middle small text-muted">${fileInfo ? fileInfo.size : '-'}</td>
-                <td class="text-center align-middle">${fileActionHtml}</td>
-            `;
-            listContainer.appendChild(tr);
+                let files = {};
+                try {
+                    const txt = document.createElement("textarea");
+                    txt.innerHTML = fileBerkasJson;
+                    files = JSON.parse(txt.value || '{}');
+                } catch (e) {
+                    console.error("Error parsing berkas JSON", e);
+                }
+                
+                const activeReqs = tipe === 'Lokal' ? requirementsLokal : requirementsBerjenjang;
+                const listContainer = document.getElementById('berkas-list-container');
+                listContainer.innerHTML = '';
+
+                activeReqs.forEach((req, idx) => {
+                    if (req.isPengurus) return; // Skip pengurus berkas
+                    const fileIdx = idx + 1;
+                    const fileInfo = files[fileIdx];
+                    
+                    const tr = document.createElement('tr');
+                    let fileActionHtml = '<span class="text-danger small"><i class="fa-solid fa-circle-xmark me-1"></i> Belum Diunggah</span>';
+                    if (fileInfo && fileInfo.filename) {
+                        fileActionHtml = `<a href="<?= base_url('uploads/ormas/') ?>/${fileInfo.filename}" target="_blank" class="btn btn-xs btn-outline-info text-white"><i class="fa-solid fa-eye me-1"></i> Buka File</a>`;
+                    }
+
+                    tr.innerHTML = `
+                        <td class="text-center align-middle">${fileIdx}</td>
+                        <td class="align-middle">
+                            <div class="fw-bold text-white small">${req.name}</div>
+                            <div class="text-muted" style="font-size: 0.72rem;">${req.desc}</div>
+                        </td>
+                        <td class="text-center align-middle small text-muted">${fileInfo ? fileInfo.size : '-'}</td>
+                        <td class="text-center align-middle">${fileActionHtml}</td>
+                    `;
+                    listContainer.appendChild(tr);
+                });
+
+                new bootstrap.Modal(document.getElementById('modalLihatBerkas')).show();
+            });
         });
-
-        new bootstrap.Modal(document.getElementById('modalLihatBerkas')).show();
-    }
+    });
 
     // ===== Modal Helpers =====
     function openModalSkt(id, namaOrmas, tipe) {

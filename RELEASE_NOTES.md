@@ -1,5 +1,14 @@
 # RELEASE NOTES - SIPAKATAU
 
+## [v2.9.35] - 2026-07-15
+### ✨ Added
+- **Informasi Pengirim (User) & Rincian Ormas di Modal Kabid**:
+  - Menghubungkan tabel `sys_users` di query pendaftaran Kabid ([Bidang.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Controllers/Bidang.php)) untuk mengambil data username dan email pengaju.
+  - Memperbarui modal peninjauan di [penerbitan_skt.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/bidang/penerbitan_skt.php) untuk menampilkan kartu informasi terperinci berisi: Nama Ormas, Alamat Sekretariat, Kontak Ormas (Email/Telp), Akun Pengirim (Username & Email), serta Tanggal Pengajuan sebelum tabel berkas persyaratan.
+  - Mengintegrasikan data HTML5 attributes (`data-nama`, `data-alamat`, `data-email`, `data-telepon`, `data-pengirim`, `data-tanggal`) pada tombol detail mata di [penerbitan_skt.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/bidang/penerbitan_skt.php) untuk sinkronisasi data yang mulus.
+
+---
+
 ## [v2.9.34] - 2026-07-15
 ### 🔄 Changed
 - **Pelepasan Kondisional Tombol Mata (Inspeksi Berkas) Kabid**:
