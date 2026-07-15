@@ -244,11 +244,12 @@
                                         <i class="fa-solid fa-xmark"></i>
                                     </button>
 
-                                <?php elseif (in_array($status, ['New', 'Pending'])): ?>
+                                <?php elseif (in_array($status, ['Pending']) && $progress < 75): ?>
                                     <!-- Validasi Berkas -->
+                                    <?php $confirmMsg = $isLokal ? 'Laporan Tanggapan Keberadaan' : 'Surat Keberadaan'; ?>
                                     <form method="POST" action="<?= base_url('bidang/proses-pendaftaran/' . $p['id'] . '/approve_bidang') ?>"
                                         style="display:inline;"
-                                        onsubmit="return confirm('Validasi berkas ormas ini ke tahap penerbitan <?= $isLokal ? 'Laporan Tanggapan' : 'Surat Keberadaan' ?>?')">
+                                        onsubmit="return confirm('Validasi berkas ormas ini ke tahap penerbitan <?= $confirmMsg ?>?')">
                                         <?= csrf_field() ?>
                                         <button type="submit" class="btn btn-sm btn-success" style="font-size:12px; padding:4px 10px;">
                                             <i class="fa-solid fa-check me-1"></i>Validasi
