@@ -29,7 +29,7 @@ class UpdateDatabaseMeet3 extends Migration
         $this->forge->addColumn('trn_pendaftaran', [
             'tipe_ormas' => [
                 'type'       => 'ENUM',
-                'constraint' => ['Nasional', 'Lokal'],
+                'constraint' => ['Nasional', 'Berjenjang', 'Lokal'],
                 'default'    => 'Lokal',
                 'after'      => 'ormas_id'
             ],

@@ -15,6 +15,11 @@
   - Membatasi perekaman data payload `before_data` dan `after_data` di [Admin.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Controllers/Admin.php) dan [Bidang.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Controllers/Bidang.php) untuk alur kerja transaksi.
   - Hanya menyimpan atribut-atribut kunci (`id`, `ormas_id`, `nomor_registrasi`, `status_verifikasi`, `progress_percentage`, `alasan_ditolak`, `pdf_tte_path`, `updated_at`) untuk menghindari pembengkakan ukuran database dan mempercepat pembacaan log audit.
 
+### 🐛 Fixed
+- **Registrasi Ormas Berjenjang**:
+  - Memperbaiki tipe data kolom `tipe_ormas` pada tabel `trn_pendaftaran` di database (dan migrasi) yang sebelumnya menggunakan `ENUM('Nasional', 'Lokal')`.
+  - Mengubah tipe kolom menjadi `ENUM('Nasional', 'Berjenjang', 'Lokal')` agar opsi *"Berjenjang"* yang dipilih di Step 1 tersimpan dengan benar, sehingga formulir Step 2 dapat memuat berkas persyaratan ormas berjenjang yang sesuai (10 berkas).
+
 ---
 
 ## [v2.9.28] - 2026-07-15
