@@ -1,5 +1,18 @@
 # RELEASE NOTES - SIPAKATAU
 
+## [v2.9.30] - 2026-07-15
+### 🐛 Fixed
+- **Tombol Terbitkan SKT/Tanggapan di Kabid Poldagri tidak bisa diklik**:
+  - Penyebab: Perbandingan PHP strict `===` pada `$progress` yang bertipe string dari hasil query database, menyebabkan kondisi `$progress === 75` selalu bernilai `false`.
+  - Solusi: Menggunakan `(int)` cast dan loose comparison `==` pada semua kondisi `progress_percentage` di [dashboard_bidang.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/bidang/dashboard_bidang.php), serta memperbaiki default status dari `'New'` (tidak ada di ENUM) menjadi `'Pending'`.
+- **Validasi Wajib Semua Berkas Pendaftaran Ormas**:
+  - Menambahkan fungsi `validateAndSubmitBerkas()` di [form_pengajuan.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/user/form_pengajuan.php) yang memblokir pengiriman form jika ada berkas yang belum diunggah.
+  - Ormas **Lokal**: wajib melengkapi 14 berkas persyaratan (diluar berkas pengurus).
+  - Ormas **Berjenjang**: wajib melengkapi 10 berkas persyaratan (diluar berkas pengurus).
+  - Menampilkan daftar berkas yang kurang secara spesifik dalam alert merah di bawah tombol submit agar pengguna tahu berkas mana yang masih perlu dilengkapi.
+
+---
+
 ## [v2.9.29] - 2026-07-15
 ### ✨ Added
 - **Penyempurnaan Notifikasi Telegram Alur Kerja**:

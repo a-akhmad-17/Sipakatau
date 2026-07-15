@@ -114,9 +114,9 @@
 <?php if ($isPoldagri): ?>
 <?php
     $totalSkt    = count($pendaftaran);
-    $menugggu    = count(array_filter($pendaftaran, fn($p) => in_array($p['status_verifikasi'], ['New','Pending']) && $p['progress_percentage'] < 75));
-    $perluSkt    = count(array_filter($pendaftaran, fn($p) => $p['status_verifikasi'] === 'Approved' && $p['progress_percentage'] == 75));
-    $selesai     = count(array_filter($pendaftaran, fn($p) => $p['progress_percentage'] == 100));
+    $menugggu    = count(array_filter($pendaftaran, fn($p) => in_array($p['status_verifikasi'], ['Pending']) && (int)$p['progress_percentage'] < 75));
+    $perluSkt    = count(array_filter($pendaftaran, fn($p) => $p['status_verifikasi'] === 'Approved' && (int)$p['progress_percentage'] == 75));
+    $selesai     = count(array_filter($pendaftaran, fn($p) => (int)$p['progress_percentage'] == 100));
 ?>
 
 <!-- Stat Cards SKT -->
@@ -190,7 +190,7 @@
                     </thead>
                     <tbody>
                     <?php foreach ($pendaftaran as $i => $p):
-                        $status    = $p['status_verifikasi'] ?? 'New';
+                        $status    = $p['status_verifikasi'] ?? 'Pending';
                         $progress  = (int)($p['progress_percentage'] ?? 0);
                         $isLokal   = (($p['tipe_ormas'] ?? 'Lokal') === 'Lokal');
                         $badgeClass = match(true) {
@@ -233,7 +233,7 @@
                                     <!-- Selesai / Ditolak — no action -->
                                     <span class="text-muted" style="font-size:11px;">—</span>
 
-                                <?php elseif ($status === 'Approved' && $progress === 75): ?>
+                                <?php elseif ($status === 'Approved' && $progress == 75): ?>
                                     <!-- Terbitkan SKT -->
                                     <button class="btn btn-sm btn-primary" onclick="openModalSkt('<?= $p['id'] ?>', '<?= esc($p['nama_ormas']) ?>', '<?= esc($p['tipe_ormas'] ?? 'Lokal') ?>')"
                                         style="font-size:12px; padding:4px 10px;">

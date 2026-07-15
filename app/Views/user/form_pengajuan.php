@@ -398,7 +398,8 @@ $requirementsBerjenjang = [
                     <input type="hidden" name="pendaftaran_id" value="<?= esc($pendaftaran['id']) ?>">
                 <?php endif; ?>
                 <input type="hidden" name="current_step" value="2">
-                <input type="hidden" name="tipe_ormas" value="<?= esc($pendaftaran['tipe_ormas'] ?? 'Lokal') ?>">
+                <input type="hidden" name="tipe_ormas" id="tipe_ormas_step2" value="<?= esc($pendaftaran['tipe_ormas'] ?? 'Lokal') ?>">
+
 
                 <!-- Info Board -->
                 <div class="alert alert-warning bg-warning-subtle border-warning-subtle text-warning-light p-4 mb-4" role="alert" style="border-radius: 12px; font-size: 0.95rem; line-height: 1.6;">
@@ -564,10 +565,15 @@ $requirementsBerjenjang = [
                     </button>
                     <div class="d-flex gap-2">
                         <a href="<?= base_url('user') ?>" class="btn btn-secondary text-white">Batal</a>
-                        <button type="submit" class="btn btn-success text-white fw-bold">
+                        <button type="button" id="btn-submit-berkas" class="btn btn-success text-white fw-bold" onclick="validateAndSubmitBerkas()">
                             <i class="fa-solid fa-paper-plane me-1"></i> Kirim Pengajuan Berkas
                         </button>
                     </div>
+                </div>
+                <!-- Alert validasi berkas -->
+                <div id="berkas-validation-alert" class="alert alert-danger border-0 mt-3 d-none" role="alert" style="background: rgba(239,68,68,0.12); color: #f87171; border-radius: 8px; font-size: 0.88rem;">
+                    <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                    <span id="berkas-validation-msg"></span>
                 </div>
             </form>
         </div>
@@ -862,6 +868,47 @@ const requirementsBerjenjang = [
     { name: "Foto Sekretariat", desc: "Foto Sekretariat (Tampak depan menampilkan Papan Nama resmi)", tte: false, template: "" },
     { name: "Dokumen Pendukung Tambahan", desc: "Dokumen pendukung legalitas tambahan lainnya (ZIP/PDF)", tte: false, template: "" }
 ];
+
+/**
+ * Validasi semua berkas wajib sebelum form dikirim.
+ * Ormas Lokal  : 14 berkas (tanpa isPengurus)
+ * Ormas Berjenjang : 10 berkas (tanpa isPengurus)
+ */
+function validateAndSubmitBerkas() {
+    // Baca tipe dari Step 2 hidden field (paling akurat)
+    const step2Hidden = document.getElementById('tipe_ormas_step2');
+    const step1Select = document.getElementById('tipe_ormas');
+    const tipeOrmas = (step2Hidden ? step2Hidden.value : null) || (step1Select ? step1Select.value : 'Lokal') || 'Lokal';
+    const activeReqs = tipeOrmas === 'Lokal' ? requirementsLokal : requirementsBerjenjang;
+    const alertDiv = document.getElementById('berkas-validation-alert');
+    const alertMsg = document.getElementById('berkas-validation-msg');
+    
+    const missing = [];
+
+    activeReqs.forEach((req, idx) => {
+        if (req.isPengurus) return; // Berkas pengurus divalidasi terpisah
+        const fileIdx = idx + 1;
+        const fileInput = document.querySelector(`input[name="file_berkas_${fileIdx}"]`);
+        const hasExist = existingFiles[fileIdx] !== undefined && existingFiles[fileIdx] !== null;
+        const hasChosen = fileInput && fileInput.files && fileInput.files.length > 0;
+
+        if (!hasExist && !hasChosen) {
+            missing.push(`#${fileIdx} — ${req.name}`);
+        }
+    });
+
+    if (missing.length > 0) {
+        const listHtml = missing.map(m => `<li>${m}</li>`).join('');
+        alertMsg.innerHTML = `Masih ada <b>${missing.length} berkas</b> yang belum diunggah. Wajib melengkapi semua persyaratan sebelum mengirim:<ul class="mt-2 mb-0 ps-3">${listHtml}</ul>`;
+        alertDiv.classList.remove('d-none');
+        alertDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        return false;
+    }
+
+    // Semua berkas sudah ada — submit form
+    alertDiv.classList.add('d-none');
+    document.querySelector('#section-step-2 form').submit();
+}
 
 function handleFileInputChange(input, index) {
     const fileChosenSpan = document.querySelector(`.file-chosen-name-${index}`);
