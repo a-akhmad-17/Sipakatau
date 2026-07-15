@@ -72,6 +72,37 @@ class Bidang extends BaseController
         return view('bidang/dashboard_bidang', $data);
     }
 
+    public function penerbitanSkt()
+    {
+        $db      = \Config\Database::connect();
+        $session = session();
+        $bidangId   = $session->get('bidang_id');
+
+        // Ambil nama bidang
+        $bidang    = $db->table('mst_bidang')->where('id', $bidangId)->get()->getRowArray();
+        $namaBidang = $bidang ? $bidang['nama_bidang'] : 'Semua Bidang';
+
+        if (!$bidang || $bidang['kode_bidang'] !== 'POLDAGRI_ORMAS') {
+            return redirect()->to('bidang')->with('error', 'Halaman ini hanya dapat diakses oleh Bidang Poldagri & Ormas.');
+        }
+
+        $pendaftaran = $db->table('trn_pendaftaran')
+            ->select('trn_pendaftaran.*, mst_ormas.nama_ormas, mst_ormas.alamat, mst_ormas.email, mst_ormas.telepon, mst_ormas.file_berkas, mst_ormas.tgl_sk_kepengurusan, mst_ormas.tgl_sk_kedaluwarsa')
+            ->join('mst_ormas', 'mst_ormas.id = trn_pendaftaran.ormas_id', 'left')
+            ->orderBy('trn_pendaftaran.created_at', 'DESC')
+            ->get()
+            ->getResultArray();
+
+        $data = [
+            'title'       => 'Penerbitan SKT / Tanggapan - SIPAKATAU',
+            'namaBidang'  => $namaBidang,
+            'pendaftaran' => $pendaftaran,
+            'isPoldagri'  => true,
+        ];
+
+        return view('bidang/penerbitan_skt', $data);
+    }
+
     // =========================================================================
     // KELOLA PENDAFTARAN SKT ORMAS (Khusus Kabid Poldagri & Ormas)
     // =========================================================================

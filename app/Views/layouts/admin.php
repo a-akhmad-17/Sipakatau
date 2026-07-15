@@ -1025,13 +1025,13 @@
 
                 <?php elseif ($role === 'kabid'): ?>
                     <div class="sidebar-label">Dasbor Kabid</div>
-                    <a href="<?= site_url('bidang') ?>" class="sidebar-link active" id="menu-bidang-home">
+                    <a href="<?= site_url('bidang') ?>" class="sidebar-link <?= ($uriString === 'bidang') ? 'active' : '' ?>" id="menu-bidang-home">
                         <i class="fa-solid fa-chart-pie"></i> Ringkasan Dasbor
                     </a>
-                    <a href="#" class="sidebar-link scroll-anchor-link" data-target-id="validasi-skt">
+                    <a href="<?= site_url('bidang/penerbitan-skt') ?>" class="sidebar-link <?= ($uriString === 'bidang/penerbitan-skt') ? 'active' : '' ?>">
                         <i class="fa-solid fa-file-signature"></i> Penerbitan SKT / Tanggapan
                     </a>
-                    <a href="#" class="sidebar-link scroll-anchor-link" data-target-id="gis-map">
+                    <a href="<?= site_url('bidang') ?>#gis-map" class="sidebar-link scroll-anchor-link" data-target-id="gis-map">
                         <i class="fa-solid fa-map-location-dot"></i> Peta Geografis
                     </a>
 
@@ -1414,6 +1414,8 @@
                             if (adminSidebar.classList.contains('show')) {
                                 sidebarToggle.click();
                             }
+                        } else {
+                            window.location.href = link.getAttribute('href');
                         }
                     });
                 });

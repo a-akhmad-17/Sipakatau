@@ -1,5 +1,16 @@
 # RELEASE NOTES - SIPAKATAU
 
+## [v2.9.32] - 2026-07-15
+### ✨ Added
+- **Halaman Khusus Penerbitan SKT / Tanggapan (Kabid)**:
+  - Membuat rute baru `bidang/penerbitan-skt` di [Routes.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Config/Routes.php).
+  - Mengimplementasikan metode `penerbitanSkt()` di [Bidang.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Controllers/Bidang.php) untuk melayani halaman ini.
+  - Membuat view terpisah [penerbitan_skt.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/bidang/penerbitan_skt.php) untuk menampung tabel manajemen pendaftaran, statistik SKT, penolakan berkas, penerbitan berkas resmi, serta modal peninjauan dokumen persyaratan.
+  - Membersihkan [dashboard_bidang.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/bidang/dashboard_bidang.php) agar hanya memfokuskan visualisasi Peta interaktif GIS dan ringkasan wilayah kerja.
+  - Memperbarui sidebar menu di [admin.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/layouts/admin.php) agar link "Penerbitan SKT / Tanggapan" mengarah langsung ke halaman baru, lengkap dengan status aktif link dan penyempurnaan scroll behavior.
+
+---
+
 ## [v2.9.31] - 2026-07-15
 ### 🔄 Changed
 - **Penghapusan Cetak Permohonan Mandiri oleh User**:

@@ -105,6 +105,7 @@ $routes->group('admin', ['filter' => 'auth:admin'], function($routes) {
 // Bidang Dashboard Routes (Protected by auth filter - role: kabid)
 $routes->group('bidang', ['filter' => 'auth:kabid'], function($routes) {
     $routes->get('/', 'Bidang::index');
+    $routes->get('penerbitan-skt', 'Bidang::penerbitanSkt');
     // Kelola Pendaftaran SKT Ormas — Khusus Kabid Poldagri & Ormas
     $routes->post('proses-pendaftaran/(:any)/(:any)', 'Bidang::prosesPendaftaran/$1/$2');
 });
