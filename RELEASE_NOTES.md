@@ -1,5 +1,15 @@
 # RELEASE NOTES - SIPAKATAU
 
+## [v2.9.33] - 2026-07-15
+### ✨ Added
+- **Aksi Hapus Pendaftaran Permanen oleh Kabid**:
+  - Menambahkan aksi `delete` di controller `Bidang::prosesPendaftaran` ([Bidang.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Controllers/Bidang.php)) untuk membersihkan record database ormas, pengurus, pendaftaran, serta file-file fisik terkait di server.
+  - Memasukkan audit trail dan notifikasi Telegram terintegrasi untuk aksi hapus ormas oleh Kabid.
+  - Menambahkan tombol hapus bersimbol tempat sampah merah (`btn-outline-danger`) di kolom aksi tabel pendaftaran pada [penerbitan_skt.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/bidang/penerbitan_skt.php).
+  - Menyelaraskan seluruh redirect path rute `prosesPendaftaran` agar kembali ke `bidang/penerbitan-skt` secara konsisten.
+
+---
+
 ## [v2.9.32] - 2026-07-15
 ### ✨ Added
 - **Halaman Khusus Penerbitan SKT / Tanggapan (Kabid)**:

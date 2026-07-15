@@ -164,11 +164,7 @@
                             </td>
                             <td class="text-muted" style="font-size:12px;"><?= date('d M Y', strtotime($p['created_at'])) ?></td>
                             <td class="text-center">
-                                <?php if ($progress === 100 || $status === 'Rejected'): ?>
-                                    <!-- Selesai / Ditolak — no action -->
-                                    <span class="text-muted" style="font-size:11px;">—</span>
-
-                                <?php elseif ($status === 'Approved' && $progress == 75): ?>
+                                <?php if ($status === 'Approved' && $progress == 75): ?>
                                     <!-- Terbitkan SKT -->
                                     <button class="btn btn-sm btn-primary" onclick="openModalSkt('<?= $p['id'] ?>', '<?= esc($p['nama_ormas']) ?>', '<?= esc($p['tipe_ormas'] ?? 'Lokal') ?>')"
                                         style="font-size:12px; padding:4px 10px;">
@@ -209,6 +205,16 @@
                                         <i class="fa-solid fa-file-arrow-down"></i>
                                     </a>
                                 <?php endif; ?>
+
+                                <!-- Tombol Hapus Permanen (Semua State) -->
+                                <form method="POST" action="<?= base_url('bidang/proses-pendaftaran/' . $p['id'] . '/delete') ?>"
+                                    style="display:inline;"
+                                    onsubmit="return confirm('Apakah Anda yakin ingin menghapus pendaftaran ormas <?= esc($p['nama_ormas']) ?> secara permanen? Seluruh berkas fisik di server juga akan terhapus. Tindakan ini tidak dapat dibatalkan.')">
+                                    <?= csrf_field() ?>
+                                    <button type="submit" class="btn btn-sm btn-outline-danger ms-1" style="font-size:12px; padding:4px 8px;" title="Hapus Pendaftaran">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     <?php endforeach; ?>

@@ -117,7 +117,7 @@ class Bidang extends BaseController
         $bidangId = $session->get('bidang_id');
         $bidang   = $db->table('mst_bidang')->where('id', $bidangId)->get()->getRowArray();
         if (!$bidang || $bidang['kode_bidang'] !== 'POLDAGRI_ORMAS') {
-            return redirect()->to('bidang')->with('error', 'Anda tidak memiliki kewenangan untuk aksi ini.');
+            return redirect()->to('bidang/penerbitan-skt')->with('error', 'Anda tidak memiliki kewenangan untuk aksi ini.');
         }
 
         $pendaftaran = $db->table('trn_pendaftaran')
@@ -128,7 +128,7 @@ class Bidang extends BaseController
             ->getRowArray();
 
         if (!$pendaftaran) {
-            return redirect()->to('bidang')->with('error', 'Data pendaftaran tidak ditemukan.');
+            return redirect()->to('bidang/penerbitan-skt')->with('error', 'Data pendaftaran tidak ditemukan.');
         }
 
         $beforeData = $pendaftaran;
@@ -203,8 +203,43 @@ class Bidang extends BaseController
                 'Alasan Penolakan' => $updateData['alasan_ditolak'],
                 'Diproses Oleh' => $session->get('username') ?: 'Kabid Poldagri'
             ];
+        } elseif ($action === 'delete') {
+            // Hapus file berkas ormas & data pendaftaran
+            $ormas = $db->table('mst_ormas')->where('id', $pendaftaran['ormas_id'])->get()->getRowArray();
+            
+            // Hapus file logo dan berkas jika ada
+            if ($ormas) {
+                if (!empty($ormas['file_logo'])) {
+                    @unlink(ROOTPATH . 'public/uploads/ormas/' . $ormas['file_logo']);
+                }
+                if (!empty($ormas['file_berkas'])) {
+                    $files = json_decode($ormas['file_berkas'], true) ?: [];
+                    foreach ($files as $file) {
+                        if (!empty($file['filename'])) {
+                            @unlink(ROOTPATH . 'public/uploads/ormas/' . $file['filename']);
+                        }
+                    }
+                }
+            }
+            
+            // Hapus data
+            $db->table('trn_pendaftaran')->where('id', $id)->delete();
+            if ($ormas) {
+                $db->table('mst_ormas_pengurus')->where('ormas_id', $pendaftaran['ormas_id'])->delete();
+                $db->table('mst_ormas')->where('id', $pendaftaran['ormas_id'])->delete();
+            }
+
+            log_activity('BIDANG_HAPUS_PENDAFTARAN_ORMAS', ['pendaftaran' => $pendaftaran, 'ormas' => $ormas], [], 'trn_pendaftaran', $id);
+            
+            telegram_send_transaction('🗑️ Pendaftaran Ormas Dihapus (Kabid)', [
+                'Nama Ormas' => $pendaftaran['nama_ormas'] ?? 'Tidak Diketahui',
+                'Status' => 'Dihapus Permanen',
+                'Diproses Oleh' => $session->get('username') ?: 'Kabid Poldagri'
+            ]);
+
+            return redirect()->to('bidang/penerbitan-skt')->with('success', 'Pendaftaran ormas berhasil dihapus secara permanen.');
         } else {
-            return redirect()->to('bidang')->with('error', 'Aksi tidak dikenali.');
+            return redirect()->to('bidang/penerbitan-skt')->with('error', 'Aksi tidak dikenali.');
         }
 
         $db->table('trn_pendaftaran')->where('id', $id)->update($updateData);
@@ -227,6 +262,6 @@ class Bidang extends BaseController
             telegram_send_transaction($telegramTitle, $telegramDetails);
         }
 
-        return redirect()->to('bidang')->with('success', $msg);
+        return redirect()->to('bidang/penerbitan-skt')->with('success', $msg);
     }
 }
