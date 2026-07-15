@@ -21,7 +21,12 @@ class Auth extends BaseController
             $target = $redirects[$userRole] ?? '/';
             return redirect()->to($target);
         }
-        return view('auth/login', ['title' => 'Log In - SIPAKATAU']);
+        
+        $clientId = env('google.clientID') ?? getenv('google.clientID');
+        return view('auth/login', [
+            'title' => 'Log In - SIPAKATAU',
+            'googleClientId' => $clientId
+        ]);
     }
 
     public function attemptLogin()
@@ -250,52 +255,79 @@ class Auth extends BaseController
             $name = $this->request->getPost('name');
             $username = strtolower(explode('@', $email)[0]);
         } else {
-            // Real OAuth flow code handling
-            $code = $this->request->getGet('code');
-            if (empty($code)) {
-                return redirect()->to('login')->with('error', 'Google Login: Kode otentikasi tidak ditemukan.');
+            // Check if Google Identity Services credential (ID Token) is POSTed
+            $idToken = $this->request->getPost('credential');
+            
+            if (!empty($idToken)) {
+                $clientId = env('google.clientID') ?? getenv('google.clientID');
+                
+                // Verify the ID Token via Google's tokeninfo API
+                $ch = curl_init('https://oauth2.googleapis.com/tokeninfo?id_token=' . urlencode($idToken));
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                $response = curl_exec($ch);
+                curl_close($ch);
+                
+                $tokenInfo = json_decode($response, true);
+                if (empty($tokenInfo['email'])) {
+                    return redirect()->to('login')->with('error', 'Google Login: Verifikasi token gagal atau token kedaluwarsa.');
+                }
+                
+                // Validate that the audience matches our Client ID
+                if (isset($tokenInfo['aud']) && $tokenInfo['aud'] !== $clientId) {
+                    return redirect()->to('login')->with('error', 'Google Login: Client ID tidak cocok.');
+                }
+                
+                $email = $tokenInfo['email'];
+                $name = $tokenInfo['name'] ?? 'Google User';
+                $username = strtolower(explode('@', $email)[0]);
+            } else {
+                // Real OAuth flow code handling (legacy fallback)
+                $code = $this->request->getGet('code');
+                if (empty($code)) {
+                    return redirect()->to('login')->with('error', 'Google Login: ID Token atau Kode otentikasi tidak ditemukan.');
+                }
+                
+                $clientId = env('google.clientID') ?? getenv('google.clientID');
+                $clientSecret = env('google.clientSecret') ?? getenv('google.clientSecret');
+                $redirectUri = base_url('auth/google/callback');
+                
+                // Exchange code for token
+                $ch = curl_init('https://oauth2.googleapis.com/token');
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_POST, true);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
+                    'code'          => $code,
+                    'client_id'     => $clientId,
+                    'client_secret' => $clientSecret,
+                    'redirect_uri'  => $redirectUri,
+                    'grant_type'    => 'authorization_code'
+                ]));
+                $response = curl_exec($ch);
+                curl_close($ch);
+                
+                $tokenData = json_decode($response, true);
+                if (empty($tokenData['access_token'])) {
+                    return redirect()->to('login')->with('error', 'Google Login: Gagal menukar kode otentikasi.');
+                }
+                
+                // Fetch User info
+                $ch = curl_init('https://www.googleapis.com/oauth2/v3/userinfo');
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                    'Authorization: Bearer ' . $tokenData['access_token']
+                ]);
+                $userInfoResponse = curl_exec($ch);
+                curl_close($ch);
+                
+                $userInfo = json_decode($userInfoResponse, true);
+                if (empty($userInfo['email'])) {
+                    return redirect()->to('login')->with('error', 'Google Login: Gagal mengambil data pengguna.');
+                }
+                
+                $email = $userInfo['email'];
+                $name = $userInfo['name'] ?? 'Google User';
+                $username = strtolower(explode('@', $email)[0]);
             }
-            
-            $clientId = env('google.clientID') ?? getenv('google.clientID');
-            $clientSecret = env('google.clientSecret') ?? getenv('google.clientSecret');
-            $redirectUri = base_url('auth/google/callback');
-            
-            // Exchange code for token
-            $ch = curl_init('https://oauth2.googleapis.com/token');
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
-                'code'          => $code,
-                'client_id'     => $clientId,
-                'client_secret' => $clientSecret,
-                'redirect_uri'  => $redirectUri,
-                'grant_type'    => 'authorization_code'
-            ]));
-            $response = curl_exec($ch);
-            curl_close($ch);
-            
-            $tokenData = json_decode($response, true);
-            if (empty($tokenData['access_token'])) {
-                return redirect()->to('login')->with('error', 'Google Login: Gagal menukar kode otentikasi.');
-            }
-            
-            // Fetch User info
-            $ch = curl_init('https://www.googleapis.com/oauth2/v3/userinfo');
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                'Authorization: Bearer ' . $tokenData['access_token']
-            ]);
-            $userInfoResponse = curl_exec($ch);
-            curl_close($ch);
-            
-            $userInfo = json_decode($userInfoResponse, true);
-            if (empty($userInfo['email'])) {
-                return redirect()->to('login')->with('error', 'Google Login: Gagal mengambil data pengguna.');
-            }
-            
-            $email = $userInfo['email'];
-            $name = $userInfo['name'] ?? 'Google User';
-            $username = strtolower(explode('@', $email)[0]);
         }
 
         // Clean & Validate email and username

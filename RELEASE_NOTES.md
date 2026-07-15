@@ -1,5 +1,20 @@
 # RELEASE NOTES - SIPAKATAU
 
+## [v2.9.28] - 2026-07-15
+### ✨ Added
+- **Integrasi Google Identity Services (GIS)**:
+  - Menyematkan SDK Google Identity Services (`https://accounts.google.com/gsi/client`) pada halaman [login.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/auth/login.php) untuk mengganti pustaka lama Google Platform Library yang telah didepresiasi.
+  - Memanfaatkan fungsi popup GIS resmi dengan callback yang diproses secara dinamis di frontend.
+  - Menghubungkan respon autentikasi ke backend melalui form tersembunyi dengan token keamanan CSRF terintegrasi (`csrf_field()`) guna mematuhi filter keamanan global CodeIgniter 4.
+
+### 🔄 Changed
+- **Pembaruan Verifikasi Token Google di Sisi Backend**:
+  - Mengubah metode verifikasi token di [Auth.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Controllers/Auth.php) agar memproses parameter POST `credential` (ID Token) dari Google Identity Services.
+  - Mengimplementasikan panggilan cURL terenkripsi ke endpoint verifikasi Tokeninfo Google (`https://oauth2.googleapis.com/tokeninfo`) untuk memvalidasi tanda tangan JWT token dan mencocokkan Client ID (`aud`) sebelum melakukan inisialisasi sesi login atau pendaftaran otomatis pengguna.
+  - Mempertahankan kompatibilitas penuh dengan mode simulasi (Simulator Google Sign-In) ketika kunci API / Client ID tidak dikonfigurasi di file `.env`.
+
+---
+
 ## [v2.9.27] - 2026-07-15
 ### 🔄 Changed
 - **Penyempurnaan Tautan Unduh TTE Ormas**:

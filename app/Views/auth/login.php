@@ -28,15 +28,36 @@
 
             <!-- Google Login Button -->
             <div class="mb-4">
-                <a href="<?= base_url('auth/google') ?>" class="btn w-100 d-flex align-items-center justify-content-center gap-2 py-2.5 fw-bold" style="background: rgba(255, 255, 255, 0.06); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px; font-size: 0.9rem; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255, 255, 255, 0.12)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.06)'">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48">
-                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                        <path fill="#4285F4" d="M46.5 24c0-1.55-.15-3.24-.47-4.75H24v9.03h12.75c-.53 2.87-2.14 5.31-4.59 6.96l7.15 5.54C43.5 36.27 46.5 30.73 46.5 24z"/>
-                        <path fill="#FBBC05" d="M10.54 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.98-6.19z"/>
-                        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.15-5.54c-1.99 1.33-4.54 2.12-8.74 2.12-6.26 0-11.57-4.22-13.46-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-                    </svg>
-                    Masuk dengan Google
-                </a>
+                <?php if (!empty($googleClientId)): ?>
+                    <!-- Google Identity Services Container -->
+                    <div id="g_id_onload"
+                         data-client_id="<?= esc($googleClientId) ?>"
+                         data-context="signin"
+                         data-ux_mode="popup"
+                         data-callback="handleCredentialResponse"
+                         data-auto_prompt="false">
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <div id="g_id_signin_btn" class="w-100"></div>
+                    </div>
+                    
+                    <!-- Hidden form for GIS submission -->
+                    <form action="<?= base_url('auth/google/callback') ?>" method="POST" id="gisLoginForm">
+                        <?= csrf_field() ?>
+                        <input type="hidden" name="credential" id="gisCredential">
+                    </form>
+                <?php else: ?>
+                    <!-- Fallback Simulator -->
+                    <a href="<?= base_url('auth/google') ?>" class="btn w-100 d-flex align-items-center justify-content-center gap-2 py-2.5 fw-bold" style="background: rgba(255, 255, 255, 0.06); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px; font-size: 0.9rem; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255, 255, 255, 0.12)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.06)'">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48">
+                            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                            <path fill="#4285F4" d="M46.5 24c0-1.55-.15-3.24-.47-4.75H24v9.03h12.75c-.53 2.87-2.14 5.31-4.59 6.96l7.15 5.54C43.5 36.27 46.5 30.73 46.5 24z"/>
+                            <path fill="#FBBC05" d="M10.54 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.98-6.19z"/>
+                            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.15-5.54c-1.99 1.33-4.54 2.12-8.74 2.12-6.26 0-11.57-4.22-13.46-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                        </svg>
+                        Masuk dengan Google (Mode Simulasi)
+                    </a>
+                <?php endif; ?>
             </div>
 
             <!-- Separator -->
@@ -87,6 +108,18 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
+<?php if (!empty($googleClientId)): ?>
+    <!-- Load Google Identity Services SDK -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script>
+        function handleCredentialResponse(response) {
+            if (response.credential) {
+                document.getElementById('gisCredential').value = response.credential;
+                document.getElementById('gisLoginForm').submit();
+            }
+        }
+    </script>
+<?php endif; ?>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const togglePasswordBtn = document.getElementById('toggle-password');
@@ -107,6 +140,57 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // Google Identity Services dynamic button rendering
+    <?php if (!empty($googleClientId)): ?>
+    const renderGisButton = () => {
+        const btnContainer = document.getElementById("g_id_signin_btn");
+        if (btnContainer && typeof google !== 'undefined') {
+            const themeMode = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+            google.accounts.id.renderButton(
+                btnContainer,
+                { 
+                    theme: themeMode === 'dark' ? 'filled_black' : 'outline', 
+                    size: "large",
+                    width: btnContainer.offsetWidth || 350,
+                    text: "signin_with",
+                    shape: "rectangular"
+                }
+            );
+        }
+    };
+
+    // Try rendering immediately or retry if google script is still loading
+    if (typeof google !== 'undefined') {
+        renderGisButton();
+    } else {
+        const checkGoogleSdk = setInterval(() => {
+            if (typeof google !== 'undefined') {
+                renderGisButton();
+                clearInterval(checkGoogleSdk);
+            }
+        }, 100);
+        // Timeout after 5 seconds
+        setTimeout(() => clearInterval(checkGoogleSdk), 5000);
+    }
+
+    // Re-render on window resize to keep it responsive
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(renderGisButton, 200);
+    });
+
+    // Re-render when theme changes (using MutationObserver to detect theme toggle)
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.attributeName === 'data-theme') {
+                renderGisButton();
+            }
+        });
+    });
+    observer.observe(document.documentElement, { attributes: true });
+    <?php endif; ?>
 });
 </script>
 <?= $this->endSection() ?>
