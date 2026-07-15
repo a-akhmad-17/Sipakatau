@@ -147,13 +147,15 @@
                         <div id="berjenjang-requirements" class="small text-muted d-none">
                             <ol class="mb-0 ps-3 d-flex flex-column gap-2" style="font-size: 0.88rem;">
                                 <li>Surat Permohonan ditujukan kepada Kepala Badan Kesbangpol Kab. Sinjai</li>
-                                <li>Surat Pernyataan Resmi (Meterai Rp 10.000)</li>
-                                <li>Surat Keterangan Domisili (Alamat domisili kop surat & sekretariat)</li>
+                                <li>Surat Pernyataan Resmi (Memuat 6 poin pernyataan, Meterai Rp 10.000)</li>
+                                <li>SK Kemenkumham RI</li>
+                                <li>Surat Keterangan Domisili Organisasi</li>
                                 <li>Formulir Isian Data Ormas (ditandatangani Ketua & Sekretaris)</li>
-                                <li>Pasfoto Pengurus ukuran 4x6 cm sebanyak 2 lembar</li>
+                                <li>Pasfoto Pengurus ukuran 4x6 cm sebanyak 2 lembar (Ketua, Sekretaris, Bendahara)</li>
                                 <li>Fotokopi KTP Pengurus (Ketua, Sekretaris, Bendahara)</li>
                                 <li>Surat Keputusan (SK) Pengurus Organisasi</li>
                                 <li>Foto Sekretariat (Tampak depan menampilkan Papan Nama resmi)</li>
+                                <li>Dokumen Pendukung Tambahan (ZIP/PDF)</li>
                             </ol>
                         </div>
                     </div>
@@ -250,7 +252,7 @@
         } else {
             lokalRequirements.classList.add('d-none');
             berjenjangRequirements.classList.remove('d-none');
-            downloadLink.href = "https://drive.google.com/uc?export=download&id=1UX2CJCfXpWZUix7o-j3jY9cld63dX7KS";
+            downloadLink.href = "<?= base_url('uploads/templates/Persyaratan_Ormas_Berjenjang_2026.docx') ?>";
         }
     }
 

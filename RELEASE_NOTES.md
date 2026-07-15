@@ -1,5 +1,116 @@
 # RELEASE NOTES - SIPAKATAU
 
+## [v2.9.27] - 2026-07-15
+### 🔄 Changed
+- **Penyempurnaan Tautan Unduh TTE Ormas**:
+  - Mengoreksi format URL unduh dokumen TTE Ormas pada [dashboard.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/user/dashboard.php) dan [form_pengajuan.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/user/form_pengajuan.php) menggunakan prefix folder yang tepat (`uploads/rekomendasi_ormas/`), karena database menyimpan nama file TTE Ormas secara mandiri (tanpa folder prefix).
+
+---
+
+## [v2.9.26] - 2026-07-15
+### 🐛 Fixed
+- **Bug Kritis #1 — Sinkronisasi URL Tombol Unduh TTE Ormas**:
+  - Menyesuaikan format URL download sertifikat TTE di tabel riwayat pengajuan pada [dashboard.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/user/dashboard.php).
+- **Bug Kritis #2 — Tombol Revisi di Alert Rejected Tidak Membawa ID**:
+  - Memperbaiki link tombol "Revisi Berkas Pendaftaran" pada alert Rejected di [dashboard.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/user/dashboard.php).
+  - Sesudahnya: mengarah ke `/user/pengajuan?id={pendaftaran_id}` sehingga user langsung diarahkan ke form revisi pengajuan yang bersangkutan.
+
+---
+
+## [v2.9.25] - 2026-07-15
+### 🐛 Fixed
+- **Sinkronisasi Jumlah Persyaratan Ormas Berjenjang di Dasbor**:
+  - Menyelaraskan array persyaratan Ormas Berjenjang di [dashboard.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/user/dashboard.php) sehingga berisi 10 poin berkas yang lengkap dan sinkron dengan halaman panduan registrasi publik.
+  - Memperbarui teks statis instruksi panduan di dasbor pemohon agar menampilkan daftar 10 poin berkas persyaratan Ormas Berjenjang yang akurat.
+- **Sinkronisasi Persyaratan Ormas Lokal & Rekomendasi Kegiatan**:
+  - Menyinkronkan daftar berkas persyaratan Ormas Lokal di halaman publik [info_registrasi.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/layanan/info_registrasi.php) (dari 21 poin menjadi 14 poin riil) dan ringkasan dasbor pemohon [dashboard.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/user/dashboard.php) (dari 7 poin menjadi 14 poin penuh) agar seragam dengan data database dan form upload.
+  - Memastikan persyaratan dokumen Rekomendasi Kegiatan tetap konsisten sebanyak 6 berkas utama di seluruh halaman terkait.
+
+### 🔄 Changed
+- **Pengaturan Akses Unduh Template Ormas Berjenjang**:
+  - Mengembalikan tombol unduh format template berkas Ormas Berjenjang (`Persyaratan_Ormas_Berjenjang_2026.docx`) ke dalam dasbor pemohon [dashboard.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/user/dashboard.php) dan form isian [form_pengajuan.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/user/form_pengajuan.php) karena pemohon yang login membutuhkannya.
+  - Menghapus tombol unduh template berkas Ormas Berjenjang dari halaman informasi registrasi publik [info_registrasi.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/layanan/info_registrasi.php) agar dokumen mentahan tidak beredar bebas untuk umum.
+
+## [v2.9.24] - 2026-07-14
+### 🐛 Fixed
+- **Perbaikan SyntaxError Duplikasi tipeOrmasEl & Pembersihan Debug**:
+  - Menyelesaikan *SyntaxError: Identifier 'tipeOrmasEl' has already been declared* pada [form_pengajuan.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/user/form_pengajuan.php) dengan menghapus redeklarasi variabel `const` ganda di dalam scope `DOMContentLoaded`. Ini memperbaiki form yang sempat tidak muncul (blank).
+  - Melakukan pembersihan menyeluruh terhadap bar debug diagnostic Alexa dan handler `window.onerror` sementara yang digunakan selama proses investigasi.
+
+### 🔄 Changed
+- **Pembersihan UI & Menonaktifkan Debug Toolbar CodeIgniter**:
+  - Menonaktifkan filter `toolbar` (CodeIgniter Debug Toolbar) pada `$required['after']` di [Filters.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Config/Filters.php) untuk menghilangkan logo/ikon api CodeIgniter di sudut kanan bawah aplikasi secara permanen pada lingkungan pengembangan/produksi.
+
+## [v2.9.23] - 2026-07-14
+### 🐛 Fixed
+- **Peta Lokasi & Keamanan Script Offline (Form Pengajuan Baru)**:
+  - Membungkus inisialisasi peta Leaflet dan fungsi marker di [form_pengajuan.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/user/form_pengajuan.php) dengan validasi `typeof L !== 'undefined'` dan blok `try-catch`. Hal ini mencegah ReferenceError yang memicu kegagalan eksekusi JavaScript secara total (menyebabkan form menjadi blank/hidden) apabila client berada dalam kondisi offline (tidak dapat mengunduh library Leaflet via CDN unpkg.com).
+
+## [v2.9.22] - 2026-07-14
+### 🐛 Fixed
+- **Perbaikan Alur Penghapusan Ormas & Konflik Routing**:
+  - Memperbaiki konflik prioritas routing di [Routes.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Config/Routes.php#L43-L48) dengan memindahkan rute spesifik (`setujui-hapus` dan `tolak-hapus`) ke atas rute wildcard umum (`proses-pendaftaran/(:any)/(:any)`). Sebelumnya, prioritas rute wildcard yang lebih tinggi membelokkan permintaan setuju/tolak hapus ke fungsi `prosesPendaftaran` dengan parameter yang salah.
+  - Menambahkan alias kolom eksplisit (`mst_ormas.id AS id` dan `trn_pendaftaran.id AS id`) pada kueri `LEFT JOIN` di `Admin::index()` dan kueri data `$requestHapus` di `dashboard.php` untuk mengamankan data ID ormas dan pendaftaran dari tabrakan nama kolom (column name collision) akibat join table.
+  - Menambahkan fungsi `trim()` pada penanganan parameter ID di controller Admin (`deleteOrmas`, `deletePendaftaran`, `setujuiHapusPendaftaran`) untuk memastikan format ID bersih sebelum eksekusi kueri.
+  - Menghapus record terasosiasi di tabel pengurus (`mst_ormas_pengurus`) terlebih dahulu sebelum menghapus data ormas di `mst_ormas` untuk menghindari kegagalan penghapusan akibat kendala integritas relasi database (foreign key constraint).
+
+## [v2.9.21] - 2026-07-14
+### ✨ Added
+- **Menu Persetujuan Hapus di Sidebar Admin**:
+  - Menampilkan menu **Persetujuan Hapus** pada sidebar admin ([admin.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/layouts/admin.php)) lengkap dengan badge notifikasi real-time yang menghitung jumlah permohonan hapus ormas dan rekomendasi.
+  - Memudahkan admin berpindah langsung ke tab persetujuan hapus melalui navigasi hash link.
+
+### 🔄 Changed
+- **Pembaruan Alur Ormas Terdaftar (Syarat 100% Selesai)**:
+  - Menyaring seluruh daftar ormas aktif, total hitungan, dan plotting peta sebaran GIS di dasbor Admin ([Admin.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Controllers/Admin.php)), Kepala Bidang ([Bidang.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Controllers/Bidang.php)), Eksekutif ([Eksekutif.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Controllers/Eksekutif.php)), dan Halaman Utama ([Home.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Controllers/Home.php)).
+  - Ormas yang mendaftar baru di sistem tidak akan dihitung atau ditampilkan ke publik sebagai ormas aktif/terdaftar sampai proses registrasi dan verifikasi berkasnya selesai sepenuhnya hingga mencapai progres 100%.
+  - Tetap mendukung kompatibilitas data legacy (data ormas lama yang langsung dimasukkan ke database tanpa melalui pendaftaran digital).
+
+---
+
+## [v2.9.20] - 2026-07-14
+### ✨ Added
+- **Penyelarasan Dokumen Persyaratan Ormas Berjenjang Resmi 2026**:
+  - Menyelaraskan seluruh alur berkas persyaratan pendaftaran Ormas Berjenjang di sistem dengan dokumen resmi `Persyaratan Ormas Berjenjang 2026.docx`.
+  - Menambahkan slot **SK Kemenkumham RI** sebagai berkas wajib (nomor 3) dalam persyaratan Ormas Berjenjang.
+  - Memperbarui file view form pengajuan user ([form_pengajuan.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/user/form_pengajuan.php)), form pendaftaran publik ([form_ormas.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/layanan/form_ormas.php)), dan halaman panduan informasi pendaftaran ([info_registrasi.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/layanan/info_registrasi.php)).
+  - Menghosting berkas kompilasi template dokumen resmi (`Persyaratan_Ormas_Berjenjang_2026.docx`) secara lokal pada server di path `uploads/templates/` agar dapat diunduh langsung secara praktis oleh pemohon dari dasbor maupun halaman publik.
+  - Menambahkan info rinci mengenai **6 Poin Wajib Surat Pernyataan Resmi** pada halaman panduan pendaftaran publik.
+
+### 🔄 Changed
+- **Pembersihan Logika Checklist dan Progres Berkas**:
+  - Memisahkan data kepengurusan (Pasfoto & KTP) agar tidak tumpang tindih dalam daftar berkas utama checklist verifikasi, baik di dasbor pemohon maupun di panel verifikasi admin ([dashboard.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/admin/dashboard.php)).
+  - Mengubah cara kalkulasi progres berkas di frontend agar mengecualikan berkas kepengurusan secara dinamis, sehingga persentase kelengkapan dapat mencapai 100% dengan tepat.
+  - Memperbarui backend verifikasi dokumen admin (`Admin::verifyDocument`) agar memproses data berdasarkan tipe ormas riil dari database pendaftaran dengan pembagi yang tepat (12 berkas untuk Lokal, 8 berkas untuk Berjenjang).
+
+---
+
+## [v2.9.19] - 2026-07-14
+### ✨ Added
+- **Opsi Penggunaan Fasilitas Publik/Pemerintah & Rekomendasi Stakeholder**:
+  - Menambahkan pertanyaan kondisional "Apakah kegiatan menggunakan fasilitas publik / gedung milik pemerintah?" pada form pengajuan rekomendasi kegiatan ([form_rekomendasi.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/user/form_rekomendasi.php) & [form_rekomendasi.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/layanan/form_rekomendasi.php)).
+  - Jika pengguna memilih "Ya", sistem secara dinamis mewajibkan pengunggahan Surat Rekomendasi Stakeholder Terkait (berkas ke-6) dengan tanda bintang (*) dan menyesuaikan penghitungan progres form secara real-time.
+  - Menyimpan parameter `is_fasilitas_pemerintah` dan `lokasi_kegiatan` ke dalam database `trn_rekomendasi` ([Home.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Controllers/Home.php)).
+- **Dokumen Tambahan Ormas Berjenjang**:
+  - Menambahkan slot dokumen persyaratan ke-9 "Dokumen Pendukung Tambahan (ZIP/PDF)" untuk pendaftaran ormas berjenjang pada dashboard, form pengajuan user, dan portal panduan publik.
+
+### 🔄 Changed
+- **Peta GIS Warna Dinamis**:
+  - Mengimplementasikan visualisasi marker dinamis pada seluruh peta GIS (dasbor Admin, Kabid Bidang, dan Eksekutif/Gis).
+  - Parpol dibedakan warnanya berdasarkan kepemilikan kursi DPRD (Pink untuk yang memiliki kursi, Abu-Abu untuk yang tidak memiliki kursi).
+  - Ormas dibedakan warnanya berdasarkan masa aktif SK Kepengurusan (Hijau jika aktif/aman, Kuning jika akan habis dalam waktu <= 90 hari, Merah jika sudah kedaluwarsa).
+- **Pembatasan Masa Aktif Ormas Berjenjang (Maks. 2 Tahun)**:
+  - Mengunci tanggal kedaluwarsa SK kepengurusan ormas berjenjang secara otomatis tepat 2 tahun sejak tanggal mulai SK.
+  - Menerapkan pembatasan dan kalkulasi auto-date ini baik pada sisi form Javascript maupun validasi controller backend ([User.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Controllers/User.php)).
+
+### 🐛 Fixed
+- **Sistem Catatan Penolakan Per-Berkas (Komentar Detil)**:
+  - Mengintegrasikan kolom catatan penolakan (`note`) saat admin menolak berkas satuan ormas maupun rekomendasi via API `verifyDocument` ([Admin.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Controllers/Admin.php)).
+  - Mengubah tombol tolak berkas di dasbor admin untuk memicu prompt alasan penolakan dan menyimpannya secara terstruktur ke database.
+  - Memperbarui halaman tracking pemohon agar dapat menampilkan detail alasan penolakan untuk setiap berkas secara transparan beserta alasan penolakan umum.
+
+---
+
 ## [v2.9.18] - 2026-07-13
 ### ✨ Added
 - **Integrasi Nomor WhatsApp Piket Dinamis**:

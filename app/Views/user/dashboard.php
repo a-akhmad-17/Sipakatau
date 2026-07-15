@@ -18,13 +18,15 @@ $requirementsLokal = [
 
 $requirementsBerjenjang = [
     ["name" => "Surat Permohonan", "desc" => "Surat Permohonan ditujukan kepada Kepala Badan Kesbangpol Kab. Sinjai", "tte" => true, "template" => "https://drive.google.com/uc?export=download&id=1UX2CJCfXpWZUix7o-j3jY9cld63dX7KS"],
-    ["name" => "Surat Pernyataan Resmi", "desc" => "Surat Pernyataan Resmi (Meterai Rp 10.000)", "tte" => true, "template" => "https://drive.google.com/uc?export=download&id=1UX2CJCfXpWZUix7o-j3jY9cld63dX7KS"],
+    ["name" => "Surat Pernyataan Resmi", "desc" => "Surat Pernyataan Resmi (Memuat 6 poin pernyataan, Meterai Rp 10.000)", "tte" => true, "template" => "https://drive.google.com/uc?export=download&id=1UX2CJCfXpWZUix7o-j3jY9cld63dX7KS"],
+    ["name" => "SK Kemenkumham", "desc" => "Surat Keputusan (SK) Kemenkumham RI", "tte" => true, "template" => ""],
     ["name" => "Surat Keterangan Domisili", "desc" => "Surat Keterangan Domisili (Alamat domisili kop surat & sekretariat)", "tte" => true, "template" => ""],
     ["name" => "Formulir Isian Data Ormas", "desc" => "Formulir Isian Data Ormas (ditandatangani Ketua & Sekretaris)", "tte" => true, "template" => "https://drive.google.com/uc?export=download&id=1UX2CJCfXpWZUix7o-j3jY9cld63dX7KS"],
     ["name" => "Pasfoto Pengurus", "desc" => "Pasfoto Pengurus ukuran 4x6 cm sebanyak 2 lembar", "tte" => false, "template" => "", "isPengurus" => true],
     ["name" => "Fotokopi KTP Pengurus", "desc" => "Fotokopi KTP Pengurus (Ketua, Sekretaris, Bendahara)", "tte" => false, "template" => "", "isPengurus" => true],
     ["name" => "Surat Keputusan (SK) Pengurus", "desc" => "Surat Keputusan (SK) Pengurus Organisasi", "tte" => false, "template" => ""],
-    ["name" => "Foto Sekretariat", "desc" => "Foto Sekretariat (Tampak depan menampilkan Papan Nama resmi)", "tte" => false, "template" => ""]
+    ["name" => "Foto Sekretariat", "desc" => "Foto Sekretariat (Tampak depan menampilkan Papan Nama resmi)", "tte" => false, "template" => ""],
+    ["name" => "Dokumen Pendukung Tambahan", "desc" => "Dokumen pendukung legalitas tambahan lainnya (ZIP/PDF)", "tte" => false, "template" => ""]
 ];
 ?>
 <?= $this->extend('layouts/admin') ?>
@@ -221,25 +223,36 @@ $requirementsBerjenjang = [
     <div class="row g-3">
         <div class="col-md-6">
             <h6 class="text-white small mb-2 fw-bold"><i class="fa-solid fa-house-user text-primary me-2"></i>Persyaratan Ormas Lokal:</h6>
-            <div class="text-muted small" style="font-size: 12px; line-height: 1.6;">
+            <div class="text-muted small" style="font-size: 11px; line-height: 1.6; max-height: 250px; overflow-y: auto;">
                 1. Surat Permohonan ditujukan kepada Menteri (Cq. Kaban Kesbangpol)<br>
-                2. Anggaran Dasar (AD) & Anggaran Rumah Tangga (ART) (satu PDF)<br>
-                3. Akta Pendirian Notaris memuat Anggaran Dasar<br>
+                2. Anggaran Dasar (AD) & Anggaran Rumah Tangga (ART)<br>
+                3. Akta Pendirian Notaris memuat Anggaran Dasar dll.<br>
                 4. Surat Pernyataan Keabsahan Dokumen (Meterai Rp 10.000)<br>
-                5. Program Kerja & Struktur Organisasi Resmi<br>
-                6. Surat Keterangan Domisili Kantor Sekretariat & NPWP Ormas<br>
-                7. Biodata, Fotokopi KTP, dan Pasfoto 4x6 Pengurus (Ketua, Sekretaris, Bendahara)
+                5. Program Kerja Organisasi & Struktur Organisasi Resmi<br>
+                6. Surat Keterangan Domisili Kantor Sekretariat<br>
+                7. NPWP atas nama Organisasi<br>
+                8. Formulir Isian Data Ormas (Ketua & Sekretaris)<br>
+                9. Surat Rekomendasi Kementerian Agama / Kebudayaan<br>
+                10. Biodata & KTP Pengurus (Ketua, Sekretaris, Bendahara)<br>
+                11. Pasfoto Pengurus 4x6 cm 2 Lembar (Latar Merah)<br>
+                12. SK Pengurus & Foto Sekretariat (Papan Nama)<br>
+                13. Surat Perjanjian Kontrak/Izin Pakai Gedung Sekretariat<br>
+                14. Nomor Rekening Organisasi & File Logo Organisasi
             </div>
         </div>
         <div class="col-md-6">
             <h6 class="text-white small mb-2 fw-bold"><i class="fa-solid fa-network-wired text-primary me-2"></i>Persyaratan Ormas Berjenjang:</h6>
             <div class="text-muted small" style="font-size: 12px; line-height: 1.6;">
                 1. Surat Permohonan ditujukan kepada Kepala Badan Kesbangpol Kab. Sinjai<br>
-                2. Surat Pernyataan Resmi (Meterai Rp 10.000)<br>
-                3. Surat Keterangan Domisili kantor sekretariat<br>
-                4. Formulir Isian Data Ormas (ditandatangani Ketua & Sekretaris)<br>
-                5. SK Pengurus dari Dewan Pimpinan Pusat/Wilayah<br>
-                6. Foto Kantor Sekretariat (Tampak depan menampilkan Papan Nama resmi)
+                2. Surat Pernyataan Resmi (Memuat 6 poin pernyataan, Meterai Rp 10.000)<br>
+                3. Surat Keputusan (SK) Kemenkumham RI<br>
+                4. Surat Keterangan Domisili Organisasi<br>
+                5. Formulir Isian Data Ormas (ditandatangani Ketua & Sekretaris)<br>
+                6. Pasfoto Pengurus ukuran 4x6 cm (Ketua, Sekretaris, Bendahara)<br>
+                7. Fotokopi KTP Pengurus (Ketua, Sekretaris, Bendahara)<br>
+                8. Surat Keputusan (SK) Pengurus Organisasi<br>
+                9. Foto Sekretariat (Tampak depan menampilkan Papan Nama resmi)<br>
+                10. Dokumen Pendukung Tambahan (ZIP/PDF)
             </div>
         </div>
     </div>
@@ -440,7 +453,7 @@ $requirementsBerjenjang = [
                         <b class="text-white small italic">"<?= esc($pendaftaran['alasan_ditolak']) ?>"</b>
                     </div>
                     <div class="mt-3">
-                        <a href="<?= base_url('user/pengajuan') ?>" class="btn btn-sm btn-danger text-white fw-bold"><i class="fa-solid fa-pencil me-1"></i> Revisi Berkas Pendaftaran</a>
+                        <a href="<?= base_url('user/pengajuan?id=' . $pendaftaran['id']) ?>" class="btn btn-sm btn-danger text-white fw-bold"><i class="fa-solid fa-pencil me-1"></i> Revisi Berkas Pendaftaran</a>
                     </div>
                 </div>
             </div>
@@ -481,7 +494,18 @@ $requirementsBerjenjang = [
                                     </td>
                                     <td class="text-center align-middle">
                                         <?php if ($exist): ?>
-                                            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 small"><i class="fa-solid fa-circle-check me-1"></i> Ada</span>
+                                            <?php 
+                                            $docStatus = $exist['status'] ?? 'pending';
+                                            if ($docStatus === 'verified'): ?>
+                                                <span class="badge bg-success text-white border px-2 py-1 small"><i class="fa-solid fa-circle-check me-1"></i> Terverifikasi</span>
+                                            <?php elseif ($docStatus === 'rejected'): ?>
+                                                <span class="badge bg-danger text-white border px-2 py-1 small"><i class="fa-solid fa-circle-xmark me-1"></i> Ditolak</span>
+                                                <?php if (!empty($exist['note'])): ?>
+                                                    <div class="text-danger small fw-bold mt-1" style="font-size: 0.72rem; line-height:1.2;">Ket: <?= esc($exist['note']) ?></div>
+                                                <?php endif; ?>
+                                            <?php else: ?>
+                                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 small"><i class="fa-solid fa-clock me-1"></i> Belum Diperiksa</span>
+                                            <?php endif; ?>
                                         <?php else: ?>
                                             <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 small"><i class="fa-solid fa-circle-xmark me-1"></i> Belum Ada</span>
                                         <?php endif; ?>

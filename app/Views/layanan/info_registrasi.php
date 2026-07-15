@@ -70,30 +70,23 @@
                     <div class="col-md-6">
                         <ul class="list-group list-group-flush" style="background: transparent;">
                             <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>1. Surat Permohonan ditujukan kepada Menteri (Cq. Kaban Kesbangpol)</li>
-                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>2. Anggaran Dasar (AD) & Anggaran Rumah Tangga (ART) - *PDF satu file*</li>
+                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>2. Anggaran Dasar (AD) & Anggaran Rumah Tangga (ART)</li>
                             <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>3. Akta Pendirian Notaris memuat (Nama, Lambang, Asas, Tujuan, Pengurus, Hak, Keuangan, dll.)</li>
                             <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>4. Surat Pernyataan Keabsahan Dokumen (Meterai Rp 10.000)</li>
-                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>5. Program Kerja Organisasi</li>
-                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>6. Struktur Organisasi Resmi</li>
-                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>7. Surat Keterangan Domisili Kantor Sekretariat</li>
-                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>8. NPWP atas nama Organisasi</li>
-                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>9. Formulir Isian Data Ormas (ditandatangani Ketua & Sekretaris)</li>
-                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>10. Surat Rekomendasi Kementerian Agama (Ormas Agama) / Kebudayaan</li>
+                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>5. Program Kerja Organisasi & Struktur Organisasi Resmi</li>
+                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>6. Surat Keterangan Domisili Kantor Sekretariat</li>
+                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>7. NPWP atas nama Organisasi</li>
                         </ul>
                     </div>
                     <div class="col-md-6">
                         <ul class="list-group list-group-flush" style="background: transparent;">
-                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>11. Biodata Pengurus (Ketua, Sekretaris, Bendahara - *di-scan satu-satu*)</li>
-                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>12. Pasfoto Pengurus 4x6 cm 2 Lembar (Latar Merah - *di-scan satu-satu*)</li>
-                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>13. Fotokopi KTP Pengurus (Ketua, Sekretaris, Bendahara - *di-scan satu-satu*)</li>
-                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>14. Fotokopi KTP Pendiri, Penasihat, dan Pembina</li>
-                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>15. Surat Keputusan (SK) Pengurus</li>
-                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>16. Foto Sekretariat (Tampak depan menampilkan Papan Nama)</li>
-                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>17. Surat Perjanjian Kontrak atau Izin Pakai dari Pemilik Gedung</li>
-                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>18. Nomor Rekening Organisasi</li>
-                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>19. Alamat Email Organisasi</li>
-                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>20. File Logo Organisasi</li>
-                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>21. Seluruh berkas di atas di-scan ke format PDF</li>
+                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>8. Formulir Isian Data Ormas (ditandatangani Ketua & Sekretaris)</li>
+                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>9. Surat Rekomendasi Kementerian Agama (Ormas Agama) / Kebudayaan</li>
+                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>10. Biodata & KTP Pengurus (Ketua, Sekretaris, Bendahara)</li>
+                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>11. Pasfoto Pengurus 4x6 cm 2 Lembar (Latar Merah)</li>
+                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>12. SK Pengurus & Foto Sekretariat (Tampak depan menampilkan Papan Nama)</li>
+                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>13. Surat Perjanjian Kontrak atau Izin Pakai Gedung dari Pemilik Gedung</li>
+                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>14. Nomor Rekening Organisasi & File Logo Organisasi</li>
                         </ul>
                     </div>
                 </div>
@@ -155,28 +148,44 @@
             </div>
 
             <!-- Persyaratan Dokumen Berjenjang -->
-            <div class="glass-card">
+            <div class="glass-card mb-4">
                 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
                     <h3 class="text-white mb-0"><i class="fa-solid fa-list-check text-warning me-2"></i>Berkas Persyaratan Ormas Berjenjang</h3>
                 </div>
-                <div class="row g-3">
+                <div class="row g-3 mb-4">
                     <div class="col-md-6">
                         <ul class="list-group list-group-flush" style="background: transparent;">
                             <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>1. Surat Permohonan ditujukan kepada Kepala Badan Kesbangpol Kab. Sinjai</li>
                             <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>2. Surat Pernyataan Resmi (Meterai Rp 10.000)</li>
-                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>3. Surat Keterangan Domisili (Alamat sesuai domisili, kop surat & sekretariat)</li>
-                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>4. Formulir Isian Data Ormas (ditandatangani Ketua & Sekretaris)</li>
+                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>3. Surat Keputusan (SK) Kemenkumham RI</li>
+                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>4. Surat Keterangan Domisili Organisasi</li>
+                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>5. Formulir Isian Data Ormas (ditandatangani Ketua & Sekretaris)</li>
                         </ul>
                     </div>
                     <div class="col-md-6">
                         <ul class="list-group list-group-flush" style="background: transparent;">
-                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>5. Pasfoto Pengurus ukuran 4x6 cm sebanyak 2 lembar (Ketua, Sekretaris, Bendahara)</li>
-                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>6. Fotokopi KTP Pengurus (Ketua, Sekretaris, Bendahara)</li>
-                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>7. Surat Keputusan (SK) Pengurus Organisasi</li>
-                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>8. Foto Sekretariat (Tampak depan menampilkan Papan Nama resmi)</li>
+                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>6. Pasfoto Pengurus ukuran 4x6 cm sebanyak 2 lembar (Ketua, Sekretaris, Bendahara)</li>
+                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>7. Fotokopi KTP Pengurus (Ketua, Sekretaris, Bendahara)</li>
+                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>8. Surat Keputusan (SK) Pengurus Organisasi</li>
+                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>9. Foto Sekretariat (Tampak depan menampilkan Papan Nama resmi)</li>
+                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>10. Dokumen Pendukung Tambahan (ZIP/PDF)</li>
                         </ul>
                     </div>
                 </div>
+            </div>
+
+            <!-- Detail Poin Surat Pernyataan Resmi (Khas Berjenjang 2026) -->
+            <div class="glass-card mb-4" style="background: rgba(255, 255, 255, 0.01); border-color: rgba(255, 255, 255, 0.05);">
+                <h4 class="text-white mb-3" style="font-size: 1.1rem;"><i class="fa-solid fa-circle-info text-info me-2"></i>6 Poin Wajib dalam Surat Pernyataan Resmi</h4>
+                <p class="text-muted small">Berdasarkan dokumen persyaratan resmi 2026, Surat Pernyataan harus ditandatangani oleh Ketua dan Sekretaris di atas meterai Rp 10.000 dengan memuat poin-poin berikut:</p>
+                <ol class="text-muted small ps-3 d-flex flex-column gap-2 mb-0" style="font-size: 0.85rem; line-height: 1.5;">
+                    <li>Tidak berafiliasi secara kelembagaan dengan partai politik tertentu.</li>
+                    <li>Tidak sedang terjadi konflik kepengurusan atau perkara pengadilan.</li>
+                    <li>Nama, lambang, bendera, tanda gambar, simbol, atribut, dan/atau cap stempel yang digunakan belum menjadi hak paten / hak cipta pihak lain serta bukan milik pemerintah.</li>
+                    <li>Bersedia menertibkan kegiatan, pengurus, dan/atau anggota organisasi.</li>
+                    <li>Bersedia menyampaikan laporan perkembangan dan kegiatan organisasi ke Bakesbangpol setiap akhir tahun.</li>
+                    <li>Bertanggung jawab penuh atas keabsahan seluruh berkas dokumen yang diserahkan dan tidak menyalahgunakan SKT/Surat Keberadaan.</li>
+                </ol>
             </div>
         </div>
     </div>

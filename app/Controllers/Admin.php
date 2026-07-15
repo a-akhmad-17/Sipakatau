@@ -12,7 +12,13 @@ class Admin extends BaseController
         $db = \Config\Database::connect();
         
         $ormas = $db->table('mst_ormas')
-                    ->orderBy('created_at', 'DESC')
+                    ->select('mst_ormas.*, mst_ormas.id AS id')
+                    ->join('trn_pendaftaran', 'trn_pendaftaran.ormas_id = mst_ormas.id', 'left')
+                    ->groupStart()
+                        ->where('trn_pendaftaran.id IS NULL')
+                        ->orWhere('trn_pendaftaran.progress_percentage', 100)
+                    ->groupEnd()
+                    ->orderBy('mst_ormas.created_at', 'DESC')
                     ->get()
                     ->getResultArray();
                     
@@ -23,7 +29,7 @@ class Admin extends BaseController
 
         // Ambil data registrasi ormas riil
         $pendaftaran = $db->table('trn_pendaftaran')
-                          ->select('trn_pendaftaran.*, mst_ormas.nama_ormas, mst_ormas.alamat, mst_ormas.email, mst_ormas.telepon, mst_ormas.file_berkas, mst_ormas.tgl_sk_kepengurusan, mst_ormas.tgl_sk_kedaluwarsa')
+                          ->select('trn_pendaftaran.*, trn_pendaftaran.id AS id, mst_ormas.nama_ormas, mst_ormas.alamat, mst_ormas.email, mst_ormas.telepon, mst_ormas.file_berkas, mst_ormas.tgl_sk_kepengurusan, mst_ormas.tgl_sk_kedaluwarsa')
                           ->join('mst_ormas', 'mst_ormas.id = trn_pendaftaran.ormas_id', 'left')
                           ->orderBy('trn_pendaftaran.created_at', 'DESC')
                           ->get()
@@ -464,8 +470,10 @@ class Admin extends BaseController
             ];
             $msg = 'Surat Rekomendasi berhasil diunggah dan dikirim ke pemohon!';
         } elseif ($action === 'reject') {
+            $alasan = $this->request->getPost('alasan_ditolak');
             $updateData = [
                 'status_rekomendasi' => 'Rejected',
+                'alasan_ditolak'      => $alasan ?: 'Berkas kurang lengkap atau tidak sesuai.',
                 'updated_at' => date('Y-m-d H:i:s')
             ];
             $msg = 'Pengajuan rekomendasi ditolak.';
@@ -1670,6 +1678,7 @@ class Admin extends BaseController
         $db = \Config\Database::connect();
         helper(['app']);
 
+        $id = trim($id);
         $pendaftaran = $db->table('trn_pendaftaran')->where('id', $id)->get()->getRowArray();
         if (!$pendaftaran) {
             return redirect()->back()->with('error', 'Data pendaftaran tidak ditemukan.');
@@ -1689,6 +1698,7 @@ class Admin extends BaseController
         // Hapus data
         $db->table('trn_pendaftaran')->where('id', $id)->delete();
         if ($ormas) {
+            $db->table('mst_ormas_pengurus')->where('ormas_id', $pendaftaran['ormas_id'])->delete();
             $db->table('mst_ormas')->where('id', $pendaftaran['ormas_id'])->delete();
         }
 
@@ -1881,6 +1891,7 @@ class Admin extends BaseController
         $db = \Config\Database::connect();
         helper(['app']);
 
+        $id = trim($id);
         $ormas = $db->table('mst_ormas')->where('id', $id)->get()->getRowArray();
         if (!$ormas) {
             return redirect()->back()->with('error', 'Ormas tidak ditemukan.');
@@ -1907,6 +1918,7 @@ class Admin extends BaseController
         if (!empty($ormas['file_berkas'])) {
             @unlink($destination . '/' . $ormas['file_berkas']);
         }
+        $db->table('mst_ormas_pengurus')->where('ormas_id', $id)->delete();
         $db->table('mst_ormas')->where('id', $id)->delete();
 
         log_activity('HAPUS_ORMAS_ADMIN', $ormas, [], 'mst_ormas', $id);
@@ -1918,6 +1930,7 @@ class Admin extends BaseController
         $db = \Config\Database::connect();
         helper(['app', 'telegram']);
 
+        $id = trim($id);
         $pendaftaran = $db->table('trn_pendaftaran')->where('id', $id)->get()->getRowArray();
         if (!$pendaftaran) {
             return redirect()->back()->with('error', 'Data pendaftaran tidak ditemukan.');
@@ -1944,6 +1957,7 @@ class Admin extends BaseController
         // Delete from database
         $db->table('trn_pendaftaran')->where('id', $id)->delete();
         if ($ormas) {
+            $db->table('mst_ormas_pengurus')->where('ormas_id', $ormas['id'])->delete();
             $db->table('mst_ormas')->where('id', $ormas['id'])->delete();
         }
 
@@ -1955,7 +1969,7 @@ class Admin extends BaseController
             'Status'           => 'Terhapus Permanen'
         ]);
 
-        return redirect()->to('admin')->with('success', 'Penghapusan Ormas berhasil disetujui dan data telah dihapus secara permanen.');
+        return redirect()->to('admin')->with('success', 'Penghapusan Ormas berhasil disetujui and data telah dihapus secara permanen.');
     }
 
     public function tolakHapusPendaftaran(string $id)
@@ -2227,6 +2241,7 @@ class Admin extends BaseController
         $type = $json['type'] ?? null;
         $docIndex = $json['doc_index'] ?? null;
         $status = $json['status'] ?? 'pending';
+        $note = $json['note'] ?? null;
 
         if (!$id || !$type || !$docIndex) {
             return $this->response->setJSON(['status' => false, 'message' => 'Parameter tidak lengkap.']);
@@ -2251,9 +2266,14 @@ class Admin extends BaseController
             }
 
             $berkas[$docIndex]['status'] = $status;
+            if ($status === 'rejected') {
+                $berkas[$docIndex]['note'] = $note;
+            } else {
+                $berkas[$docIndex]['note'] = null;
+            }
             
-            $tipeOrmas = $ormas['tipe_ormas'] ?? 'Lokal';
-            $totalFiles = ($tipeOrmas === 'Lokal') ? 12 : 16;
+            $tipeOrmas = $pendaftaran['tipe_ormas'] ?? 'Lokal';
+            $totalFiles = ($tipeOrmas === 'Lokal') ? 12 : 8;
             
             $verifiedCount = 0;
             foreach ($berkas as $fileInfo) {
@@ -2310,6 +2330,11 @@ class Admin extends BaseController
             }
 
             $proposal[$docIndex]['status'] = $status;
+            if ($status === 'rejected') {
+                $proposal[$docIndex]['note'] = $note;
+            } else {
+                $proposal[$docIndex]['note'] = null;
+            }
 
             $totalRequired = 5;
             $verifiedCount = 0;

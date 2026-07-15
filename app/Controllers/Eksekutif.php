@@ -13,7 +13,12 @@ class Eksekutif extends BaseController
 
         // Count expired ormas (SK Merah)
         $expiredCount = $db->table('mst_ormas')
-                           ->where('tgl_sk_kedaluwarsa <', $today)
+                           ->join('trn_pendaftaran', 'trn_pendaftaran.ormas_id = mst_ormas.id', 'left')
+                           ->where('mst_ormas.tgl_sk_kedaluwarsa <', $today)
+                           ->groupStart()
+                               ->where('trn_pendaftaran.id IS NULL')
+                               ->orWhere('trn_pendaftaran.progress_percentage', 100)
+                           ->groupEnd()
                            ->countAllResults();
 
         // Count pengaduan masyarakat
@@ -37,8 +42,14 @@ class Eksekutif extends BaseController
         $today = date('Y-m-d');
 
         $expiredOrmas = $db->table('mst_ormas')
-                           ->where('tgl_sk_kedaluwarsa <', $today)
-                           ->orderBy('tgl_sk_kedaluwarsa', 'ASC')
+                           ->select('mst_ormas.*')
+                           ->join('trn_pendaftaran', 'trn_pendaftaran.ormas_id = mst_ormas.id', 'left')
+                           ->where('mst_ormas.tgl_sk_kedaluwarsa <', $today)
+                           ->groupStart()
+                               ->where('trn_pendaftaran.id IS NULL')
+                               ->orWhere('trn_pendaftaran.progress_percentage', 100)
+                           ->groupEnd()
+                           ->orderBy('mst_ormas.tgl_sk_kedaluwarsa', 'ASC')
                            ->get()
                            ->getResultArray();
 
@@ -55,7 +66,16 @@ class Eksekutif extends BaseController
     {
         $db = \Config\Database::connect();
 
-        $ormas = $db->table('mst_ormas')->orderBy('nama_ormas', 'ASC')->get()->getResultArray();
+        $ormas = $db->table('mst_ormas')
+                    ->select('mst_ormas.*')
+                    ->join('trn_pendaftaran', 'trn_pendaftaran.ormas_id = mst_ormas.id', 'left')
+                    ->groupStart()
+                        ->where('trn_pendaftaran.id IS NULL')
+                        ->orWhere('trn_pendaftaran.progress_percentage', 100)
+                    ->groupEnd()
+                    ->orderBy('mst_ormas.nama_ormas', 'ASC')
+                    ->get()
+                    ->getResultArray();
         $parpol = $db->table('mst_parpol')->orderBy('nama_parpol', 'ASC')->get()->getResultArray();
 
         $hotspotSetting = $db->table('sys_settings')->where('key', 'titik_kerawanan')->get()->getRowArray();

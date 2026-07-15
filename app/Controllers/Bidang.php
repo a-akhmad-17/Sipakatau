@@ -18,7 +18,16 @@ class Bidang extends BaseController
         $bidang    = $db->table('mst_bidang')->where('id', $bidangId)->get()->getRowArray();
         $namaBidang = $bidang ? $bidang['nama_bidang'] : 'Semua Bidang';
 
-        $ormas    = $db->table('mst_ormas')->orderBy('nama_ormas', 'ASC')->get()->getResultArray();
+        $ormas    = $db->table('mst_ormas')
+                            ->select('mst_ormas.*')
+                            ->join('trn_pendaftaran', 'trn_pendaftaran.ormas_id = mst_ormas.id', 'left')
+                            ->groupStart()
+                                ->where('trn_pendaftaran.id IS NULL')
+                                ->orWhere('trn_pendaftaran.progress_percentage', 100)
+                            ->groupEnd()
+                            ->orderBy('mst_ormas.nama_ormas', 'ASC')
+                            ->get()
+                            ->getResultArray();
         $parpol   = $db->table('mst_parpol')->orderBy('nama_parpol', 'ASC')->get()->getResultArray();
         $pengaduan = $db->table('log_activities')
                         ->where('action', 'DAFTAR_PENGADUAN_ANONIM')

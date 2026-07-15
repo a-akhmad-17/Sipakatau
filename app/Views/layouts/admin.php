@@ -986,6 +986,17 @@
                     <a href="<?= site_url('admin#tab-antrean') ?>" class="sidebar-link sidebar-tab-link" data-target-tab="antrean-tab" data-tab-hash="tab-antrean">
                         <i class="fa-solid fa-ticket"></i> Antrean MPP
                     </a>
+                    <a href="<?= site_url('admin#tab-persetujuan') ?>" class="sidebar-link sidebar-tab-link" data-target-tab="persetujuan-tab" data-tab-hash="tab-persetujuan">
+                        <i class="fa-solid fa-trash-can"></i> Persetujuan Hapus
+                        <?php 
+                        $db = \Config\Database::connect();
+                        $countMintaHapusOrmas = $db->table('trn_pendaftaran')->where('delete_requested', 1)->countAllResults();
+                        $countMintaHapusRek = $db->table('trn_rekomendasi')->where('delete_requested', 1)->countAllResults();
+                        $totalCountMintaHapus = $countMintaHapusOrmas + $countMintaHapusRek;
+                        if ($totalCountMintaHapus > 0): ?>
+                            <span class="badge bg-danger ms-auto"><?= $totalCountMintaHapus ?></span>
+                        <?php endif; ?>
+                    </a>
                     
                     <div class="sidebar-label">Konfigurasi</div>
                     <a href="#settingsCollapse" data-bs-toggle="collapse" class="sidebar-link <?= (strpos($uriString, 'admin/settings') === 0) ? 'active' : '' ?>" role="button" aria-expanded="<?= (strpos($uriString, 'admin/settings') === 0) ? 'true' : 'false' ?>">

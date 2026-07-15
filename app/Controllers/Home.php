@@ -25,7 +25,13 @@ class Home extends BaseController
         }
 
         // Hitung statistik real dari database
-        $totalOrmas = $this->db->table('mst_ormas')->countAllResults();
+        $totalOrmas = $this->db->table('mst_ormas')
+                               ->join('trn_pendaftaran', 'trn_pendaftaran.ormas_id = mst_ormas.id', 'left')
+                               ->groupStart()
+                                   ->where('trn_pendaftaran.id IS NULL')
+                                   ->orWhere('trn_pendaftaran.progress_percentage', 100)
+                               ->groupEnd()
+                               ->countAllResults();
         $totalRekomendasi = $this->db->table('trn_rekomendasi')->where('status_rekomendasi', 'Approved')->countAllResults();
 
         // Ambil 3 berita terbaru untuk slider Beranda
@@ -244,6 +250,8 @@ class Home extends BaseController
         $tglMulai = $this->request->getPost('tgl_mulai');
         $tglSelesai = $this->request->getPost('tgl_selesai');
         $deskripsi = $this->request->getPost('deskripsi');
+        $lokasiKegiatan = $this->request->getPost('lokasi_kegiatan');
+        $pakeFasilitas = $this->request->getPost('pake_fasilitas') === 'Ya' ? 1 : 0;
 
         // Handle multiple file uploads for the 6 requirements
         $berkasData = [];
@@ -280,16 +288,18 @@ class Home extends BaseController
         );
 
         $this->db->table('trn_rekomendasi')->insert([
-            'id'                  => $rekomendasiId,
-            'user_id'             => session()->get('user_id') ?: null,
-            'nama_kegiatan'       => $namaKegiatan,
-            'pemohon'             => $pemohon,
-            'tgl_mulai'           => $tglMulai,
-            'tgl_selesai'         => $tglSelesai,
-            'deskripsi'           => $deskripsi,
-            'status_rekomendasi'  => 'Pending',
-            'file_proposal'       => $proposalFilename,
-            'created_at'          => date('Y-m-d H:i:s')
+            'id'                      => $rekomendasiId,
+            'user_id'                 => session()->get('user_id') ?: null,
+            'nama_kegiatan'           => $namaKegiatan,
+            'pemohon'                 => $pemohon,
+            'tgl_mulai'               => $tglMulai,
+            'tgl_selesai'             => $tglSelesai,
+            'deskripsi'               => $deskripsi,
+            'lokasi_kegiatan'         => $lokasiKegiatan,
+            'is_fasilitas_pemerintah' => $pakeFasilitas,
+            'status_rekomendasi'      => 'Pending',
+            'file_proposal'           => $proposalFilename,
+            'created_at'              => date('Y-m-d H:i:s')
         ]);
 
         // Activity log

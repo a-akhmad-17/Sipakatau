@@ -166,22 +166,24 @@ $requirementsLokal = [
     ["name" => "NPWP Organisasi", "desc" => "NPWP atas nama Organisasi", "tte" => false, "template" => ""],
     ["name" => "Formulir Isian Data Ormas", "desc" => "Formulir Isian Data Ormas (ditandatangani Ketua & Sekretaris)", "tte" => true, "template" => "https://drive.google.com/uc?export=download&id=1XqCYdQYp87AXN4RGMvJqJKslvA05nRNR"],
     ["name" => "Rekomendasi Kementerian", "desc" => "Surat Rekomendasi Kementerian Agama (Ormas Agama) / Kebudayaan", "tte" => true, "template" => ""],
-    ["name" => "Biodata & KTP Pengurus", "desc" => "Biodata & KTP Pengurus (Ketua, Sekretaris, Bendahara)", "tte" => false, "template" => ""],
-    ["name" => "Pasfoto Pengurus", "desc" => "Pasfoto Pengurus 4x6 cm 2 Lembar (Latar Merah)", "tte" => false, "template" => ""],
+    ["name" => "Biodata & KTP Pengurus", "desc" => "Biodata & KTP Pengurus (Ketua, Sekretaris, Bendahara)", "tte" => false, "template" => "", "isPengurus" => true],
+    ["name" => "Pasfoto Pengurus", "desc" => "Pasfoto Pengurus 4x6 cm 2 Lembar (Latar Merah)", "tte" => false, "template" => "", "isPengurus" => true],
     ["name" => "SK & Foto Sekretariat", "desc" => "SK Pengurus & Foto Sekretariat (Tampak depan menampilkan Papan Nama)", "tte" => false, "template" => ""],
     ["name" => "Kontrak/Izin Pakai Gedung", "desc" => "Surat Perjanjian Kontrak/Izin Pakai Gedung dari Pemilik Gedung", "tte" => true, "template" => ""],
     ["name" => "Rekening & Logo Organisasi", "desc" => "Nomor Rekening Organisasi & File Logo Organisasi", "tte" => false, "template" => ""]
 ];
 
 $requirementsBerjenjang = [
-    ["name" => "Surat Permohonan", "desc" => "Surat Permohonan ditujukan kepada Kepala Badan Kesbangpol Kab. Sinjai", "tte" => true, "template" => "https://drive.google.com/uc?export=download&id=1UX2CJCfXpWZUix7o-j3jY9cld63dX7KS"],
-    ["name" => "Surat Pernyataan Resmi", "desc" => "Surat Pernyataan Resmi (Meterai Rp 10.000)", "tte" => true, "template" => "https://drive.google.com/uc?export=download&id=1UX2CJCfXpWZUix7o-j3jY9cld63dX7KS"],
+    ["name" => "Surat Permohonan", "desc" => "Surat Permohonan ditujukan kepada Kepala Badan Kesbangpol Kab. Sinjai", "tte" => true, "template" => base_url('uploads/templates/Persyaratan_Ormas_Berjenjang_2026.docx')],
+    ["name" => "Surat Pernyataan Resmi", "desc" => "Surat Pernyataan Resmi (Memuat 6 poin pernyataan, Meterai Rp 10.000)", "tte" => true, "template" => base_url('uploads/templates/Persyaratan_Ormas_Berjenjang_2026.docx')],
+    ["name" => "SK Kemenkumham", "desc" => "Surat Keputusan (SK) Kemenkumham RI", "tte" => true, "template" => ""],
     ["name" => "Surat Keterangan Domisili", "desc" => "Surat Keterangan Domisili (Alamat domisili kop surat & sekretariat)", "tte" => true, "template" => ""],
-    ["name" => "Formulir Isian Data Ormas", "desc" => "Formulir Isian Data Ormas (ditandatangani Ketua & Sekretaris)", "tte" => true, "template" => "https://drive.google.com/uc?export=download&id=1UX2CJCfXpWZUix7o-j3jY9cld63dX7KS"],
-    ["name" => "Pasfoto Pengurus", "desc" => "Pasfoto Pengurus ukuran 4x6 cm sebanyak 2 lembar", "tte" => false, "template" => ""],
-    ["name" => "Fotokopi KTP Pengurus", "desc" => "Fotokopi KTP Pengurus (Ketua, Sekretaris, Bendahara)", "tte" => false, "template" => ""],
+    ["name" => "Formulir Isian Data Ormas", "desc" => "Formulir Isian Data Ormas (ditandatangani Ketua & Sekretaris)", "tte" => true, "template" => base_url('uploads/templates/Persyaratan_Ormas_Berjenjang_2026.docx')],
+    ["name" => "Pasfoto Pengurus", "desc" => "Pasfoto Pengurus ukuran 4x6 cm sebanyak 2 lembar", "tte" => false, "template" => "", "isPengurus" => true],
+    ["name" => "Fotokopi KTP Pengurus", "desc" => "Fotokopi KTP Pengurus (Ketua, Sekretaris, Bendahara)", "tte" => false, "template" => "", "isPengurus" => true],
     ["name" => "Surat Keputusan (SK) Pengurus", "desc" => "Surat Keputusan (SK) Pengurus Organisasi", "tte" => false, "template" => ""],
-    ["name" => "Foto Sekretariat", "desc" => "Foto Sekretariat (Tampak depan menampilkan Papan Nama resmi)", "tte" => false, "template" => ""]
+    ["name" => "Foto Sekretariat", "desc" => "Foto Sekretariat (Tampak depan menampilkan Papan Nama resmi)", "tte" => false, "template" => ""],
+    ["name" => "Dokumen Pendukung Tambahan", "desc" => "Dokumen pendukung legalitas tambahan lainnya (ZIP/PDF)", "tte" => false, "template" => ""]
 ];
 ?>
 
@@ -756,7 +758,7 @@ $requirementsBerjenjang = [
                     <?php if ($progress == 100): ?>
                         <div class="mt-4 pt-3 border-top border-secondary border-opacity-10 d-flex justify-content-center">
                             <?php if (!empty($pendaftaran['pdf_tte_path'])): ?>
-                                <a href="<?= base_url($pendaftaran['pdf_tte_path']) ?>" target="_blank" class="btn btn-success fw-bold text-white px-4 py-2.5">
+                                <a href="<?= base_url('uploads/rekomendasi_ormas/' . $pendaftaran['pdf_tte_path']) ?>" target="_blank" class="btn btn-success fw-bold text-white px-4 py-2.5">
                                     <i class="fa-solid fa-cloud-download me-1"></i> Unduh <?= ($tipe === 'Lokal') ? 'Laporan Tanggapan Keberadaan' : 'Surat Keberadaan' ?> Resmi
                                 </a>
                             <?php else: ?>
@@ -786,6 +788,7 @@ $requirementsBerjenjang = [
                                 <?php 
                                 $activeReqs = ($tipe === 'Lokal') ? $requirementsLokal : $requirementsBerjenjang;
                                 foreach ($activeReqs as $idx => $req):
+                                    if (isset($req['isPengurus']) && $req['isPengurus']) continue;
                                     $fileIdx = $idx + 1;
                                     $exist = $existingFiles[$fileIdx] ?? null;
                                 ?>
@@ -856,14 +859,16 @@ const requirementsLokal = [
 ];
 
 const requirementsBerjenjang = [
-    { name: "Surat Permohonan", desc: "Surat Permohonan ditujukan kepada Kepala Badan Kesbangpol Kab. Sinjai", tte: true, template: "https://drive.google.com/uc?export=download&id=1UX2CJCfXpWZUix7o-j3jY9cld63dX7KS" },
-    { name: "Surat Pernyataan Resmi", desc: "Surat Pernyataan Resmi (Meterai Rp 10.000)", tte: true, template: "https://drive.google.com/uc?export=download&id=1UX2CJCfXpWZUix7o-j3jY9cld63dX7KS" },
+    { name: "Surat Permohonan", desc: "Surat Permohonan ditujukan kepada Kepala Badan Kesbangpol Kab. Sinjai", tte: true, template: "<?= base_url('uploads/templates/Persyaratan_Ormas_Berjenjang_2026.docx') ?>" },
+    { name: "Surat Pernyataan Resmi", desc: "Surat Pernyataan Resmi (Memuat 6 poin pernyataan, Meterai Rp 10.000)", tte: true, template: "<?= base_url('uploads/templates/Persyaratan_Ormas_Berjenjang_2026.docx') ?>" },
+    { name: "SK Kemenkumham", desc: "Surat Keputusan (SK) Kemenkumham RI", tte: true, template: "" },
     { name: "Surat Keterangan Domisili", desc: "Surat Keterangan Domisili (Alamat domisili kop surat & sekretariat)", tte: true, template: "" },
-    { name: "Formulir Isian Data Ormas", desc: "Formulir Isian Data Ormas (ditandatangani Ketua & Sekretaris)", tte: true, template: "https://drive.google.com/uc?export=download&id=1UX2CJCfXpWZUix7o-j3jY9cld63dX7KS" },
+    { name: "Formulir Isian Data Ormas", desc: "Formulir Isian Data Ormas (ditandatangani Ketua & Sekretaris)", tte: true, template: "<?= base_url('uploads/templates/Persyaratan_Ormas_Berjenjang_2026.docx') ?>" },
     { name: "Pasfoto Pengurus", desc: "Pasfoto Pengurus ukuran 4x6 cm sebanyak 2 lembar", tte: false, template: "", isPengurus: true },
     { name: "Fotokopi KTP Pengurus", desc: "Fotokopi KTP Pengurus (Ketua, Sekretaris, Bendahara)", tte: false, template: "", isPengurus: true },
     { name: "Surat Keputusan (SK) Pengurus", desc: "Surat Keputusan (SK) Pengurus Organisasi", tte: false, template: "" },
-    { name: "Foto Sekretariat", desc: "Foto Sekretariat (Tampak depan menampilkan Papan Nama resmi)", tte: false, template: "" }
+    { name: "Foto Sekretariat", desc: "Foto Sekretariat (Tampak depan menampilkan Papan Nama resmi)", tte: false, template: "" },
+    { name: "Dokumen Pendukung Tambahan", desc: "Dokumen pendukung legalitas tambahan lainnya (ZIP/PDF)", tte: false, template: "" }
 ];
 
 function handleFileInputChange(input, index) {
@@ -1067,19 +1072,22 @@ function updateFormProgress() {
 
     // --- SECTION 2: Kelengkapan Berkas (Maks 50%) ---
     const tipeOrmas = document.getElementById('tipe_ormas')?.value || 'Lokal';
-    const maxFiles = tipeOrmas === 'Lokal' ? 14 : 8;
+    const activeReqs = tipeOrmas === 'Lokal' ? requirementsLokal : requirementsBerjenjang;
+    const actualReqs = activeReqs.filter(r => !r.isPengurus);
+    const totalFilesToUpload = actualReqs.length;
     let filesUploadedCount = 0;
 
-    for (let i = 1; i <= maxFiles; i++) {
-        const fileInput = document.querySelector(`input[name="file_berkas_${i}"]`);
-        const hasExist = existingFiles[i] !== undefined && existingFiles[i] !== null;
+    actualReqs.forEach((req) => {
+        const fileIdx = activeReqs.indexOf(req) + 1;
+        const fileInput = document.querySelector(`input[name="file_berkas_${fileIdx}"]`);
+        const hasExist = existingFiles[fileIdx] !== undefined && existingFiles[fileIdx] !== null;
         const hasChosen = fileInput && fileInput.files && fileInput.files.length > 0;
         if (hasExist || hasChosen) {
             filesUploadedCount++;
         }
-    }
+    });
 
-    const documentProgress = Math.round((filesUploadedCount / maxFiles) * 50);
+    const documentProgress = Math.round((filesUploadedCount / totalFilesToUpload) * 50);
     progress += documentProgress;
 
     // Update UI Progress Bar
@@ -1122,64 +1130,115 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const centerCoords = [initialLat, initialLng];
 
-    const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '© OpenStreetMap contributors'
-    });
-
-    const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        maxZoom: 19,
-        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-    });
-
-    const terrain = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-        maxZoom: 17,
-        attribution: 'Map data: &copy; OpenStreetMap contributors, SRTM | Map style: &copy; OpenTopoMap (CC-BY-SA)'
-    });
-
-    const map = L.map('form-map', {
-        center: centerCoords,
-        zoom: 13,
-        layers: [osm]
-    });
-
-    const baseMaps = {
-        "Peta Standar (OSM)": osm,
-        "Satelit (Esri)": satellite,
-        "Topografi (TopoMap)": terrain
-    };
-
-    L.control.layers(baseMaps).addTo(map);
-
+    let map = null;
     let marker = null;
 
-    if (latInput.value && lngInput.value) {
-        marker = L.marker(centerCoords, { draggable: true }).addTo(map);
-        bindMarkerEvents(marker);
+    function bindMarkerEvents(m) {
+        if (typeof L !== 'undefined') {
+            m.on('dragend', function(event) {
+                const position = event.target.getLatLng();
+                latInput.value = position.lat.toFixed(6);
+                lngInput.value = position.lng.toFixed(6);
+                updateFormProgress();
+            });
+        }
     }
 
-    map.on('click', function(e) {
-        const lat = e.latlng.lat.toFixed(6);
-        const lng = e.latlng.lng.toFixed(6);
-        latInput.value = lat;
-        lngInput.value = lng;
-        
-        if (marker) {
-            marker.setLatLng(e.latlng);
-        } else {
-            marker = L.marker(e.latlng, { draggable: true }).addTo(map);
-            bindMarkerEvents(marker);
-        }
-        updateFormProgress();
-    });
+    if (typeof L !== 'undefined') {
+        try {
+            const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap contributors'
+            });
 
-    function bindMarkerEvents(m) {
-        m.on('dragend', function(event) {
-            const position = event.target.getLatLng();
-            latInput.value = position.lat.toFixed(6);
-            lngInput.value = position.lng.toFixed(6);
-            updateFormProgress();
-        });
+            const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                maxZoom: 19,
+                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+            });
+
+            const terrain = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+                maxZoom: 17,
+                attribution: 'Map data: &copy; OpenStreetMap contributors, SRTM | Map style: &copy; OpenTopoMap (CC-BY-SA)'
+            });
+
+            map = L.map('form-map', {
+                center: centerCoords,
+                zoom: 13,
+                layers: [osm]
+            });
+
+            const baseMaps = {
+                "Peta Standar (OSM)": osm,
+                "Satelit (Esri)": satellite,
+                "Topografi (TopoMap)": terrain
+            };
+
+            L.control.layers(baseMaps).addTo(map);
+
+            if (latInput.value && lngInput.value) {
+                marker = L.marker(centerCoords, { draggable: true }).addTo(map);
+                bindMarkerEvents(marker);
+            }
+
+            map.on('click', function(e) {
+                const lat = e.latlng.lat.toFixed(6);
+                const lng = e.latlng.lng.toFixed(6);
+                latInput.value = lat;
+                lngInput.value = lng;
+                
+                if (marker) {
+                    marker.setLatLng(e.latlng);
+                } else {
+                    marker = L.marker(e.latlng, { draggable: true }).addTo(map);
+                    bindMarkerEvents(marker);
+                }
+                updateFormProgress();
+            });
+        } catch (mapErr) {
+            console.error("Gagal inisialisasi peta:", mapErr);
+        }
+    } else {
+        console.warn("Leaflet tidak terdeteksi. Peta dinonaktifkan.");
+        const mapContainer = document.getElementById('form-map');
+        if (mapContainer) {
+            mapContainer.innerHTML = '<div class="alert alert-warning m-0 p-3 rounded" style="background: rgba(234,179,8,0.1); border: 1px solid rgba(234,179,8,0.2); color: #fef08a;"><i class="fa-solid fa-triangle-exclamation me-2"></i>Koneksi internet offline. Peta lokasi tidak dapat dimuat. Anda masih dapat mengisi koordinat secara manual atau menyimpan formulir.</div>';
+        }
+    }
+
+    // Auto-Date Calculation for Ormas Berjenjang (Maksimal 2 Tahun)
+    const tipeOrmasEl = document.getElementById('tipe_ormas');
+    const tglMulaiEl = document.getElementById('tgl_sk_kepengurusan');
+    const tglExpEl = document.getElementById('tgl_sk_kedaluwarsa');
+
+    function handleOrmasDateCalculation() {
+        if (!tipeOrmasEl || !tglMulaiEl || !tglExpEl) return;
+        
+        if (tipeOrmasEl.value === 'Berjenjang') {
+            if (tglMulaiEl.value) {
+                const startDate = new Date(tglMulaiEl.value);
+                startDate.setFullYear(startDate.getFullYear() + 2);
+                
+                const yyyy = startDate.getFullYear();
+                let mm = startDate.getMonth() + 1;
+                let dd = startDate.getDate();
+                if (mm < 10) mm = '0' + mm;
+                if (dd < 10) dd = '0' + dd;
+                
+                tglExpEl.value = `${yyyy}-${mm}-${dd}`;
+            }
+            tglExpEl.readOnly = true;
+            tglExpEl.style.opacity = '0.7';
+        } else {
+            tglExpEl.readOnly = false;
+            tglExpEl.style.opacity = '1';
+        }
+    }
+
+    if (tipeOrmasEl && tglMulaiEl && tglExpEl) {
+        tipeOrmasEl.addEventListener('change', handleOrmasDateCalculation);
+        tglMulaiEl.addEventListener('change', handleOrmasDateCalculation);
+        tglMulaiEl.addEventListener('input', handleOrmasDateCalculation);
+        handleOrmasDateCalculation();
     }
 
     latInput.addEventListener('change', updateMarkerFromInputs);
@@ -1189,14 +1248,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const lat = parseFloat(latInput.value);
         const lng = parseFloat(lngInput.value);
         if (!isNaN(lat) && !isNaN(lng)) {
-            const newLatLng = L.latLng(lat, lng);
-            if (marker) {
-                marker.setLatLng(newLatLng);
-            } else {
-                marker = L.marker(newLatLng, { draggable: true }).addTo(map);
-                bindMarkerEvents(marker);
+            if (typeof L !== 'undefined' && map) {
+                const newLatLng = L.latLng(lat, lng);
+                if (marker) {
+                    marker.setLatLng(newLatLng);
+                } else {
+                    marker = L.marker(newLatLng, { draggable: true }).addTo(map);
+                    bindMarkerEvents(marker);
+                }
+                map.panTo(newLatLng);
             }
-            map.panTo(newLatLng);
             updateFormProgress();
         }
     }
@@ -1337,14 +1398,16 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateMapPosition(lat, lng) {
         latInput.value = lat.toFixed(6);
         lngInput.value = lng.toFixed(6);
-        const newLatLng = L.latLng(lat, lng);
-        if (marker) {
-            marker.setLatLng(newLatLng);
-        } else {
-            marker = L.marker(newLatLng, { draggable: true }).addTo(map);
-            bindMarkerEvents(marker);
+        if (typeof L !== 'undefined' && map) {
+            const newLatLng = L.latLng(lat, lng);
+            if (marker) {
+                marker.setLatLng(newLatLng);
+            } else {
+                marker = L.marker(newLatLng, { draggable: true }).addTo(map);
+                bindMarkerEvents(marker);
+            }
+            map.setView(newLatLng, 16);
         }
-        map.setView(newLatLng, 16);
         updateFormProgress();
     }
 
@@ -1352,7 +1415,6 @@ document.addEventListener('DOMContentLoaded', function() {
     goToStep(<?= $activeStep ?>);
 
     // Call toggle initial requirements
-    const tipeOrmasEl = document.getElementById('tipe_ormas');
     if (tipeOrmasEl) {
         toggleOrmasRequirements(tipeOrmasEl.value);
     }

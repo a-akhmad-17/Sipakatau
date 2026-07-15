@@ -211,6 +211,7 @@
                                                  data-mulai="<?= date('d F Y', strtotime($rek['tgl_mulai'])) ?>" 
                                                  data-selesai="<?= date('d F Y', strtotime($rek['tgl_selesai'])) ?>"
                                                  data-tte="<?= esc($rek['pdf_tte_path'] ?? '') ?>"
+                                                 data-alasan-ditolak="<?= esc($rek['alasan_ditolak'] ?? '') ?>"
                                                  data-tanggal="<?= date('d F Y H:i:s', strtotime($rek['created_at'])) ?>">
                                              <i class="fa-solid fa-list-check me-1"></i> Detail
                                          </button>
@@ -253,7 +254,7 @@
                                                                      if ($docStatus === 'verified'): ?>
                                                                          <span class="badge bg-success" style="font-size: 9px; padding: 2px 4px;"><i class="fa-solid fa-check"></i></span>
                                                                      <?php elseif ($docStatus === 'rejected'): ?>
-                                                                         <span class="badge bg-danger" style="font-size: 9px; padding: 2px 4px;"><i class="fa-solid fa-xmark"></i></span>
+                                                                         <span class="badge bg-danger" style="font-size: 9px; padding: 2px 4px;" title="<?= esc($fileInfo['note'] ?? 'Ditolak') ?>"><i class="fa-solid fa-xmark"></i></span>
                                                                      <?php else: ?>
                                                                          <span class="badge bg-warning text-dark" style="font-size: 9px; padding: 2px 4px;"><i class="fa-solid fa-clock"></i></span>
                                                                      <?php endif; ?>
@@ -333,6 +334,10 @@
                                 <th style="background: rgba(255,255,255,0.02);" class="text-muted">Progres Alur</th>
                                 <td id="m-rek-progress" class="text-warning fw-bold">-</td>
                             </tr>
+                            <tr id="row-m-rek-rejection" class="d-none">
+                                 <th style="background: rgba(255,255,255,0.02);" class="text-muted text-danger fw-bold"><i class="fa-solid fa-circle-xmark me-1"></i> Alasan Penolakan</th>
+                                 <td id="m-rek-rejection-note" class="text-danger fw-bold">-</td>
+                             </tr>
                             <tr id="row-m-rek-tte" class="d-none">
                                 <th style="background: rgba(255,255,255,0.02);" class="text-muted">Surat Rekomendasi Resmi</th>
                                 <td id="m-rek-tte-download"></td>
@@ -416,6 +421,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     rowTte.classList.add('d-none');
                 }
 
+                const alasanDitolak = this.getAttribute('data-alasan-ditolak') || '';
+                const rowRejection = document.getElementById('row-m-rek-rejection');
+                if (status === 'Rejected' && alasanDitolak !== '') {
+                    rowRejection.classList.remove('d-none');
+                    document.getElementById('m-rek-rejection-note').innerText = alasanDitolak;
+                } else {
+                    rowRejection.classList.add('d-none');
+                }
+
                 document.getElementById('m-rek-nama').innerText = nama;
                 document.getElementById('m-rek-kegiatan').innerText = kegiatan;
                 document.getElementById('m-rek-waktu').innerText = mulai + ' s/d ' + selesai;
@@ -484,7 +498,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (docStatus === 'verified') {
                             statusCol = `<span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 rounded small"><i class="fa-solid fa-circle-check me-1"></i> Terverifikasi</span>`;
                         } else if (docStatus === 'rejected') {
-                            statusCol = `<span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded small"><i class="fa-solid fa-circle-xmark me-1"></i> Ditolak</span>`;
+                            const rejectionNote = exist.note ? `<div class="text-danger small fw-bold mt-1" style="font-size: 10px; line-height:1.2;">Ket: ${exist.note}</div>` : '';
+                            statusCol = `<span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded small"><i class="fa-solid fa-circle-xmark me-1"></i> Ditolak</span>${rejectionNote}`;
                         } else {
                             statusCol = `<span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 rounded small"><i class="fa-solid fa-clock me-1"></i> Sedang Diperiksa</span>`;
                         }

@@ -148,7 +148,12 @@
         animation: pulse 1.5s infinite;
     }
     .glow-ormas { background-color: #3b82f6 !important; box-shadow: 0 0 10px #3b82f6 !important; }
+    .glow-ormas-aktif { background-color: #10b981 !important; box-shadow: 0 0 10px #10b981 !important; }
+    .glow-ormas-warning { background-color: #eab308 !important; box-shadow: 0 0 10px #eab308 !important; }
+    .glow-ormas-expired { background-color: #ef4444 !important; box-shadow: 0 0 10px #ef4444 !important; }
     .glow-parpol { background-color: #fbbf24 !important; box-shadow: 0 0 10px #fbbf24 !important; }
+    .glow-parpol-kursi { background-color: #ec4899 !important; box-shadow: 0 0 10px #ec4899 !important; }
+    .glow-parpol-nokursi { background-color: #9ca3af !important; box-shadow: 0 0 10px #9ca3af !important; }
     .glow-pengaduan { background-color: #ef4444 !important; box-shadow: 0 0 10px #ef4444 !important; }
     .glow-rekomendasi { background-color: #a855f7 !important; box-shadow: 0 0 10px #a855f7 !important; }
     .hotspot-item {
@@ -174,6 +179,26 @@
         color: #000 !important;
         border-color: #0dcaf0 !important;
         font-weight: bold;
+    }
+    /* Map Legend */
+    .legend-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid var(--border-color);
+        border-radius: 50px;
+        padding: 3px 10px 3px 7px;
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        transition: background .2s;
+    }
+    .legend-pill:hover { background: rgba(255,255,255,0.08); }
+    .legend-dot {
+        width: 9px; height: 9px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        box-shadow: 0 0 5px currentColor;
     }
 </style>
 <?= $this->endSection() ?>
@@ -725,6 +750,24 @@
                         </div>
                     </div>
                     <div id="gis-map" style="height: 470px; border-radius: 12px; border: 1px solid var(--border-color); position: relative; overflow: hidden; width: 100%;"></div>
+                    <!-- Map Legend -->
+                    <div class="mt-3 p-3 rounded" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color);">
+                        <div class="text-muted mb-2" style="font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;"><i class="fa-solid fa-circle-info me-1"></i> Keterangan Warna Marker Peta</div>
+                        <div class="d-flex flex-wrap gap-2">
+                            <span class="text-muted d-block w-100" style="font-size:0.65rem; opacity:.6; font-weight:600;">🏢 ORMAS — Berdasarkan Masa Aktif SK Kepengurusan</span>
+                            <span class="legend-pill"><span class="legend-dot" style="background:#10b981; color:#10b981;"></span>SK Aktif (> 90 hari)</span>
+                            <span class="legend-pill"><span class="legend-dot" style="background:#eab308; color:#eab308;"></span>Hampir Expired (≤ 90 hari)</span>
+                            <span class="legend-pill"><span class="legend-dot" style="background:#ef4444; color:#ef4444;"></span>SK Expired / Kedaluwarsa</span>
+                            <div class="w-100"></div>
+                            <span class="text-muted d-block w-100" style="font-size:0.65rem; opacity:.6; font-weight:600;">🏛️ PARPOL — Berdasarkan Representasi Kursi DPRD</span>
+                            <span class="legend-pill"><span class="legend-dot" style="background:#ec4899; color:#ec4899;"></span>Memiliki Kursi DPRD</span>
+                            <span class="legend-pill"><span class="legend-dot" style="background:#9ca3af; color:#9ca3af;"></span>Tidak Memiliki Kursi</span>
+                            <div class="w-100"></div>
+                            <span class="text-muted d-block w-100" style="font-size:0.65rem; opacity:.6; font-weight:600;">📋 LAINNYA</span>
+                            <span class="legend-pill"><span class="legend-dot" style="background:#ef4444; color:#ef4444;"></span>Aduan / Titik Rawan Konflik (Berkedip)</span>
+                            <span class="legend-pill"><span class="legend-dot" style="background:#a855f7; color:#a855f7;"></span>Rekomendasi Kegiatan Ormas</span>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- Sidebar Control & Input -->
@@ -1049,7 +1092,7 @@
                         <?php 
                         $db = \Config\Database::connect();
                         $requestHapus = $db->table('trn_pendaftaran')
-                                           ->select('trn_pendaftaran.*, mst_ormas.nama_ormas, mst_ormas.alamat')
+                                           ->select('trn_pendaftaran.*, trn_pendaftaran.id AS id, mst_ormas.nama_ormas, mst_ormas.alamat')
                                            ->join('mst_ormas', 'mst_ormas.id = trn_pendaftaran.ormas_id', 'left')
                                            ->where('trn_pendaftaran.delete_requested', 1)
                                            ->get()
@@ -1920,8 +1963,37 @@ document.addEventListener('DOMContentLoaded', function() {
             let dateToMatch = o.tgl_sk_kepengurusan || o.created_at;
             if (matchDate(dateToMatch, year, month)) {
                 let coords = (o.latitude && o.longitude) ? [parseFloat(o.latitude), parseFloat(o.longitude)] : getCoordinates(o.id, 'ormas');
-                let marker = L.marker(coords, {icon: ormasIcon}).addTo(ormasGroup)
-                    .bindPopup(`<b>Ormas: ${o.nama_ormas}</b><br>Alamat: ${o.alamat}<br>Status: <span class="badge bg-success">${o.status}</span><br>Tgl SK Kepengurusan: ${o.tgl_sk_kepengurusan || '-'}`);
+                
+                // Kalkulasi warna marker ormas berdasarkan masa berlaku SK
+                let oIcon = ormasIcon;
+                let statusBadgeText = o.status;
+                let badgeClass = 'bg-success';
+                
+                if (o.tgl_sk_kedaluwarsa) {
+                    let expDate = new Date(o.tgl_sk_kedaluwarsa);
+                    let today = new Date();
+                    expDate.setHours(0,0,0,0);
+                    today.setHours(0,0,0,0);
+                    let timeDiff = expDate.getTime() - today.getTime();
+                    let dayDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                    
+                    if (dayDiff < 0) {
+                        oIcon = createGlowIcon('glow-ormas-expired', 12);
+                        statusBadgeText = 'Expired / Tidak Aktif';
+                        badgeClass = 'bg-danger';
+                    } else if (dayDiff <= 90) {
+                        oIcon = createGlowIcon('glow-ormas-warning', 12);
+                        statusBadgeText = `Hampir Expired (${dayDiff} hari lagi)`;
+                        badgeClass = 'bg-warning text-dark';
+                    } else {
+                        oIcon = createGlowIcon('glow-ormas-aktif', 12);
+                    }
+                } else {
+                    oIcon = createGlowIcon('glow-ormas-aktif', 12);
+                }
+
+                let marker = L.marker(coords, {icon: oIcon}).addTo(ormasGroup)
+                    .bindPopup(`<b>Ormas: ${o.nama_ormas}</b><br>Alamat: ${o.alamat}<br>Status: <span class="badge ${badgeClass}">${statusBadgeText}</span><br>Tgl SK Kepengurusan: ${o.tgl_sk_kepengurusan || '-'}`);
                 
                 marker.on('click', function(e) {
                     map.flyTo(e.latlng, 15, { animate: true, duration: 1.2 });
@@ -1934,7 +2006,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (matchDate(p.created_at, year, month)) {
                 let coords = (p.latitude && p.longitude) ? [parseFloat(p.latitude), parseFloat(p.longitude)] : getCoordinates(p.id, 'parpol');
                 let dewanInfo = p.has_kursi == 1 ? `<br>Representasi: Punya Kursi DPRD (${p.level_dewan || '-'} • Periode ${p.periode_dewan || '-'})` : '<br>Representasi: Tidak Ada Kursi';
-                let marker = L.marker(coords, {icon: parpolIcon}).addTo(parpolGroup)
+                let pIcon = (p.has_kursi == 1) ? createGlowIcon('glow-parpol-kursi', 12) : createGlowIcon('glow-parpol-nokursi', 12);
+                let marker = L.marker(coords, {icon: pIcon}).addTo(parpolGroup)
                     .bindPopup(`<b>Parpol: ${p.nama_parpol}</b><br>Ketua: ${p.ketua}<br>Kontak: ${p.telepon}${dewanInfo}<br>Terdaftar: ${p.created_at || '-'}`);
                 
                 marker.on('click', function(e) {
@@ -2507,8 +2580,8 @@ document.addEventListener('DOMContentLoaded', function() {
         {"name": "NPWP Organisasi", "desc": "NPWP atas nama Organisasi", "tte": false},
         {"name": "Formulir Isian Data Ormas", "desc": "Formulir Isian Data Ormas (ditandatangani Ketua & Sekretaris)", "tte": true},
         {"name": "Rekomendasi Kementerian", "desc": "Surat Rekomendasi Kementerian Agama (Ormas Agama) / Kebudayaan", "tte": true},
-        {"name": "Biodata & KTP Pengurus", "desc": "Biodata & KTP Pengurus (Ketua, Sekretaris, Bendahara)", "tte": false},
-        {"name": "Pasfoto Pengurus", "desc": "Pasfoto Pengurus 4x6 cm 2 Lembar (Latar Merah)", "tte": false},
+        {"name": "Biodata & KTP Pengurus", "desc": "Biodata & KTP Pengurus (Ketua, Sekretaris, Bendahara)", "tte": false, "isPengurus": true},
+        {"name": "Pasfoto Pengurus", "desc": "Pasfoto Pengurus 4x6 cm 2 Lembar (Latar Merah)", "tte": false, "isPengurus": true},
         {"name": "SK & Foto Sekretariat", "desc": "SK Pengurus & Foto Sekretariat (Tampak depan menampilkan Papan Nama)", "tte": false},
         {"name": "Kontrak/Izin Pakai Gedung", "desc": "Surat Perjanjian Kontrak/Izin Pakai Gedung dari Pemilik Gedung", "tte": true},
         {"name": "Rekening & Logo Organisasi", "desc": "Nomor Rekening Organisasi & File Logo Organisasi", "tte": false}
@@ -2516,12 +2589,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const globalRequirementsBerjenjang = [
         {"name": "Surat Permohonan", "desc": "Surat Permohonan ditujukan kepada Kepala Badan Kesbangpol Kab. Sinjai", "tte": true},
-        {"name": "Surat Pernyataan Resmi", "desc": "Surat Pernyataan Resmi (Meterai Rp 10.000)", "tte": true},
+        {"name": "Surat Pernyataan Resmi", "desc": "Surat Pernyataan Resmi (Memuat 6 poin pernyataan, Meterai Rp 10.000)", "tte": true},
+        {"name": "SK Kemenkumham", "desc": "Surat Keputusan (SK) Kemenkumham RI", "tte": true},
         {"name": "Surat Keterangan Domisili", "desc": "Surat Keterangan Domisili (Alamat domisili kop surat & sekretariat)", "tte": true},
         {"name": "Formulir Isian Data Ormas", "desc": "Formulir Isian Data Ormas (ditandatangani Ketua & Sekretaris)", "tte": true},
-        {"name": "Pasfoto Pengurus", "desc": "Pasfoto Pengurus ukuran 4x6 cm sebanyak 2 lembar", "tte": false},
-        {"name": "Fotokopi KTP Pengurus", "desc": "Fotokopi KTP Pengurus (Ketua, Sekretaris, Bendahara)", "tte": false},
+        {"name": "Pasfoto Pengurus", "desc": "Pasfoto Pengurus ukuran 4x6 cm sebanyak 2 lembar", "tte": false, "isPengurus": true},
+        {"name": "Fotokopi KTP Pengurus", "desc": "Fotokopi KTP Pengurus (Ketua, Sekretaris, Bendahara)", "tte": false, "isPengurus": true},
         {"name": "Surat Keputusan (SK) Pengurus", "desc": "Surat Keputusan (SK) Pengurus Organisasi", "tte": false},
+        {"name": "Foto Sekretariat", "desc": "Foto Sekretariat (Tampak depan menampilkan Papan Nama resmi)", "tte": false},
+        {"name": "Dokumen Pendukung Tambahan", "desc": "Dokumen pendukung legalitas tambahan lainnya (ZIP/PDF)", "tte": false}
     ];
 
     const globalRequirementsRekomendasi = [
@@ -2681,6 +2757,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 activeReqs.forEach((req, idx) => {
+                    if (req.isPengurus) return;
                     const fileIdx = idx + 1;
                     const exist = filesList[fileIdx] || null;
 
@@ -2694,7 +2771,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (docStatus === 'verified') {
                             statusBadge = `<span class="badge bg-success text-white border px-2 py-1 small"><i class="fa-solid fa-circle-check me-1"></i> Terverifikasi</span>`;
                         } else if (docStatus === 'rejected') {
-                            statusBadge = `<span class="badge bg-danger text-white border px-2 py-1 small"><i class="fa-solid fa-circle-xmark me-1"></i> Ditolak</span>`;
+                            const rejectionNote = exist.note ? `<div class="text-danger small fw-bold mt-1" style="font-size: 0.72rem; line-height:1.2;">Ket: ${exist.note}</div>` : '';
+                            statusBadge = `<span class="badge bg-danger text-white border px-2 py-1 small"><i class="fa-solid fa-circle-xmark me-1"></i> Ditolak</span>${rejectionNote}`;
                         } else {
                             statusBadge = `<span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 small"><i class="fa-solid fa-clock me-1"></i> Belum Diperiksa</span>`;
                         }
@@ -2875,7 +2953,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (docStatus === 'verified') {
                             statusBadge = `<span class="badge bg-success text-white border px-2 py-1 small"><i class="fa-solid fa-circle-check me-1"></i> Terverifikasi</span>`;
                         } else if (docStatus === 'rejected') {
-                            statusBadge = `<span class="badge bg-danger text-white border px-2 py-1 small"><i class="fa-solid fa-circle-xmark me-1"></i> Ditolak</span>`;
+                            const rejectionNote = exist.note ? `<div class="text-danger small fw-bold mt-1" style="font-size: 0.72rem; line-height:1.2;">Ket: ${exist.note}</div>` : '';
+                            statusBadge = `<span class="badge bg-danger text-white border px-2 py-1 small"><i class="fa-solid fa-circle-xmark me-1"></i> Ditolak</span>${rejectionNote}`;
                         } else {
                             statusBadge = `<span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 small"><i class="fa-solid fa-clock me-1"></i> Belum Diperiksa</span>`;
                         }
@@ -2921,7 +3000,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     rejectForm.action = `<?= base_url('admin/proses-rekomendasi') ?>/${id}/reject`;
                     rejectForm.method = 'POST';
                     rejectForm.className = 'd-inline me-2';
-                    rejectForm.onsubmit = () => confirm('Tolak pengajuan rekomendasi ini?');
+                    rejectForm.onsubmit = (e) => {
+                        const alasan = prompt('Masukkan alasan penolakan Rekomendasi Kegiatan ini:', 'Berkas kurang lengkap atau tidak sesuai.');
+                        if (alasan === null) {
+                            e.preventDefault();
+                            return false;
+                        }
+                        const inputAlasan = document.createElement('input');
+                        inputAlasan.type = 'hidden';
+                        inputAlasan.name = 'alasan_ditolak';
+                        inputAlasan.value = alasan;
+                        rejectForm.appendChild(inputAlasan);
+                        return true;
+                    };
                     rejectForm.innerHTML = `
                         <?= csrf_field() ?>
                         <button type="submit" class="btn btn-danger text-white fw-bold"><i class="fa-solid fa-xmark me-1"></i> Tolak</button>
@@ -3144,8 +3235,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.verifyDoc = function(id, type, docIndex, status) {
         const statusLabels = { 'verified': 'menyetujui', 'rejected': 'menolak', 'pending': 'mereset' };
-        if (!confirm(`Apakah Anda yakin ingin ${statusLabels[status]} dokumen ini?`)) {
-            return;
+        let note = null;
+        
+        if (status === 'rejected') {
+            note = prompt('Tuliskan alasan/catatan penolakan untuk berkas ini:');
+            if (note === null) return; // Batal
+            if (note.trim() === '') {
+                alert('Alasan penolakan berkas wajib diisi!');
+                return;
+            }
+        } else {
+            if (!confirm(`Apakah Anda yakin ingin ${statusLabels[status]} dokumen ini?`)) {
+                return;
+            }
         }
 
         fetch('<?= base_url('admin/verify-document') ?>', {
@@ -3158,7 +3260,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 id: id,
                 type: type,
                 doc_index: docIndex,
-                status: status
+                status: status,
+                note: note
             })
         })
         .then(response => response.json())

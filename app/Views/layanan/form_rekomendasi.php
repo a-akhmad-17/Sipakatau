@@ -93,6 +93,17 @@
                     <label for="deskripsi" class="form-label small text-muted">Deskripsi Rencana Kegiatan / Lokasi Sasaran *</label>
                     <textarea class="form-control form-control-custom" id="deskripsi" name="deskripsi" rows="4" placeholder="Jelaskan rincian agenda dan instansi sasaran kegiatan di Kabupaten Sinjai..." required></textarea>
                 </div>
+
+                <div class="col-md-12">
+                    <label for="pake_fasilitas" class="form-label small text-muted">Apakah kegiatan menggunakan fasilitas publik / gedung milik pemerintah? <span class="text-danger">*</span></label>
+                    <select class="form-select form-control-custom py-3" id="pake_fasilitas" name="pake_fasilitas" required>
+                        <option value="Tidak">Tidak</option>
+                        <option value="Ya">Ya (Wajib mengunggah Surat Rekomendasi dari Instansi/Stakeholder pengelola fasilitas di berkas nomor 6)</option>
+                    </select>
+                    <div class="form-text text-muted small mt-1.5" id="fasilitas-note" style="display: none;">
+                        <span class="text-warning fw-bold"><i class="fa-solid fa-triangle-exclamation"></i> PENTING:</span> Karena Anda memilih <b>Ya</b>, maka <b>Dokumen Rekomendasi Stakeholder (Berkas nomor 6)</b> di bawah ini otomatis menjadi <b>WAJIB diunggah</b>.
+                    </div>
+                </div>
             </div>
 
             <!-- Documents Table Section -->
@@ -162,7 +173,7 @@
                                 <tr>
                                     <td class="text-center align-middle"><?= $req['id'] ?></td>
                                     <td class="align-middle">
-                                        <div class="fw-semibold text-white small"><?= esc($req['name']) ?> <?php if ($req['required']): ?><span class="text-danger">*</span><?php endif; ?></div>
+                                        <div class="fw-semibold text-white small"><?= esc($req['name']) ?> <span id="req-badge-<?= $req['id'] ?>"><?php if ($req['required']): ?><span class="text-danger">*</span><?php else: ?><span class="text-muted small">(Opsional)</span><?php endif; ?></span></div>
                                         <div class="text-muted small" style="font-size: 0.72rem;"><?= esc($req['desc']) ?></div>
                                     </td>
                                     <td class="text-center align-middle" id="status-badge-<?= $req['id'] ?>">
@@ -314,9 +325,38 @@
             });
         }
 
+        const pakeFasEl = document.getElementById('pake_fasilitas');
+        if (pakeFasEl) {
+            pakeFasEl.addEventListener('change', function() {
+                toggleFasilitasRekomendasi(this.value);
+            });
+            toggleFasilitasRekomendasi(pakeFasEl.value);
+        }
+
         // Run initial check
         updateFormProgress();
     });
+
+    window.toggleFasilitasRekomendasi = function(value) {
+        const noteEl = document.getElementById('fasilitas-note');
+        const file6Input = document.getElementById('file_proposal_6');
+        const reqBadge = document.getElementById('req-badge-6');
+        
+        if (value === 'Ya') {
+            if (noteEl) noteEl.style.display = 'block';
+            if (file6Input) file6Input.setAttribute('data-required', 'true');
+            if (reqBadge) {
+                reqBadge.innerHTML = '<span class="text-danger fw-bold">*</span>';
+            }
+        } else {
+            if (noteEl) noteEl.style.display = 'none';
+            if (file6Input) file6Input.setAttribute('data-required', 'false');
+            if (reqBadge) {
+                reqBadge.innerHTML = '<span class="text-muted small">(Opsional)</span>';
+            }
+        }
+        updateFormProgress();
+    };
 
     // Live Progress Calculation
     function updateFormProgress() {
@@ -352,8 +392,9 @@
             progress += 10;
         }
 
-        // 6. Required Files (10% each for first 5 files)
-        for (let i = 1; i <= 5; i++) {
+        // 6. Required Files (10% each for first 5 files, and 6th if using facility)
+        const limitFiles = (document.getElementById('pake_fasilitas')?.value === 'Ya') ? 6 : 5;
+        for (let i = 1; i <= limitFiles; i++) {
             const fileInput = document.getElementById(`file_proposal_${i}`);
             if (fileInput && fileInput.files && fileInput.files.length > 0) {
                 progress += 10;

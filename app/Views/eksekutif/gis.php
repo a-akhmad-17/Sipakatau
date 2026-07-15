@@ -51,7 +51,12 @@
         animation: pulse 1.5s infinite;
     }
     .glow-ormas { background-color: #3b82f6 !important; box-shadow: 0 0 10px #3b82f6 !important; }
+    .glow-ormas-aktif { background-color: #10b981 !important; box-shadow: 0 0 10px #10b981 !important; }
+    .glow-ormas-warning { background-color: #eab308 !important; box-shadow: 0 0 10px #eab308 !important; }
+    .glow-ormas-expired { background-color: #ef4444 !important; box-shadow: 0 0 10px #ef4444 !important; }
     .glow-parpol { background-color: #fbbf24 !important; box-shadow: 0 0 10px #fbbf24 !important; }
+    .glow-parpol-kursi { background-color: #ec4899 !important; box-shadow: 0 0 10px #ec4899 !important; }
+    .glow-parpol-nokursi { background-color: #9ca3af !important; box-shadow: 0 0 10px #9ca3af !important; }
     .glow-pengaduan { background-color: #ef4444 !important; box-shadow: 0 0 10px #ef4444 !important; }
     .glow-rekomendasi { background-color: #a855f7 !important; box-shadow: 0 0 10px #a855f7 !important; }
     
@@ -65,6 +70,26 @@
     .filter-card {
         background: var(--input-bg);
         border: 1px solid var(--border-color);
+    }
+    /* Legend */
+    .legend-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid var(--border-color);
+        border-radius: 50px;
+        padding: 4px 12px 4px 8px;
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        transition: background .2s;
+    }
+    .legend-pill:hover { background: rgba(255,255,255,0.08); }
+    .legend-dot {
+        width: 10px; height: 10px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        box-shadow: 0 0 6px currentColor;
     }
 </style>
 <?= $this->endSection() ?>
@@ -135,6 +160,24 @@
         <!-- Map Area -->
         <div class="col-lg-8">
             <div id="gis-map" style="height: 550px; border-radius: 12px; border: 1px solid var(--border-color); position: relative; overflow: hidden; width: 100%;"></div>
+            <!-- Map Legend -->
+            <div class="mt-3 p-3 rounded" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color);">
+                <div class="text-muted mb-2" style="font-size: 0.72rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;"><i class="fa-solid fa-circle-info me-1"></i> Keterangan Warna Marker</div>
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="legend-group-label text-muted small fw-semibold d-block w-100" style="font-size:0.68rem; opacity:.6;">🏢 ORMAS</span>
+                    <span class="legend-pill"><span class="legend-dot" style="background:#10b981; color:#10b981;"></span>SK Aktif (> 90 hari)</span>
+                    <span class="legend-pill"><span class="legend-dot" style="background:#eab308; color:#eab308;"></span>Hampir Expired (≤ 90 hari)</span>
+                    <span class="legend-pill"><span class="legend-dot" style="background:#ef4444; color:#ef4444;"></span>SK Expired / Kedaluwarsa</span>
+                    <div class="w-100"></div>
+                    <span class="legend-group-label text-muted small fw-semibold d-block w-100" style="font-size:0.68rem; opacity:.6;">🏛️ PARTAI POLITIK</span>
+                    <span class="legend-pill"><span class="legend-dot" style="background:#ec4899; color:#ec4899;"></span>Parpol <b style="color:var(--text-muted);">Punya Kursi DPRD</b></span>
+                    <span class="legend-pill"><span class="legend-dot" style="background:#9ca3af; color:#9ca3af;"></span>Parpol <b style="color:var(--text-muted);">Tidak Ada Kursi</b></span>
+                    <div class="w-100"></div>
+                    <span class="legend-group-label text-muted small fw-semibold d-block w-100" style="font-size:0.68rem; opacity:.6;">📋 LAINNYA</span>
+                    <span class="legend-pill"><span class="legend-dot" style="background:#ef4444; color:#ef4444;"></span>Aduan / Titik Rawan Konflik</span>
+                    <span class="legend-pill"><span class="legend-dot" style="background:#a855f7; color:#a855f7;"></span>Rekomendasi Kegiatan</span>
+                </div>
+            </div>
         </div>
         
         <!-- Sidebar Controls & Hotspot List -->
@@ -342,8 +385,36 @@
                 if (matchDate(dateToMatch, year, month)) {
                     filteredOrmasCount++;
                     let coords = (o.latitude && o.longitude) ? [parseFloat(o.latitude), parseFloat(o.longitude)] : getCoordinates(o.id, 'ormas');
-                    let marker = L.marker(coords, {icon: ormasIcon}).addTo(ormasGroup)
-                        .bindPopup(`<b>Ormas: ${o.nama_ormas}</b><br>Alamat: ${o.alamat}<br>Status: <span class="badge bg-success">${o.status}</span><br>Tgl SK Kepengurusan: ${o.tgl_sk_kepengurusan || '-'}`);
+                    
+                    let oIcon = ormasIcon;
+                    let statusBadgeText = o.status;
+                    let badgeClass = 'bg-success';
+                    
+                    if (o.tgl_sk_kedaluwarsa) {
+                        let expDate = new Date(o.tgl_sk_kedaluwarsa);
+                        let today = new Date();
+                        expDate.setHours(0,0,0,0);
+                        today.setHours(0,0,0,0);
+                        let timeDiff = expDate.getTime() - today.getTime();
+                        let dayDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                        
+                        if (dayDiff < 0) {
+                            oIcon = createGlowIcon('glow-ormas-expired', 12);
+                            statusBadgeText = 'Expired / Tidak Aktif';
+                            badgeClass = 'bg-danger';
+                        } else if (dayDiff <= 90) {
+                            oIcon = createGlowIcon('glow-ormas-warning', 12);
+                            statusBadgeText = `Hampir Expired (${dayDiff} hari lagi)`;
+                            badgeClass = 'bg-warning text-dark';
+                        } else {
+                            oIcon = createGlowIcon('glow-ormas-aktif', 12);
+                        }
+                    } else {
+                        oIcon = createGlowIcon('glow-ormas-aktif', 12);
+                    }
+
+                    let marker = L.marker(coords, {icon: oIcon}).addTo(ormasGroup)
+                        .bindPopup(`<b>Ormas: ${o.nama_ormas}</b><br>Alamat: ${o.alamat}<br>Status: <span class="badge ${badgeClass}">${statusBadgeText}</span><br>Tgl SK Kepengurusan: ${o.tgl_sk_kepengurusan || '-'}`);
                     
                     marker.on('click', function(e) {
                         map.flyTo(e.latlng, 15, { animate: true, duration: 1.2 });
@@ -357,7 +428,8 @@
                     filteredParpolCount++;
                     let coords = (p.latitude && p.longitude) ? [parseFloat(p.latitude), parseFloat(p.longitude)] : getCoordinates(p.id, 'parpol');
                     let dewanInfo = p.has_kursi == 1 ? `<br>Representasi: Punya Kursi DPRD (${p.level_dewan || '-'} • Periode ${p.periode_dewan || '-'})` : '<br>Representasi: Tidak Ada Kursi';
-                    let marker = L.marker(coords, {icon: parpolIcon}).addTo(parpolGroup)
+                    let pIcon = (p.has_kursi == 1) ? createGlowIcon('glow-parpol-kursi', 12) : createGlowIcon('glow-parpol-nokursi', 12);
+                    let marker = L.marker(coords, {icon: pIcon}).addTo(parpolGroup)
                         .bindPopup(`<b>Parpol: ${p.nama_parpol}</b><br>Ketua: ${p.ketua}<br>Kontak: ${p.telepon}${dewanInfo}<br>Terdaftar: ${p.created_at || '-'}`);
                     
                     marker.on('click', function(e) {
