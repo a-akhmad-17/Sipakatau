@@ -5,6 +5,10 @@
 - **Penyempurnaan Notifikasi Telegram Alur Kerja**:
   - Mengintegrasikan pengiriman notifikasi Telegram real-time (`telegram_send_transaction`) pada setiap perubahan status transaksi ormas dan rekomendasi di [Admin.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Controllers/Admin.php) dan [Bidang.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Controllers/Bidang.php).
   - Notifikasi dikirimkan pada aksi lolos berkas admin (50%), validasi bidang (75%), penerbitan TTE/SKT akhir (100%), dan penolakan/revisi berkas (0%) lengkap dengan detail nama ormas/kegiatan, status, progres, alasan penolakan, serta nama verifikator yang memproses.
+- **Penyatuan & Sinkronisasi Input Lokasi Peta GIS**:
+  - Menambahkan proxy endpoint `reverse-geocode` di [User.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Controllers/User.php) untuk melacak nama alamat berdasarkan koordinat latitude/longitude secara aman dari Nominatim OpenStreetMap.
+  - Memperbarui halaman [form_pengajuan.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/user/form_pengajuan.php) dengan menghapus kolom pencarian peta yang duplikat (`map_search_input`). Alamat ormas kini terintegrasi secara dua arah: mengetik alamat di textarea akan memindahkan marker, dan memindahkan marker peta/mengklik peta akan memperbarui textarea alamat secara otomatis via reverse geocoding.
+  - Memperbarui halaman [form_rekomendasi.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/user/form_rekomendasi.php) dan [form_pengaduan.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/user/form_pengaduan.php) agar ketika pengguna mengklik peta atau menggeser marker, koordinat latitude/longitude otomatis terisi ke dalam input lokasi teks.
 
 ### 🔄 Changed
 - **Optimasi Payload Audit Trail (log_activities)**:

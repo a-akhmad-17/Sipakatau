@@ -362,20 +362,11 @@ $requirementsBerjenjang = [
                 </div>
 
                 <h5 class="text-main fw-bold mb-3 border-bottom border-secondary border-opacity-10 pb-2">3. Lokasi Geografis Kantor Sekretariat</h5>
-                <p class="text-muted small mb-2"><i class="fa-solid fa-circle-info text-info me-1"></i>Cari alamat, masukkan titik koordinat manual, atau tempel link Google Maps untuk mendeteksi posisi kantor Anda pada peta interaktif.</p>
+                <p class="text-muted small mb-3">
+                    <i class="fa-solid fa-circle-info text-info me-1"></i>
+                    Titik koordinat pada peta di bawah akan otomatis menyesuaikan berdasarkan alamat yang Anda ketik di atas. Anda juga dapat memindahkan marker biru atau mengklik peta secara langsung untuk menentukan titik lokasi yang lebih presisi.
+                </p>
                 
-                <div class="mb-3">
-                    <div class="input-group">
-                        <input type="text" id="map_search_input" class="form-control form-control-custom" placeholder="Ketik nama jalan, koordinat (contoh: -5.148, 120.129), atau tempel link Google Maps...">
-                        <button type="button" class="btn btn-portal text-white btn-sm" id="btn-detect-map" style="background: var(--portal-color) !important; border-color: var(--portal-color) !important;">
-                            <i class="fa-solid fa-magnifying-glass-location me-1"></i> Deteksi Lokasi
-                        </button>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mt-1.5">
-                        <span id="map-search-status" class="small text-muted" style="font-size: 11px;">Peta otomatis menggeser marker ke posisi terdeteksi. Anda juga masih bisa menggeser marker biru di peta secara manual.</span>
-                    </div>
-                </div>
-
                 <input type="hidden" name="latitude" id="latitude" value="<?= esc($lat) ?>">
                 <input type="hidden" name="longitude" id="longitude" value="<?= esc($lng) ?>">
                 <div id="form-map" class="mb-4"></div>
@@ -1140,6 +1131,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 latInput.value = position.lat.toFixed(6);
                 lngInput.value = position.lng.toFixed(6);
                 updateFormProgress();
+                performReverseGeocoding(position.lat, position.lng);
             });
         }
     }
@@ -1193,6 +1185,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     bindMarkerEvents(marker);
                 }
                 updateFormProgress();
+                performReverseGeocoding(e.latlng.lat, e.latlng.lng);
             });
         } catch (mapErr) {
             console.error("Gagal inisialisasi peta:", mapErr);
@@ -1331,84 +1324,24 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Unified Location Input Detector (Search address, raw coordinates, Google Maps links)
-    const btnDetectMap = document.getElementById('btn-detect-map');
-    const mapSearchInput = document.getElementById('map_search_input');
-    const mapSearchStatus = document.getElementById('map-search-status');
-
-    if (btnDetectMap && mapSearchInput) {
-        btnDetectMap.addEventListener('click', function() {
-            detectLocationInput();
-        });
-        mapSearchInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                detectLocationInput();
-            }
-        });
-    }
-
-    function detectLocationInput() {
-        const val = mapSearchInput.value.trim();
-        if (!val) return;
-
-        mapSearchStatus.innerHTML = '<span class="text-info"><i class="fa-solid fa-spinner fa-spin"></i> Melacak lokasi...</span>';
-
-        // 1. Cek koordinat mentah (misal: -5.148, 120.129)
-        const coordRegex = /([-+]?\d{1,2}\.\d+)\s*,\s*([-+]?\d{1,3}\.\d+)/;
-        const match = val.match(coordRegex);
-        if (match) {
-            const lat = parseFloat(match[1]);
-            const lng = parseFloat(match[2]);
-            updateMapPosition(lat, lng);
-            mapSearchStatus.innerHTML = '<span class="text-success"><i class="fa-solid fa-circle-check"></i> Koordinat berhasil dideteksi!</span>';
-            return;
-        }
-
-        // 2. Cek link Google Maps (misal: @-5.148,120.129 atau ?q=-5.148,120.129)
-        const gmapsRegex = /@([-+]?\d{1,2}\.\d+),([-+]?\d{1,3}\.\d+)/;
-        const matchGmaps = val.match(gmapsRegex);
-        if (matchGmaps) {
-            const lat = parseFloat(matchGmaps[1]);
-            const lng = parseFloat(matchGmaps[2]);
-            updateMapPosition(lat, lng);
-            mapSearchStatus.innerHTML = '<span class="text-success"><i class="fa-solid fa-circle-check"></i> Lokasi link Google Maps berhasil dideteksi!</span>';
-            return;
-        }
-
-        // 3. Cari menggunakan alamat via user/geocode
-        fetch(`<?= base_url('user/geocode') ?>?q=${encodeURIComponent(val)}`)
+    function performReverseGeocoding(lat, lng) {
+        if (!lat || !lng) return;
+        geocodeStatus.innerHTML = '<span class="text-info"><i class="fa-solid fa-spinner fa-spin"></i> Memperbarui alamat dari peta...</span>';
+        fetch(`<?= base_url('user/reverse-geocode') ?>?lat=${lat}&lng=${lng}`)
             .then(res => res.json())
             .then(data => {
-                if (data && data.length > 0) {
-                    const lat = parseFloat(data[0].lat);
-                    const lon = parseFloat(data[0].lon);
-                    updateMapPosition(lat, lon);
-                    mapSearchStatus.innerHTML = '<span class="text-success"><i class="fa-solid fa-circle-check"></i> Alamat berhasil dideteksi!</span>';
+                if (data && data.display_name) {
+                    alamatTextarea.value = data.display_name;
+                    geocodeStatus.innerHTML = '<span class="text-success"><i class="fa-solid fa-circle-check"></i> Alamat disesuaikan dari peta!</span>';
+                    updateFormProgress();
                 } else {
-                    mapSearchStatus.innerHTML = '<span class="text-danger"><i class="fa-solid fa-circle-xmark"></i> Lokasi tidak ditemukan. Silakan masukkan koordinat secara manual atau geser marker.</span>';
+                    geocodeStatus.innerHTML = '';
                 }
             })
             .catch(err => {
                 console.error(err);
-                mapSearchStatus.innerHTML = '<span class="text-danger"><i class="fa-solid fa-circle-xmark"></i> Layanan geocoding sedang sibuk.</span>';
+                geocodeStatus.innerHTML = '';
             });
-    }
-
-    function updateMapPosition(lat, lng) {
-        latInput.value = lat.toFixed(6);
-        lngInput.value = lng.toFixed(6);
-        if (typeof L !== 'undefined' && map) {
-            const newLatLng = L.latLng(lat, lng);
-            if (marker) {
-                marker.setLatLng(newLatLng);
-            } else {
-                marker = L.marker(newLatLng, { draggable: true }).addTo(map);
-                bindMarkerEvents(marker);
-            }
-            map.setView(newLatLng, 16);
-        }
-        updateFormProgress();
     }
 
     // Initialize Active Step

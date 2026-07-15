@@ -24,6 +24,7 @@ $routes->group('user', ['filter' => 'auth:user,ormas'], function($routes) {
     $routes->post('pengajuan/simpan', 'User::simpanPengajuan');
     $routes->post('pengajuan/minta-hapus/(:any)', 'User::mintaHapus/$1');
     $routes->get('geocode', 'User::geocode');
+    $routes->get('reverse-geocode', 'User::reverseGeocode');
     $routes->get('rekomendasi', 'User::rekomendasi');
     $routes->get('rekomendasi/baru', 'User::rekomendasiBaru');
     $routes->post('rekomendasi/minta-hapus/(:any)', 'User::mintaHapusRekomendasi/$1');

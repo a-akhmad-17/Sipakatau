@@ -124,9 +124,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const terrain = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17, attribution: '&copy; OpenStreetMap contributors' });
     L.control.layers({'Peta Standar (OSM)': osmLayer, 'Satelit (Esri)': sat, 'Topografi': terrain}).addTo(map);
 
-    // Klik langsung di peta
+    // Klik langsung di peta → pasang marker & perbarui input koordinat
     map.on('click', function(e) {
         placeMarker(e.latlng.lat, e.latlng.lng);
+        const lat = e.latlng.lat.toFixed(6);
+        const lng = e.latlng.lng.toFixed(6);
+        lokasiInput.value = lat + ', ' + lng;
         setStatus('success', '<i class="fa-solid fa-check-circle text-success me-1"></i>Titik lokasi ditetapkan di peta.');
     });
 
@@ -135,6 +138,10 @@ document.addEventListener('DOMContentLoaded', function() {
         else {
             marker = L.marker([lat, lng], { draggable: true }).addTo(map);
             marker.on('dragend', function() {
+                const position = marker.getLatLng();
+                const newLat = position.lat.toFixed(6);
+                const newLng = position.lng.toFixed(6);
+                lokasiInput.value = newLat + ', ' + newLng;
                 setStatus('success', '<i class="fa-solid fa-check-circle text-success me-1"></i>Titik lokasi diperbarui.');
             });
         }
