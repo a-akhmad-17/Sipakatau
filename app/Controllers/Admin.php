@@ -355,7 +355,7 @@ class Admin extends BaseController
     public function prosesPendaftaran(string $id, string $action)
     {
         $db = \Config\Database::connect();
-        helper('app');
+        helper(['app', 'telegram']);
 
         $pendaftaran = $db->table('trn_pendaftaran')->where('id', $id)->get()->getRowArray();
         if (!$pendaftaran) {
@@ -364,6 +364,12 @@ class Admin extends BaseController
 
         $beforeData = $pendaftaran;
         $updateData = [];
+        $telegramTitle = '';
+        $telegramDetails = [];
+
+        // Ambil nama ormas untuk detail telegram
+        $ormas = $db->table('mst_ormas')->where('id', $pendaftaran['ormas_id'])->get()->getRowArray();
+        $namaOrmas = $ormas ? $ormas['nama_ormas'] : 'Tidak Diketahui';
 
         if ($action === 'approve_berkas') {
             $updateData = [
@@ -372,6 +378,14 @@ class Admin extends BaseController
                 'updated_at' => date('Y-m-d H:i:s')
             ];
             $msg = 'Berkas persyaratan berhasil diverifikasi. Dokumen kini berada di tahap Validasi Bidang.';
+            
+            $telegramTitle = '✨ Verifikasi Berkas Ormas Lolos (Admin)';
+            $telegramDetails = [
+                'Nama Ormas' => $namaOrmas,
+                'Status Baru' => 'Pending (Menunggu Validasi Bidang)',
+                'Progres' => '50%',
+                'Diproses Oleh' => session()->get('username') ?: 'System Admin'
+            ];
         } elseif ($action === 'approve_bidang') {
             $updateData = [
                 'status_verifikasi' => 'Approved',
@@ -379,6 +393,14 @@ class Admin extends BaseController
                 'updated_at' => date('Y-m-d H:i:s')
             ];
             $msg = 'Pendaftaran telah divalidasi oleh Bidang terkait. Siap untuk penerbitan TTE.';
+            
+            $telegramTitle = '✅ Validasi Bidang Ormas Selesai';
+            $telegramDetails = [
+                'Nama Ormas' => $namaOrmas,
+                'Status Baru' => 'Approved (Siap TTE)',
+                'Progres' => '75%',
+                'Diproses Oleh' => session()->get('username') ?: 'System Admin'
+            ];
         } elseif ($action === 'terbitkan_tte') {
             $file = $this->request->getFile('berkas_rekomendasi');
             $fileName = null;
@@ -402,6 +424,15 @@ class Admin extends BaseController
                 'updated_at' => date('Y-m-d H:i:s')
             ];
             $msg = 'Surat Rekomendasi berhasil diunggah dan diterbitkan. Proses registrasi ormas selesai!';
+            
+            $telegramTitle = '🎉 Surat Keberadaan Ormas Terbit (TTE)';
+            $telegramDetails = [
+                'Nama Ormas' => $namaOrmas,
+                'Status Baru' => 'Selesai (100% Aktif)',
+                'Progres' => '100%',
+                'Nama File TTE' => $fileName,
+                'Diproses Oleh' => session()->get('username') ?: 'System Admin'
+            ];
         } elseif ($action === 'reject') {
             $alasan = $this->request->getPost('alasan_ditolak');
             $updateData = [
@@ -411,19 +442,38 @@ class Admin extends BaseController
                 'updated_at' => date('Y-m-d H:i:s')
             ];
             $msg = 'Pendaftaran ditolak.';
+            
+            $telegramTitle = '❌ Pendaftaran Ormas Direvisi/Ditolak';
+            $telegramDetails = [
+                'Nama Ormas' => $namaOrmas,
+                'Status Baru' => 'Rejected (Perlu Revisi Berkas)',
+                'Progres' => '0%',
+                'Alasan Penolakan' => $updateData['alasan_ditolak'],
+                'Diproses Oleh' => session()->get('username') ?: 'System Admin'
+            ];
         } else {
             return redirect()->back()->with('error', 'Aksi tidak valid.');
         }
 
         $db->table('trn_pendaftaran')->where('id', $id)->update($updateData);
 
+        // Filter log payload untuk keamanan & efisiensi
+        $filterKeys = ['id', 'ormas_id', 'nomor_registrasi', 'status_verifikasi', 'progress_percentage', 'alasan_ditolak', 'pdf_tte_path', 'updated_at'];
+        $filteredBefore = array_intersect_key($beforeData, array_flip($filterKeys));
+        $filteredAfter = array_intersect_key(array_merge($beforeData, $updateData), array_flip($filterKeys));
+
         log_activity(
             'PROSES_PENDAFTARAN_ORMAS',
-            $beforeData,
-            array_merge($beforeData, $updateData),
+            $filteredBefore,
+            $filteredAfter,
             'trn_pendaftaran',
             $id
         );
+
+        // Kirim Telegram Notification
+        if (!empty($telegramTitle)) {
+            telegram_send_transaction($telegramTitle, $telegramDetails);
+        }
 
         return redirect()->to('admin')->with('success', $msg);
     }
@@ -431,7 +481,7 @@ class Admin extends BaseController
     public function prosesRekomendasi(string $id, string $action)
     {
         $db = \Config\Database::connect();
-        helper('app');
+        helper(['app', 'telegram']);
 
         $rekomendasi = $db->table('trn_rekomendasi')->where('id', $id)->get()->getRowArray();
         if (!$rekomendasi) {
@@ -440,6 +490,8 @@ class Admin extends BaseController
 
         $beforeData = $rekomendasi;
         $updateData = [];
+        $telegramTitle = '';
+        $telegramDetails = [];
 
         if ($action === 'approve_bidang') {
             $updateData = [
@@ -447,6 +499,14 @@ class Admin extends BaseController
                 'updated_at' => date('Y-m-d H:i:s')
             ];
             $msg = 'Rekomendasi kegiatan berhasil disetujui Bidang terkait. Siap diterbitkan TTE.';
+            
+            $telegramTitle = '✅ Validasi Bidang Rekomendasi Kegiatan Selesai';
+            $telegramDetails = [
+                'Nama Kegiatan' => $rekomendasi['nama_kegiatan'] ?? 'Tidak Diketahui',
+                'Pemohon' => $rekomendasi['nama_pemohon'] ?? 'Tidak Diketahui',
+                'Status Baru' => 'Approved (Siap TTE)',
+                'Diproses Oleh' => session()->get('username') ?: 'System Admin'
+            ];
         } elseif ($action === 'terbitkan_tte') {
             $file = $this->request->getFile('berkas_rekomendasi');
             $fileName = null;
@@ -469,6 +529,15 @@ class Admin extends BaseController
                 'updated_at' => date('Y-m-d H:i:s')
             ];
             $msg = 'Surat Rekomendasi berhasil diunggah dan dikirim ke pemohon!';
+            
+            $telegramTitle = '🎉 Surat Rekomendasi Kegiatan Diterbitkan (TTE)';
+            $telegramDetails = [
+                'Nama Kegiatan' => $rekomendasi['nama_kegiatan'] ?? 'Tidak Diketahui',
+                'Pemohon' => $rekomendasi['nama_pemohon'] ?? 'Tidak Diketahui',
+                'Status Baru' => 'Selesai',
+                'File TTE' => 'uploads/rekomendasi_tte/' . $fileName,
+                'Diproses Oleh' => session()->get('username') ?: 'System Admin'
+            ];
         } elseif ($action === 'reject') {
             $alasan = $this->request->getPost('alasan_ditolak');
             $updateData = [
@@ -477,19 +546,38 @@ class Admin extends BaseController
                 'updated_at' => date('Y-m-d H:i:s')
             ];
             $msg = 'Pengajuan rekomendasi ditolak.';
+            
+            $telegramTitle = '❌ Pengajuan Rekomendasi Kegiatan Ditolak';
+            $telegramDetails = [
+                'Nama Kegiatan' => $rekomendasi['nama_kegiatan'] ?? 'Tidak Diketahui',
+                'Pemohon' => $rekomendasi['nama_pemohon'] ?? 'Tidak Diketahui',
+                'Status Baru' => 'Rejected',
+                'Alasan Penolakan' => $updateData['alasan_ditolak'],
+                'Diproses Oleh' => session()->get('username') ?: 'System Admin'
+            ];
         } else {
             return redirect()->back()->with('error', 'Aksi tidak valid.');
         }
 
         $db->table('trn_rekomendasi')->where('id', $id)->update($updateData);
 
+        // Filter log payload untuk keamanan & efisiensi
+        $filterKeys = ['id', 'user_id', 'nomor_rekomendasi', 'nama_kegiatan', 'nama_pemohon', 'status_rekomendasi', 'progress_percentage', 'alasan_ditolak', 'pdf_tte_path', 'updated_at'];
+        $filteredBefore = array_intersect_key($beforeData, array_flip($filterKeys));
+        $filteredAfter = array_intersect_key(array_merge($beforeData, $updateData), array_flip($filterKeys));
+
         log_activity(
             'PROSES_REKOMENDASI_KEGIATAN',
-            $beforeData,
-            array_merge($beforeData, $updateData),
+            $filteredBefore,
+            $filteredAfter,
             'trn_rekomendasi',
             $id
         );
+
+        // Kirim Telegram Notification
+        if (!empty($telegramTitle)) {
+            telegram_send_transaction($telegramTitle, $telegramDetails);
+        }
 
         return redirect()->to('admin')->with('success', $msg);
     }

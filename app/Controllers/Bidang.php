@@ -80,7 +80,7 @@ class Bidang extends BaseController
     {
         $db      = \Config\Database::connect();
         $session = session();
-        helper('app');
+        helper(['app', 'telegram']);
 
         // Guard: hanya kabid Poldagri
         $bidangId = $session->get('bidang_id');
@@ -103,6 +103,8 @@ class Bidang extends BaseController
         $beforeData = $pendaftaran;
         $updateData = [];
         $msg        = '';
+        $telegramTitle = '';
+        $telegramDetails = [];
 
         if ($action === 'approve_bidang') {
             // Kabid validasi berkas → progress 75%
@@ -112,9 +114,18 @@ class Bidang extends BaseController
                 'updated_at'          => date('Y-m-d H:i:s'),
             ];
             $msg = 'Berkas pendaftaran berhasil divalidasi oleh Bidang Poldagri & Ormas. Siap untuk penerbitan dokumen resmi.';
+            
+            $telegramTitle = '✨ Validasi Bidang Ormas Disetujui (Kabid)';
+            $telegramDetails = [
+                'Nama Ormas' => $pendaftaran['nama_ormas'] ?? 'Tidak Diketahui',
+                'Status Baru' => 'Approved (Siap Terbitkan SKT)',
+                'Progres' => '75%',
+                'Diproses Oleh' => $session->get('username') ?: 'Kabid Poldagri'
+            ];
         } elseif ($action === 'terbitkan_skt') {
             // Upload SKT / dokumen final
             $file = $this->request->getFile('berkas_skt');
+            $fileName = null;
 
             if ($file && $file->isValid() && !$file->hasMoved()) {
                 $uploadPath = ROOTPATH . 'public/uploads/rekomendasi_ormas/';
@@ -134,6 +145,15 @@ class Bidang extends BaseController
                 'updated_at'          => date('Y-m-d H:i:s'),
             ];
             $msg = 'Dokumen resmi berhasil diterbitkan dan dikirim ke pemohon. Proses registrasi ormas selesai!';
+            
+            $telegramTitle = '🎉 SKT Ormas Diterbitkan (Kabid)';
+            $telegramDetails = [
+                'Nama Ormas' => $pendaftaran['nama_ormas'] ?? 'Tidak Diketahui',
+                'Status Baru' => 'Selesai (100% Aktif)',
+                'Progres' => '100%',
+                'Nama File SKT' => $fileName,
+                'Diproses Oleh' => $session->get('username') ?: 'Kabid Poldagri'
+            ];
         } elseif ($action === 'reject') {
             $alasan = $this->request->getPost('alasan_ditolak');
             $updateData = [
@@ -143,19 +163,38 @@ class Bidang extends BaseController
                 'updated_at'          => date('Y-m-d H:i:s'),
             ];
             $msg = 'Pendaftaran ormas "' . ($pendaftaran['nama_ormas'] ?? '') . '" ditolak.';
+            
+            $telegramTitle = '❌ Pendaftaran Ormas Ditolak Bidang';
+            $telegramDetails = [
+                'Nama Ormas' => $pendaftaran['nama_ormas'] ?? 'Tidak Diketahui',
+                'Status Baru' => 'Rejected (Perlu Revisi)',
+                'Progres' => '0%',
+                'Alasan Penolakan' => $updateData['alasan_ditolak'],
+                'Diproses Oleh' => $session->get('username') ?: 'Kabid Poldagri'
+            ];
         } else {
             return redirect()->to('bidang')->with('error', 'Aksi tidak dikenali.');
         }
 
         $db->table('trn_pendaftaran')->where('id', $id)->update($updateData);
 
+        // Filter log payload untuk keamanan & efisiensi
+        $filterKeys = ['id', 'ormas_id', 'nomor_registrasi', 'status_verifikasi', 'progress_percentage', 'alasan_ditolak', 'pdf_tte_path', 'updated_at'];
+        $filteredBefore = array_intersect_key($beforeData, array_flip($filterKeys));
+        $filteredAfter = array_intersect_key(array_merge($beforeData, $updateData), array_flip($filterKeys));
+
         log_activity(
             'BIDANG_PROSES_PENDAFTARAN_ORMAS',
-            $beforeData,
-            array_merge($beforeData, $updateData),
+            $filteredBefore,
+            $filteredAfter,
             'trn_pendaftaran',
             $id
         );
+
+        // Kirim Telegram Notification
+        if (!empty($telegramTitle)) {
+            telegram_send_transaction($telegramTitle, $telegramDetails);
+        }
 
         return redirect()->to('bidang')->with('success', $msg);
     }

@@ -1,5 +1,18 @@
 # RELEASE NOTES - SIPAKATAU
 
+## [v2.9.29] - 2026-07-15
+### ✨ Added
+- **Penyempurnaan Notifikasi Telegram Alur Kerja**:
+  - Mengintegrasikan pengiriman notifikasi Telegram real-time (`telegram_send_transaction`) pada setiap perubahan status transaksi ormas dan rekomendasi di [Admin.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Controllers/Admin.php) dan [Bidang.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Controllers/Bidang.php).
+  - Notifikasi dikirimkan pada aksi lolos berkas admin (50%), validasi bidang (75%), penerbitan TTE/SKT akhir (100%), dan penolakan/revisi berkas (0%) lengkap dengan detail nama ormas/kegiatan, status, progres, alasan penolakan, serta nama verifikator yang memproses.
+
+### 🔄 Changed
+- **Optimasi Payload Audit Trail (log_activities)**:
+  - Membatasi perekaman data payload `before_data` dan `after_data` di [Admin.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Controllers/Admin.php) dan [Bidang.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Controllers/Bidang.php) untuk alur kerja transaksi.
+  - Hanya menyimpan atribut-atribut kunci (`id`, `ormas_id`, `nomor_registrasi`, `status_verifikasi`, `progress_percentage`, `alasan_ditolak`, `pdf_tte_path`, `updated_at`) untuk menghindari pembengkakan ukuran database dan mempercepat pembacaan log audit.
+
+---
+
 ## [v2.9.28] - 2026-07-15
 ### ✨ Added
 - **Integrasi Google Identity Services (GIS)**:
