@@ -260,6 +260,7 @@ $requirementsBerjenjang = [
                     <div class="col-md-12">
                         <label for="alamat" class="form-label small text-muted">Alamat Kantor Sekretariat <span class="text-danger fw-bold">*</span></label>
                         <textarea name="alamat" id="alamat" class="form-control form-control-custom" rows="2" placeholder="Tulis alamat kantor sekretariat lengkap dengan kecamatan/kelurahan" required><?= esc($alamat) ?></textarea>
+                        <div class="form-text text-muted small mt-1" style="font-size: 11px;"><i class="fa-solid fa-circle-info text-info me-1"></i>Anda juga bisa klik/drag langsung pada peta di bagian bawah, alamat dan koordinat akan otomatis terisi ke form ini.</div>
                         <div class="d-flex justify-content-between align-items-center mt-2 flex-wrap gap-2">
                             <span id="geocode-status" class="small text-muted" style="font-size: 11px;"></span>
                             <button type="button" id="btn-geocode" class="btn btn-sm btn-outline-info px-3 rounded-pill text-white" style="font-size: 11px; border-color: rgba(13, 202, 240, 0.4);">
