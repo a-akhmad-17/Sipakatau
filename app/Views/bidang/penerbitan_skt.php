@@ -192,12 +192,10 @@
                                     </button>
                                 <?php endif; ?>
 
-                                <?php if (!empty($p['file_berkas'])): ?>
-                                    <button type="button" class="btn btn-sm ms-1" style="font-size:12px; padding:4px 8px; background:rgba(255,255,255,.06); color:var(--text-muted);" 
-                                        onclick="openModalLihatBerkas('<?= esc($p['file_berkas'], 'attr') ?>', '<?= esc($p['tipe_ormas'] ?? 'Lokal') ?>')" title="Lihat Berkas">
-                                        <i class="fa-solid fa-eye"></i>
-                                    </button>
-                                <?php endif; ?>
+                                <button type="button" class="btn btn-sm ms-1" style="font-size:12px; padding:4px 8px; background:rgba(255,255,255,.06); color:var(--text-muted);" 
+                                    onclick="openModalLihatBerkas('<?= esc($p['file_berkas'] ?? '{}', 'attr') ?>', '<?= esc($p['tipe_ormas'] ?? 'Lokal') ?>')" title="Lihat Berkas">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
 
                                 <?php if (!empty($p['pdf_tte_path'])): ?>
                                     <a href="<?= base_url('uploads/rekomendasi_ormas/' . $p['pdf_tte_path']) ?>" target="_blank"

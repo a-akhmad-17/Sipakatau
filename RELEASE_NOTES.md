@@ -1,5 +1,14 @@
 # RELEASE NOTES - SIPAKATAU
 
+## [v2.9.34] - 2026-07-15
+### 🔄 Changed
+- **Pelepasan Kondisional Tombol Mata (Inspeksi Berkas) Kabid**:
+  - Menghapus kondisi pembungkus `!empty($p['file_berkas'])` pada tombol mata (Lihat Berkas) di [penerbitan_skt.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/bidang/penerbitan_skt.php).
+  - Tombol mata sekarang **selalu ditampilkan** di semua state pendaftaran (termasuk yang berstatus 100% Selesai / Diterbitkan maupun Ditolak) agar Kabid dapat meninjau dokumen pendaftaran kapan pun dibutuhkan secara retrospektif.
+  - Jika berkas ormas kosong/NULL, modal akan tetap terbuka dengan anggun menampilkan daftar checklist persyaratan berlabel "Belum Diunggah".
+
+---
+
 ## [v2.9.33] - 2026-07-15
 ### ✨ Added
 - **Aksi Hapus Pendaftaran Permanen oleh Kabid**:
