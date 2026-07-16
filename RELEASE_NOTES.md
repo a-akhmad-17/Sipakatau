@@ -1,5 +1,20 @@
 # RELEASE NOTES - SIPAKATAU
 
+## [v2.9.37] - 2026-07-16
+### ✨ Added
+- **Fitur News Ticker / Teks Berjalan Premium**:
+  - Membuat panel [Pengaturan Teks Berjalan](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/admin/settings_running_text.php) di modul Admin untuk menambah, memperbarui, dan menghapus kalimat berjalan (maksimal 3 kalimat) serta mengontrol tingkat kecepatannya (Cepat, Sedang, Lambat) secara dinamis. Dilengkapi validasi batasan 150 karakter per kalimat di sisi client/server beserta visualisasi live character counter yang interaktif.
+  - Menyediakan endpoint rute manajemen teks berjalan dan pengaturan kecepatan baru di [Routes.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Config/Routes.php).
+  - Mengimplementasikan logika pemrosesan data pengaturan teks berjalan dan konfigurasi kecepatan di [Admin.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Controllers/Admin.php) dengan penyimpanan berbasis JSON objek yang kompatibel pada tabel konfigurasi `sys_settings` (`key: running_text`).
+  - Mengintegrasikan News Ticker dengan visualisasi gradasi warna merah yang elegan, indikator titik hijau berkedip (*green pulsing dot*), dan performa animasi berjalan CSS murni yang mulus (pauses on hover) pada area teratas layout portal umum ([main.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/layouts/main.php)) dan dasbor internal ([admin.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/layouts/admin.php)) yang kecepatannya mengikuti variabel durasi animasi dari database (`animation-duration`).
+
+### 🛡️ Security
+- **Sanitasi Input & CSRF Global (The Unified Manifest)**:
+  - Menerapkan pembersihan input teks berjalan secara ketat menggunakan `strip_tags()` di Controller `Admin.php` untuk membuang seluruh tag HTML/Javascript sebelum disimpan ke database.
+  - Mengaktifkan filter CSRF secara global di `Filters.php` dengan pengecualian khusus untuk berkas auto-deploy (`deploy.php`, `Deploy.php`, `deploy/*`) guna memenuhi syarat standar keamanan v2.6.
+
+---
+
 ## [v2.9.36] - 2026-07-16
 ### 🐛 Fixed
 - **Validasi Dinamis Rekomendasi Kegiatan (Admin)**:

@@ -2832,5 +2832,203 @@ class Admin extends BaseController
         preg_match_all($pattern, $content, $matches);
         return $matches[1] ?? [];
     }
+
+    public function settingsRunningText()
+    {
+        $db = \Config\Database::connect();
+        $setting = $db->table('sys_settings')->where('key', 'running_text')->get()->getRowArray();
+        $config = $setting ? json_decode($setting['value'], true) : [];
+        
+        if (is_array($config) && isset($config[0])) {
+            $config = [
+                'texts' => $config,
+                'speed' => '30s'
+            ];
+        }
+
+        $texts = $config['texts'] ?? [];
+        $speed = $config['speed'] ?? '30s';
+
+        $data = [
+            'title' => 'Pengaturan Teks Berjalan - SIPAKATAU',
+            'texts' => $texts,
+            'speed' => $speed
+        ];
+
+        return view('admin/settings_running_text', $data);
+    }
+
+    public function tambahRunningText()
+    {
+        $db = \Config\Database::connect();
+        helper('app');
+
+        $newText = strip_tags(trim($this->request->getPost('sentence')));
+        if (empty($newText)) {
+            return redirect()->to('admin/settings/running-text')->with('error', 'Kalimat teks berjalan tidak boleh kosong.');
+        }
+        if (strlen($newText) > 150) {
+            return redirect()->to('admin/settings/running-text')->with('error', 'Kalimat teks berjalan tidak boleh melebihi 150 karakter.');
+        }
+
+        $existingSetting = $db->table('sys_settings')->where('key', 'running_text')->get()->getRowArray();
+        $config = $existingSetting ? json_decode($existingSetting['value'], true) : [];
+        
+        if (is_array($config) && isset($config[0])) {
+            $config = [
+                'texts' => $config,
+                'speed' => '30s'
+            ];
+        }
+
+        $texts = $config['texts'] ?? [];
+        $speed = $config['speed'] ?? '30s';
+
+        if (count($texts) >= 3) {
+            return redirect()->to('admin/settings/running-text')->with('error', 'Maksimal teks berjalan adalah 3 kalimat.');
+        }
+
+        $beforeConfig = $config;
+        $texts[] = $newText;
+        $config['texts'] = $texts;
+        $config['speed'] = $speed;
+
+        $db->table('sys_settings')->replace([
+            'key'        => 'running_text',
+            'value'      => json_encode($config),
+            'group'      => 'system',
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
+
+        log_activity('TAMBAH_TEKS_BERJALAN', $beforeConfig, $config, 'sys_settings', 'running_text');
+
+        return redirect()->to('admin/settings/running-text')->with('success', 'Kalimat teks berjalan baru berhasil ditambahkan.');
+    }
+
+    public function updateRunningText()
+    {
+        $db = \Config\Database::connect();
+        helper('app');
+
+        $index = $this->request->getPost('index');
+        $val = strip_tags(trim($this->request->getPost('sentence')));
+
+        if ($index === null || $val === '') {
+            return redirect()->to('admin/settings/running-text')->with('error', 'Input data tidak valid.');
+        }
+        if (strlen($val) > 150) {
+            return redirect()->to('admin/settings/running-text')->with('error', 'Kalimat teks berjalan tidak boleh melebihi 150 karakter.');
+        }
+
+        $existingSetting = $db->table('sys_settings')->where('key', 'running_text')->get()->getRowArray();
+        $config = $existingSetting ? json_decode($existingSetting['value'], true) : [];
+        
+        if (is_array($config) && isset($config[0])) {
+            $config = [
+                'texts' => $config,
+                'speed' => '30s'
+            ];
+        }
+
+        $texts = $config['texts'] ?? [];
+        $speed = $config['speed'] ?? '30s';
+
+        if (!isset($texts[$index])) {
+            return redirect()->to('admin/settings/running-text')->with('error', 'Data teks berjalan tidak ditemukan.');
+        }
+
+        $beforeConfig = $config;
+        $texts[$index] = $val;
+        $config['texts'] = $texts;
+
+        $db->table('sys_settings')->replace([
+            'key'        => 'running_text',
+            'value'      => json_encode($config),
+            'group'      => 'system',
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
+
+        log_activity('UPDATE_TEKS_BERJALAN', $beforeConfig, $config, 'sys_settings', 'running_text');
+
+        return redirect()->to('admin/settings/running-text')->with('success', 'Kalimat teks berjalan berhasil diperbarui.');
+    }
+
+    public function deleteRunningText($index)
+    {
+        $db = \Config\Database::connect();
+        helper('app');
+
+        $existingSetting = $db->table('sys_settings')->where('key', 'running_text')->get()->getRowArray();
+        $config = $existingSetting ? json_decode($existingSetting['value'], true) : [];
+        
+        if (is_array($config) && isset($config[0])) {
+            $config = [
+                'texts' => $config,
+                'speed' => '30s'
+            ];
+        }
+
+        $texts = $config['texts'] ?? [];
+        $speed = $config['speed'] ?? '30s';
+
+        if (!isset($texts[$index])) {
+            return redirect()->to('admin/settings/running-text')->with('error', 'Data teks berjalan tidak ditemukan.');
+        }
+
+        $beforeConfig = $config;
+        unset($texts[$index]);
+        $texts = array_values($texts);
+        
+        $config['texts'] = $texts;
+
+        $db->table('sys_settings')->replace([
+            'key'        => 'running_text',
+            'value'      => json_encode($config),
+            'group'      => 'system',
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
+
+        log_activity('HAPUS_TEKS_BERJALAN', $beforeConfig, $config, 'sys_settings', 'running_text');
+
+        return redirect()->to('admin/settings/running-text')->with('success', 'Kalimat teks berjalan berhasil dihapus.');
+    }
+
+    public function updateRunningTextSpeed()
+    {
+        $db = \Config\Database::connect();
+        helper('app');
+
+        $speed = $this->request->getPost('speed');
+        if (!in_array($speed, ['15s', '30s', '45s'])) {
+            return redirect()->to('admin/settings/running-text')->with('error', 'Pilihan kecepatan tidak valid.');
+        }
+
+        $existingSetting = $db->table('sys_settings')->where('key', 'running_text')->get()->getRowArray();
+        $config = $existingSetting ? json_decode($existingSetting['value'], true) : [];
+        
+        if (is_array($config) && isset($config[0])) {
+            $config = [
+                'texts' => $config,
+                'speed' => '30s'
+            ];
+        }
+
+        $beforeConfig = $config;
+        $config['speed'] = $speed;
+        if (!isset($config['texts'])) {
+            $config['texts'] = [];
+        }
+
+        $db->table('sys_settings')->replace([
+            'key'        => 'running_text',
+            'value'      => json_encode($config),
+            'group'      => 'system',
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
+
+        log_activity('UPDATE_KECEPATAN_TEKS_BERJALAN', $beforeConfig, $config, 'sys_settings', 'running_text');
+
+        return redirect()->to('admin/settings/running-text')->with('success', 'Kecepatan teks berjalan berhasil diperbarui.');
+    }
 }
 

@@ -1050,11 +1050,128 @@
             background-color: rgba(244, 63, 94, 0.25) !important;
             color: #fda4af !important;
         }
+        /* Premium News Ticker Styles */
+        .news-ticker-container {
+            background: linear-gradient(90deg, #be123c 0%, #e11d48 100%);
+            color: #ffffff;
+            font-size: 0.85rem;
+            font-weight: 600;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            z-index: 1040;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+        }
+        html[data-theme="light"] .news-ticker-container {
+            background: linear-gradient(90deg, #be123c 0%, #f43f5e 100%);
+        }
+        .news-ticker-label {
+            background: #9f1239;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            position: relative;
+            z-index: 2;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.15);
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: 0.5px;
+            font-size: 0.78rem;
+            white-space: nowrap;
+        }
+        .ticker-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #22c55e;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+            box-shadow: 0 0 8px #22c55e;
+            animation: pulse-green 2s infinite;
+        }
+        @keyframes pulse-green {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 8px #22c55e;
+            }
+            50% {
+                transform: scale(1.2);
+                box-shadow: 0 0 14px #22c55e;
+            }
+        }
+        .news-ticker-wrapper {
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            z-index: 1;
+        }
+        .news-ticker-track {
+            display: flex;
+            width: max-content;
+            animation: ticker-animation 30s linear infinite;
+        }
+        .news-ticker-track:hover {
+            animation-play-state: paused;
+            cursor: pointer;
+        }
+        .news-ticker-content {
+            white-space: nowrap;
+            padding-left: 20px;
+            font-family: 'Inter', sans-serif;
+        }
+        @keyframes ticker-animation {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-50%);
+            }
+        }
 
     </style>
     <?= $this->renderSection('styles') ?>
 </head>
 <body>
+
+    <?php
+    $db = \Config\Database::connect();
+    $runningTextSetting = $db->table('sys_settings')->where('key', 'running_text')->get()->getRowArray();
+    $runningTextItems = [];
+    $runningTextSpeed = '30s';
+    if ($runningTextSetting && !empty($runningTextSetting['value'])) {
+        $config = json_decode($runningTextSetting['value'], true) ?: [];
+        if (is_array($config) && isset($config[0])) {
+            $runningTextItems = $config;
+        } else {
+            $runningTextItems = $config['texts'] ?? [];
+            $runningTextSpeed = $config['speed'] ?? '30s';
+        }
+    }
+    ?>
+    <?php if (!empty($runningTextItems) && is_array($runningTextItems)): ?>
+        <!-- Premium News Ticker / Announcement Bar -->
+        <div class="news-ticker-container">
+            <div class="news-ticker-label">
+                <span class="ticker-dot"></span>
+                <i class="fa-solid fa-bullhorn me-1.5"></i> PENGUMUMAN
+            </div>
+            <div class="news-ticker-wrapper">
+                <div class="news-ticker-track" style="animation-duration: <?= esc($runningTextSpeed) ?>;">
+                    <?php 
+                    $displayText = implode(' &nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;&nbsp; ', $runningTextItems);
+                    ?>
+                    <div class="news-ticker-content">
+                        <?= esc($displayText) ?> &nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;&nbsp; <?= esc($displayText) ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
 
     <!-- Navigation Header -->
     <nav class="navbar navbar-expand-lg navbar-custom sticky-top">

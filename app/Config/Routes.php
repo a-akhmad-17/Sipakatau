@@ -100,6 +100,13 @@ $routes->group('admin', ['filter' => 'auth:admin'], function($routes) {
     $routes->post('settings/berita/delete/(:any)', 'Admin::deleteBerita/$1');
     $routes->post('settings/berita/upload-image', 'Admin::uploadBeritaImage');
 
+    // Running Text Settings Routes
+    $routes->get('settings/running-text', 'Admin::settingsRunningText');
+    $routes->post('settings/running-text/tambah', 'Admin::tambahRunningText');
+    $routes->post('settings/running-text/update', 'Admin::updateRunningText');
+    $routes->post('settings/running-text/delete/(:num)', 'Admin::deleteRunningText/$1');
+    $routes->post('settings/running-text/speed', 'Admin::updateRunningTextSpeed');
+
 });
 
 // Bidang Dashboard Routes (Protected by auth filter - role: kabid)
