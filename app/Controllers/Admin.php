@@ -500,10 +500,10 @@ class Admin extends BaseController
             ];
             $msg = 'Rekomendasi kegiatan berhasil disetujui Bidang terkait. Siap diterbitkan TTE.';
             
-            $telegramTitle = '✅ Validasi Bidang Rekomendasi Kegiatan Selesai';
+            $telegramTitle = '      Validasi Bidang Rekomendasi Kegiatan Selesai';
             $telegramDetails = [
                 'Nama Kegiatan' => $rekomendasi['nama_kegiatan'] ?? 'Tidak Diketahui',
-                'Pemohon' => $rekomendasi['nama_pemohon'] ?? 'Tidak Diketahui',
+                'Pemohon' => $rekomendasi['pemohon'] ?? 'Tidak Diketahui',
                 'Status Baru' => 'Approved (Siap TTE)',
                 'Diproses Oleh' => session()->get('username') ?: 'System Admin'
             ];
@@ -530,10 +530,10 @@ class Admin extends BaseController
             ];
             $msg = 'Surat Rekomendasi berhasil diunggah dan dikirim ke pemohon!';
             
-            $telegramTitle = '🎉 Surat Rekomendasi Kegiatan Diterbitkan (TTE)';
+            $telegramTitle = '   Surat Rekomendasi Kegiatan Diterbitkan (TTE)';
             $telegramDetails = [
                 'Nama Kegiatan' => $rekomendasi['nama_kegiatan'] ?? 'Tidak Diketahui',
-                'Pemohon' => $rekomendasi['nama_pemohon'] ?? 'Tidak Diketahui',
+                'Pemohon' => $rekomendasi['pemohon'] ?? 'Tidak Diketahui',
                 'Status Baru' => 'Selesai',
                 'File TTE' => 'uploads/rekomendasi_tte/' . $fileName,
                 'Diproses Oleh' => session()->get('username') ?: 'System Admin'
@@ -547,10 +547,10 @@ class Admin extends BaseController
             ];
             $msg = 'Pengajuan rekomendasi ditolak.';
             
-            $telegramTitle = '❌ Pengajuan Rekomendasi Kegiatan Ditolak';
+            $telegramTitle = '   Pengajuan Rekomendasi Kegiatan Ditolak';
             $telegramDetails = [
                 'Nama Kegiatan' => $rekomendasi['nama_kegiatan'] ?? 'Tidak Diketahui',
-                'Pemohon' => $rekomendasi['nama_pemohon'] ?? 'Tidak Diketahui',
+                'Pemohon' => $rekomendasi['pemohon'] ?? 'Tidak Diketahui',
                 'Status Baru' => 'Rejected',
                 'Alasan Penolakan' => $updateData['alasan_ditolak'],
                 'Diproses Oleh' => session()->get('username') ?: 'System Admin'
@@ -562,7 +562,7 @@ class Admin extends BaseController
         $db->table('trn_rekomendasi')->where('id', $id)->update($updateData);
 
         // Filter log payload untuk keamanan & efisiensi
-        $filterKeys = ['id', 'user_id', 'nomor_rekomendasi', 'nama_kegiatan', 'nama_pemohon', 'status_rekomendasi', 'progress_percentage', 'alasan_ditolak', 'pdf_tte_path', 'updated_at'];
+        $filterKeys = ['id', 'user_id', 'nomor_rekomendasi', 'nama_kegiatan', 'pemohon', 'status_rekomendasi', 'progress_percentage', 'alasan_ditolak', 'pdf_tte_path', 'updated_at'];
         $filteredBefore = array_intersect_key($beforeData, array_flip($filterKeys));
         $filteredAfter = array_intersect_key(array_merge($beforeData, $updateData), array_flip($filterKeys));
 
@@ -2424,9 +2424,9 @@ class Admin extends BaseController
                 $proposal[$docIndex]['note'] = null;
             }
 
-            $totalRequired = 5;
+            $totalRequired = ($rekomendasi['is_fasilitas_pemerintah'] == 1) ? 6 : 5;
             $verifiedCount = 0;
-            for ($i = 1; $i <= 5; $i++) {
+            for ($i = 1; $i <= $totalRequired; $i++) {
                 if (isset($proposal[$i]) && isset($proposal[$i]['status']) && $proposal[$i]['status'] === 'verified') {
                     $verifiedCount++;
                 }

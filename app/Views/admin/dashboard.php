@@ -671,10 +671,10 @@
                                                     data-deskripsi="<?= esc($r['deskripsi'] ?? '-') ?>"
                                                     data-status="<?= esc($r['status_rekomendasi']) ?>"
                                                     data-file="<?= esc($r['file_proposal'] ?? '') ?>" 
-                                                    data-mulai="<?= date('d F Y', strtotime($r['tgl_mulai'])) ?>" 
-                                                    data-selesai="<?= date('d F Y', strtotime($r['tgl_selesai'])) ?>"
+                                                    data-mulai="<?= !empty($r['tgl_mulai']) ? date('d F Y', strtotime($r['tgl_mulai'])) : '-' ?>" 
+                                                    data-selesai="<?= !empty($r['tgl_selesai']) ? date('d F Y', strtotime($r['tgl_selesai'])) : '-' ?>"
                                                     data-tte="<?= esc($r['pdf_tte_path'] ?? '') ?>"
-                                                    data-tanggal="<?= date('d F Y H:i:s', strtotime($r['created_at'])) ?>">
+                                                    data-tanggal="<?= !empty($r['created_at']) ? date('d F Y H:i:s', strtotime($r['created_at'])) : '-' ?>">
                                                 <i class="fa-solid fa-list-check me-1"></i> Detail
                                             </button>
                                             <form action="<?= base_url('admin/delete-rekomendasi/' . $r['id']) ?>" method="POST" class="d-inline" onsubmit="return confirm('Hapus berkas rekomendasi kegiatan ini secara permanen?')">
@@ -2918,7 +2918,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('row-dt-file').classList.add('d-none');
 
                 if (ttePath) {
-                    document.getElementById('dt-tte').innerHTML = `<a href="<?= base_url() ?>/${ttePath}" target="_blank" class="btn btn-sm btn-outline-success"><i class="fa-solid fa-print me-1"></i> Cetak Surat TTE Resmi</a>`;
+                    document.getElementById('dt-tte').innerHTML = `<a href="<?= base_url() ?>${ttePath}" target="_blank" class="btn btn-sm btn-outline-success"><i class="fa-solid fa-print me-1"></i> Cetak Surat TTE Resmi</a>`;
                 } else {
                     document.getElementById('dt-tte').innerText = 'Belum diterbitkan TTE';
                 }

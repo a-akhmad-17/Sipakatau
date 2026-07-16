@@ -1,5 +1,17 @@
 # RELEASE NOTES - SIPAKATAU
 
+## [v2.9.36] - 2026-07-16
+### 🐛 Fixed
+- **Validasi Dinamis Rekomendasi Kegiatan (Admin)**:
+  - Mengubah perhitungan `$totalRequired` dan `$verifiedCount` di `Admin::verifyDocument()` agar dinamis berdasarkan nilai `is_fasilitas_pemerintah`. Jika user menggunakan fasilitas pemerintah (nilai `1`), jumlah dokumen wajib adalah 6, bukan 5. Ini memperbaiki bug kalkulasi progres persentase yang tidak terhitung untuk dokumen ke-6 (Rekomendasi Stakeholder).
+  - Memperbaiki data pengirim/pemohon di Telegram Alerts dan log aktivitas pada `Admin::prosesRekomendasi()` dari yang sebelumnya memanggil `nama_pemohon` menjadi `pemohon` sesuai skema tabel `trn_rekomendasi`.
+  - Mengamankan formatting tanggal (`tgl_mulai`, `tgl_selesai`, `created_at`) di tombol detail modal pelacakan rekomendasi kegiatan (`admin/dashboard.php`) dengan validasi `!empty()` untuk menghindari deprecation warning PHP 8.1+ atau output default 1970 saat tanggal bernilai null.
+  - Memperbaiki tautan TTE berkas rekomendasi di JavaScript modal tracking (`admin/dashboard.php`) dengan menghilangkan tanda slash berlebih (`/`) antara `base_url()` dan path berkas.
+  - **Penyelesaian Error 404 Akses Berkas di Server (Production)**:
+    - Membuat konfigurasi [root-level .htaccess](file:///f:/Xampp/htdocs/SIPAKATAU/.htaccess) baru di root direktori proyek. Hal ini memastikan seluruh request terhadap berkas statis (seperti folder `uploads/` dan `assets/`) serta file dinamis diarahkan secara transparan dari subdirektori root ke subdirektori `/public/` tanpa perlu menuliskan `/public/` pada URL. Ini menyelesaikan masalah CodeIgniter 404 route error saat berkas proposal PDF dibuka di server produksi.
+
+---
+
 ## [v2.9.35] - 2026-07-15
 ### ✨ Added
 - **Informasi Pengirim (User) & Rincian Ormas di Modal Kabid**:
