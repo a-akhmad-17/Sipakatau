@@ -858,7 +858,7 @@ $requirementsBerjenjang = [
                                 statusCol = `<span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 rounded small"><i class="fa-solid fa-clock me-1"></i> Sedang Diperiksa</span>`;
                             }
 
-                            actionCol = `<a href="<?= base_url('uploads/ormas/') ?>/${exist.filename}" target="_blank" class="btn btn-sm btn-outline-info py-0.5 px-2.5" style="font-size:11px;"><i class="fa-solid fa-file-pdf me-1"></i> Buka File</a>`;
+                            actionCol = `<a href="<?= base_url('uploads/ormas') ?>/${exist.filename}" target="_blank" class="btn btn-sm btn-outline-info py-0.5 px-2.5" style="font-size:11px;"><i class="fa-solid fa-file-pdf me-1"></i> Buka File</a>`;
                         }
 
                         const tr = document.createElement('tr');

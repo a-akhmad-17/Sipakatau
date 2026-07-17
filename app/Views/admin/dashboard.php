@@ -2693,13 +2693,13 @@ document.addEventListener('DOMContentLoaded', function() {
                       pengurusList.forEach(p => {
                           const tr = document.createElement('tr');
                           let ktpLink = p.file_ktp 
-                              ? `<a href="<?= base_url('uploads/ormas/') ?>/${p.file_ktp}" target="_blank" class="btn btn-xs btn-outline-info py-0.5 px-2.5" style="font-size: 10px; border-radius: 4px;" title="Unduh KTP"><i class="fa-solid fa-id-card me-1"></i>KTP</a>` 
+                              ? `<a href="<?= base_url('uploads/ormas') ?>/${p.file_ktp}" target="_blank" class="btn btn-xs btn-outline-info py-0.5 px-2.5" style="font-size: 10px; border-radius: 4px;" title="Unduh KTP"><i class="fa-solid fa-id-card me-1"></i>KTP</a>` 
                               : `<span class="text-muted small italic">KTP: Kosong</span>`;
                           let pasfotoLink = p.file_pasfoto 
-                              ? `<a href="<?= base_url('uploads/ormas/') ?>/${p.file_pasfoto}" target="_blank" class="btn btn-xs btn-outline-success py-0.5 px-2.5" style="font-size: 10px; border-radius: 4px;" title="Unduh Foto"><i class="fa-solid fa-image me-1"></i>Foto</a>` 
+                              ? `<a href="<?= base_url('uploads/ormas') ?>/${p.file_pasfoto}" target="_blank" class="btn btn-xs btn-outline-success py-0.5 px-2.5" style="font-size: 10px; border-radius: 4px;" title="Unduh Foto"><i class="fa-solid fa-image me-1"></i>Foto</a>` 
                               : `<span class="text-muted small italic">Foto: Kosong</span>`;
                           let biodataLink = p.file_biodata 
-                              ? `<a href="<?= base_url('uploads/ormas/') ?>/${p.file_biodata}" target="_blank" class="btn btn-xs btn-outline-warning py-0.5 px-2.5" style="font-size: 10px; border-radius: 4px;" title="Unduh Biodata"><i class="fa-solid fa-file-pdf me-1"></i>Biodata</a>` 
+                              ? `<a href="<?= base_url('uploads/ormas') ?>/${p.file_biodata}" target="_blank" class="btn btn-xs btn-outline-warning py-0.5 px-2.5" style="font-size: 10px; border-radius: 4px;" title="Unduh Biodata"><i class="fa-solid fa-file-pdf me-1"></i>Biodata</a>` 
                               : `<span class="text-muted small italic">Biodata: Kosong</span>`;
 
                           let ttl = (p.tempat_lahir || '-') + ', ' + (p.tanggal_lahir ? p.tanggal_lahir : '-');
@@ -2733,7 +2733,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const fileName = this.getAttribute('data-file');
                 if (fileName && !fileName.trim().startsWith('{')) {
-                    document.getElementById('dt-file').innerHTML = `<a href="<?= base_url('uploads/ormas/') ?>/${fileName}" target="_blank" class="btn btn-sm btn-outline-info"><i class="fa-solid fa-file-pdf me-1"></i> Buka Berkas Pendaftaran</a>`;
+                    document.getElementById('dt-file').innerHTML = `<a href="<?= base_url('uploads/ormas') ?>/${fileName}" target="_blank" class="btn btn-sm btn-outline-info"><i class="fa-solid fa-file-pdf me-1"></i> Buka Berkas Pendaftaran</a>`;
                 } else {
                     document.getElementById('dt-file').innerText = 'Tidak ada berkas tunggal';
                 }
@@ -2779,7 +2779,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                         actionCol = `
                             <div class="d-flex justify-content-center gap-1">
-                                <a href="<?= base_url('uploads/ormas/') ?>/${exist.filename}" target="_blank" class="btn btn-xs btn-info text-white px-2 py-1" title="Lihat Berkas"><i class="fa-solid fa-eye"></i></a>
+                                <a href="<?= base_url('uploads/ormas') ?>/${exist.filename}" target="_blank" class="btn btn-xs btn-info text-white px-2 py-1" title="Lihat Berkas"><i class="fa-solid fa-eye"></i></a>
                                 <button type="button" class="btn btn-xs btn-success text-white px-2 py-1" onclick="verifyDoc('${id}', 'ormas', '${fileIdx}', 'verified')" title="Setujui Dokumen"><i class="fa-solid fa-check"></i></button>
                                 <button type="button" class="btn btn-xs btn-danger text-white px-2 py-1" onclick="verifyDoc('${id}', 'ormas', '${fileIdx}', 'rejected')" title="Tolak Dokumen"><i class="fa-solid fa-xmark"></i></button>
                             </div>
@@ -2961,7 +2961,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                         actionCol = `
                             <div class="d-flex justify-content-center gap-1">
-                                <a href="<?= base_url('uploads/rekomendasi/') ?>/${exist.filename}" target="_blank" class="btn btn-xs btn-info text-white px-2 py-1" title="Lihat Berkas"><i class="fa-solid fa-eye"></i></a>
+                                <a href="<?= base_url('uploads/rekomendasi') ?>/${exist.filename}" target="_blank" class="btn btn-xs btn-info text-white px-2 py-1" title="Lihat Berkas"><i class="fa-solid fa-eye"></i></a>
                                 <button type="button" class="btn btn-xs btn-success text-white px-2 py-1" onclick="verifyDoc('${id}', 'rekomendasi', '${fileIdx}', 'verified')" title="Setujui Dokumen"><i class="fa-solid fa-check"></i></button>
                                 <button type="button" class="btn btn-xs btn-danger text-white px-2 py-1" onclick="verifyDoc('${id}', 'rekomendasi', '${fileIdx}', 'rejected')" title="Tolak Dokumen"><i class="fa-solid fa-xmark"></i></button>
                             </div>
@@ -3078,7 +3078,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('dt-tanggal').innerText = tanggal;
 
                 if (file) {
-                    document.getElementById('dt-file').innerHTML = `<a href="<?= base_url('uploads/pengaduan/') ?>/${file}" target="_blank" class="btn btn-sm btn-outline-info"><i class="fa-solid fa-file-pdf me-1"></i> Buka File Bukti</a>`;
+                    document.getElementById('dt-file').innerHTML = `<a href="<?= base_url('uploads/pengaduan') ?>/${file}" target="_blank" class="btn btn-sm btn-outline-info"><i class="fa-solid fa-file-pdf me-1"></i> Buka File Bukti</a>`;
                 } else {
                     document.getElementById('dt-file').innerText = 'Tidak ada file lampiran';
                 }

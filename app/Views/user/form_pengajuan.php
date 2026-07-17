@@ -936,7 +936,7 @@ function renderValidationTable(tipe) {
         let statusBadge = `<span class="badge bg-danger-subtle text-danger border border-danger-subtle small"><i class="fa-solid fa-circle-xmark me-1"></i> Belum Ada</span>`;
         let tteBadge = req.tte ? `<span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-0.5" style="font-size: 0.72rem;"><i class="fa-solid fa-signature me-1"></i> TTE</span>` : `<span class="badge bg-secondary-subtle text-secondary border border-secondary border-opacity-25 px-2 py-0.5" style="font-size: 0.72rem;">Non TTE</span>`;
         let keterangan = exist ? `Size: ${exist.size}` : '-';
-        let fileCol = exist ? `<a href="<?= base_url('uploads/ormas/') ?>/${exist.filename}" target="_blank" class="text-info text-decoration-none text-truncate d-inline-block" style="max-width:180px;" title="${exist.filename}"><i class="fa-solid fa-file-pdf me-1"></i> ${exist.filename.substring(0, 15)}...</a>` : '-';
+        let fileCol = exist ? `<a href="<?= base_url('uploads/ormas') ?>/${exist.filename}" target="_blank" class="text-info text-decoration-none text-truncate d-inline-block" style="max-width:180px;" title="${exist.filename}"><i class="fa-solid fa-file-pdf me-1"></i> ${exist.filename.substring(0, 15)}...</a>` : '-';
         
         if (exist) {
             statusBadge = `<span class="badge bg-success-subtle text-success border border-success-subtle small"><i class="fa-solid fa-check me-1"></i> Ada</span>`;

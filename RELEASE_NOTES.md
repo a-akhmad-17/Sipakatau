@@ -1,5 +1,13 @@
 # RELEASE NOTES - SIPAKATAU
 
+## [v2.9.38] - 2026-07-17
+### 🐛 Fixed
+- **Pembersihan Tautan Berkas (Double Slash Fix)**:
+  - Mengoreksi format URL tautan berkas di template JavaScript pada beberapa view dengan menghapus duplikasi tanda garis miring (`//`) yang terjadi akibat penggabungan `base_url()` yang berakhiran slash dengan string literal JavaScript berawalan slash (seperti `<?= base_url('uploads/ormas/') ?>/${exist.filename}`).
+  - File yang diperbarui: [dashboard_rekomendasi.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/user/dashboard_rekomendasi.php#L507), [dashboard.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/user/dashboard.php#L861), [form_pengajuan.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/user/form_pengajuan.php#L939), [admin/dashboard.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/admin/dashboard.php), dan [penerbitan_skt.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/bidang/penerbitan_skt.php#L429).
+
+---
+
 ## [v2.9.37] - 2026-07-16
 ### ✨ Added
 - **Fitur News Ticker / Teks Berjalan Premium**:

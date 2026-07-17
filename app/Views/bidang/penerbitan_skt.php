@@ -426,7 +426,7 @@
                     const tr = document.createElement('tr');
                     let fileActionHtml = '<span class="text-danger small"><i class="fa-solid fa-circle-xmark me-1"></i> Belum Diunggah</span>';
                     if (fileInfo && fileInfo.filename) {
-                        fileActionHtml = `<a href="<?= base_url('uploads/ormas/') ?>/${fileInfo.filename}" target="_blank" class="btn btn-xs btn-outline-info text-white"><i class="fa-solid fa-eye me-1"></i> Buka File</a>`;
+                        fileActionHtml = `<a href="<?= base_url('uploads/ormas') ?>/${fileInfo.filename}" target="_blank" class="btn btn-xs btn-outline-info text-white"><i class="fa-solid fa-eye me-1"></i> Buka File</a>`;
                     }
 
                     tr.innerHTML = `
