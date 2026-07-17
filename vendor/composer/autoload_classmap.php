@@ -18,6 +18,7 @@ return array(
     'App\\Database\\Seeds\\UserSeeder' => $baseDir . '/app/Database/Seeds/UserSeeder.php',
     'App\\Filters\\AuthFilter' => $baseDir . '/app/Filters/AuthFilter.php',
     'App\\Models\\AntreanModel' => $baseDir . '/app/Models/AntreanModel.php',
+    'App\\Models\\BeritaModel' => $baseDir . '/app/Models/BeritaModel.php',
     'CodeIgniter\\API\\ApiException' => $vendorDir . '/codeigniter4/framework/system/API/ApiException.php',
     'CodeIgniter\\API\\BaseTransformer' => $vendorDir . '/codeigniter4/framework/system/API/BaseTransformer.php',
     'CodeIgniter\\API\\ResponseTrait' => $vendorDir . '/codeigniter4/framework/system/API/ResponseTrait.php',

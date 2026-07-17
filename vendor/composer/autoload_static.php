@@ -62,6 +62,7 @@ class ComposerStaticInitf5cce40800fa5dae1504b9364f585e6a
         'App\\Database\\Seeds\\UserSeeder' => __DIR__ . '/../..' . '/app/Database/Seeds/UserSeeder.php',
         'App\\Filters\\AuthFilter' => __DIR__ . '/../..' . '/app/Filters/AuthFilter.php',
         'App\\Models\\AntreanModel' => __DIR__ . '/../..' . '/app/Models/AntreanModel.php',
+        'App\\Models\\BeritaModel' => __DIR__ . '/../..' . '/app/Models/BeritaModel.php',
         'CodeIgniter\\API\\ApiException' => __DIR__ . '/..' . '/codeigniter4/framework/system/API/ApiException.php',
         'CodeIgniter\\API\\BaseTransformer' => __DIR__ . '/..' . '/codeigniter4/framework/system/API/BaseTransformer.php',
         'CodeIgniter\\API\\ResponseTrait' => __DIR__ . '/..' . '/codeigniter4/framework/system/API/ResponseTrait.php',
