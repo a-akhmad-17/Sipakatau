@@ -1,3 +1,11 @@
+# Auto-detect git executable path if not in PATH
+if (!(Get-Command git -ErrorAction SilentlyContinue)) {
+    $ghGitPath = Get-ChildItem "$env:LOCALAPPDATA\GitHubDesktop\app-*\resources\app\git\cmd" -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName
+    if ($ghGitPath) {
+        $env:PATH += ";$ghGitPath"
+    }
+}
+
 # 1. Pastikan repo git diinisialisasi
 if (!(Test-Path .git)) {
     Write-Host "Inisialisasi repositori Git baru..." -ForegroundColor Yellow

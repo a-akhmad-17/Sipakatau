@@ -1,5 +1,15 @@
 # RELEASE NOTES - SIPAKATAU
 
+## [v2.9.39] - 2026-07-21
+### 🐛 Fixed
+- **Penanganan Fallback & Rute Akses Berkas Unggahan (Fix 404 Server)**:
+  - Membuat Controller baru [FileServer.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Controllers/FileServer.php) dan rute fallback `uploads/(:any)` pada [Routes.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Config/Routes.php) untuk menangani permintaan akses berkas fisik di folder `uploads/`.
+  - Jika berkas fisik **tersedia di server**, sistem menyajikannya secara otomatis dengan *Header Content-Type* dan *Content-Disposition* yang sesuai (`application/pdf`, `image/webp`, dll).
+  - Jika berkas fisik **tidak ditemukan di server** (misalnya akibat data pengujian lokal atau berkas belum diunggah ulang ke server live), sistem menampilkan halaman peringatan interaktif bertema glassmorphic [file_not_found.php](file:///f:/Xampp/htdocs/SIPAKATAU/app/Views/errors/html/file_not_found.php) yang ramah pengguna alih-alih pesan 404 kaku bawaan CodeIgniter.
+  - Memasang file `.gitkeep` pada seluruh subdirektori `public/uploads/` (`rekomendasi`, `ormas`, `rekomendasi_ormas`, `rekomendasi_tte`, `pengaduan`, `parpol`, `berita`, `dokumentasi`, `struktur`) agar struktur folder berkas selalu otomatis terbuat di server live saat deployment.
+
+---
+
 ## [v2.9.38] - 2026-07-17
 ### 🐛 Fixed
 - **Pembersihan Tautan Berkas (Double Slash Fix)**:
