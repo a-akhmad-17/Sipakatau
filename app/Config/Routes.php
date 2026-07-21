@@ -150,7 +150,3 @@ $routes->get('layanan/cetak-rekomendasi/(:any)', 'Home::cetakRekomendasi/$1');
 $routes->get('layanan/cetak-permohonan/(:any)', 'Home::cetakPermohonan/$1');
 $routes->post('layanan/ambil-antrean', 'Home::ambilAntrean');
 
-// Fallback Route for Upload Files (Serves file or displays styled 404 notice)
-$routes->get('uploads/(:any)', 'FileServer::serve/$1');
-$routes->get('uploads/(.*)', 'FileServer::serve/$1');
-
