@@ -84,9 +84,11 @@
                             <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>9. Surat Rekomendasi Kementerian Agama (Ormas Agama) / Kebudayaan</li>
                             <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>10. Biodata & KTP Pengurus (Ketua, Sekretaris, Bendahara)</li>
                             <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>11. Pasfoto Pengurus 4x6 cm 2 Lembar (Latar Merah)</li>
-                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>12. SK Pengurus & Foto Sekretariat (Tampak depan menampilkan Papan Nama)</li>
-                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>13. Surat Perjanjian Kontrak atau Izin Pakai Gedung dari Pemilik Gedung</li>
-                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>14. Nomor Rekening Organisasi & File Logo Organisasi</li>
+                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>12. Surat Keputusan (SK) Pengurus Organisasi</li>
+                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>13. Foto Sekretariat (Tampak depan menampilkan Papan Nama resmi)</li>
+                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>14. Surat Perjanjian Kontrak atau Izin Pakai Gedung dari Pemilik Gedung</li>
+                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>15. Nomor / Buku Rekening Organisasi</li>
+                            <li class="list-group-item bg-transparent text-muted border-secondary-subtle px-0"><i class="fa-solid fa-square-check text-success me-2"></i>16. File Logo Resmi Organisasi</li>
                         </ul>
                     </div>
                 </div>

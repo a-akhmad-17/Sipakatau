@@ -195,7 +195,7 @@ class User extends BaseController
         }
 
         $tipeOrmas = $this->request->getPost('tipe_ormas') ?? 'Lokal';
-        $maxFiles = ($tipeOrmas === 'Lokal') ? 14 : 10;
+        $maxFiles = ($tipeOrmas === 'Lokal') ? 16 : 10;
 
         // Paksa hitung tanggal kedaluwarsa menjadi 2 tahun jika ormas berjenjang
         if ($tipeOrmas === 'Berjenjang' && !empty($tglSk)) {

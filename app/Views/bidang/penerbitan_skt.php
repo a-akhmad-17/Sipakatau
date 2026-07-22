@@ -369,9 +369,11 @@
         { name: "Rekomendasi Kementerian", desc: "Surat Rekomendasi Kementerian Agama (Ormas Agama) / Kebudayaan" },
         { name: "Biodata & KTP Pengurus", desc: "Biodata & KTP Pengurus", isPengurus: true },
         { name: "Pasfoto Pengurus", desc: "Pasfoto Pengurus 4x6 cm 2 Lembar (Latar Merah)", isPengurus: true },
-        { name: "SK & Foto Sekretariat", desc: "SK Pengurus & Foto Sekretariat (Papan Nama)" },
+        { name: "SK Pengurus", desc: "Surat Keputusan (SK) Pengurus Organisasi" },
+        { name: "Foto Sekretariat", desc: "Foto Sekretariat (Tampak depan menampilkan Papan Nama resmi)" },
         { name: "Kontrak/Izin Pakai Gedung", desc: "Surat Perjanjian Kontrak/Izin Pakai Gedung Sekretariat" },
-        { name: "Rekening & Logo Organisasi", desc: "Nomor Rekening Organisasi & File Logo Organisasi" }
+        { name: "Rekening Organisasi", desc: "Nomor / Buku Rekening atas nama Organisasi" },
+        { name: "Logo Organisasi", desc: "File Logo Resmi Organisasi" }
     ];
 
     const requirementsBerjenjang = [

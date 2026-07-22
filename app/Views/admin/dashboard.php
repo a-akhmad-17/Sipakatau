@@ -2582,9 +2582,11 @@ document.addEventListener('DOMContentLoaded', function() {
         {"name": "Rekomendasi Kementerian", "desc": "Surat Rekomendasi Kementerian Agama (Ormas Agama) / Kebudayaan", "tte": true},
         {"name": "Biodata & KTP Pengurus", "desc": "Biodata & KTP Pengurus (Ketua, Sekretaris, Bendahara)", "tte": false, "isPengurus": true},
         {"name": "Pasfoto Pengurus", "desc": "Pasfoto Pengurus 4x6 cm 2 Lembar (Latar Merah)", "tte": false, "isPengurus": true},
-        {"name": "SK & Foto Sekretariat", "desc": "SK Pengurus & Foto Sekretariat (Tampak depan menampilkan Papan Nama)", "tte": false},
+        {"name": "SK Pengurus", "desc": "Surat Keputusan (SK) Pengurus Organisasi", "tte": false},
+        {"name": "Foto Sekretariat", "desc": "Foto Sekretariat (Tampak depan menampilkan Papan Nama resmi)", "tte": false},
         {"name": "Kontrak/Izin Pakai Gedung", "desc": "Surat Perjanjian Kontrak/Izin Pakai Gedung dari Pemilik Gedung", "tte": true},
-        {"name": "Rekening & Logo Organisasi", "desc": "Nomor Rekening Organisasi & File Logo Organisasi", "tte": false}
+        {"name": "Rekening Organisasi", "desc": "Nomor / Buku Rekening atas nama Organisasi", "tte": false},
+        {"name": "Logo Organisasi", "desc": "File Logo Resmi Organisasi", "tte": false}
     ];
 
     const globalRequirementsBerjenjang = [

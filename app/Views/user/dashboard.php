@@ -11,9 +11,11 @@ $requirementsLokal = [
     ["name" => "Rekomendasi Kementerian", "desc" => "Surat Rekomendasi Kementerian Agama (Ormas Agama) / Kebudayaan", "tte" => true, "template" => ""],
     ["name" => "Biodata & KTP Pengurus", "desc" => "Biodata & KTP Pengurus (Ketua, Sekretaris, Bendahara)", "tte" => false, "template" => "", "isPengurus" => true],
     ["name" => "Pasfoto Pengurus", "desc" => "Pasfoto Pengurus 4x6 cm 2 Lembar (Latar Merah)", "tte" => false, "template" => "", "isPengurus" => true],
-    ["name" => "SK & Foto Sekretariat", "desc" => "SK Pengurus & Foto Sekretariat (Tampak depan menampilkan Papan Nama)", "tte" => false, "template" => ""],
+    ["name" => "SK Pengurus", "desc" => "Surat Keputusan (SK) Pengurus Organisasi", "tte" => false, "template" => ""],
+    ["name" => "Foto Sekretariat", "desc" => "Foto Sekretariat (Tampak depan menampilkan Papan Nama resmi)", "tte" => false, "template" => ""],
     ["name" => "Kontrak/Izin Pakai Gedung", "desc" => "Surat Perjanjian Kontrak/Izin Pakai Gedung dari Pemilik Gedung", "tte" => true, "template" => ""],
-    ["name" => "Rekening & Logo Organisasi", "desc" => "Nomor Rekening Organisasi & File Logo Organisasi", "tte" => false, "template" => ""]
+    ["name" => "Rekening Organisasi", "desc" => "Nomor / Buku Rekening atas nama Organisasi", "tte" => false, "template" => ""],
+    ["name" => "Logo Organisasi", "desc" => "File Logo Resmi Organisasi", "tte" => false, "template" => ""]
 ];
 
 $requirementsBerjenjang = [
@@ -235,9 +237,11 @@ $requirementsBerjenjang = [
                 9. Surat Rekomendasi Kementerian Agama / Kebudayaan<br>
                 10. Biodata & KTP Pengurus (Ketua, Sekretaris, Bendahara)<br>
                 11. Pasfoto Pengurus 4x6 cm 2 Lembar (Latar Merah)<br>
-                12. SK Pengurus & Foto Sekretariat (Papan Nama)<br>
-                13. Surat Perjanjian Kontrak/Izin Pakai Gedung Sekretariat<br>
-                14. Nomor Rekening Organisasi & File Logo Organisasi
+                12. SK Pengurus Organisasi<br>
+                13. Foto Sekretariat (Tampak depan menampilkan Papan Nama resmi)<br>
+                14. Surat Perjanjian Kontrak/Izin Pakai Gedung Sekretariat<br>
+                15. Buku / Nomor Rekening Organisasi<br>
+                16. File Logo Resmi Organisasi
             </div>
         </div>
         <div class="col-md-6">

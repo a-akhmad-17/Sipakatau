@@ -168,9 +168,11 @@ $requirementsLokal = [
     ["name" => "Rekomendasi Kementerian", "desc" => "Surat Rekomendasi Kementerian Agama (Ormas Agama) / Kebudayaan", "tte" => true, "template" => ""],
     ["name" => "Biodata & KTP Pengurus", "desc" => "Biodata & KTP Pengurus (Ketua, Sekretaris, Bendahara)", "tte" => false, "template" => "", "isPengurus" => true],
     ["name" => "Pasfoto Pengurus", "desc" => "Pasfoto Pengurus 4x6 cm 2 Lembar (Latar Merah)", "tte" => false, "template" => "", "isPengurus" => true],
-    ["name" => "SK & Foto Sekretariat", "desc" => "SK Pengurus & Foto Sekretariat (Tampak depan menampilkan Papan Nama)", "tte" => false, "template" => ""],
+    ["name" => "SK Pengurus", "desc" => "Surat Keputusan (SK) Pengurus Organisasi", "tte" => false, "template" => ""],
+    ["name" => "Foto Sekretariat", "desc" => "Foto Sekretariat (Tampak depan menampilkan Papan Nama resmi)", "tte" => false, "template" => ""],
     ["name" => "Kontrak/Izin Pakai Gedung", "desc" => "Surat Perjanjian Kontrak/Izin Pakai Gedung dari Pemilik Gedung", "tte" => true, "template" => ""],
-    ["name" => "Rekening & Logo Organisasi", "desc" => "Nomor Rekening Organisasi & File Logo Organisasi", "tte" => false, "template" => ""]
+    ["name" => "Rekening Organisasi", "desc" => "Nomor / Buku Rekening atas nama Organisasi", "tte" => false, "template" => ""],
+    ["name" => "Logo Organisasi", "desc" => "File Logo Resmi Organisasi", "tte" => false, "template" => ""]
 ];
 
 $requirementsBerjenjang = [
@@ -851,9 +853,11 @@ const requirementsLokal = [
     { name: "Rekomendasi Kementerian", desc: "Surat Rekomendasi Kementerian Agama (Ormas Agama) / Kebudayaan", tte: true, template: "" },
     { name: "Biodata & KTP Pengurus", desc: "Biodata & KTP Pengurus (Ketua, Sekretaris, Bendahara)", tte: false, template: "", isPengurus: true },
     { name: "Pasfoto Pengurus", desc: "Pasfoto Pengurus 4x6 cm 2 Lembar (Latar Merah)", tte: false, template: "", isPengurus: true },
-    { name: "SK & Foto Sekretariat", desc: "SK Pengurus & Foto Sekretariat (Tampak depan menampilkan Papan Nama)", tte: false, template: "" },
+    { name: "SK Pengurus", desc: "Surat Keputusan (SK) Pengurus Organisasi", tte: false, template: "" },
+    { name: "Foto Sekretariat", desc: "Foto Sekretariat (Tampak depan menampilkan Papan Nama resmi)", tte: false, template: "" },
     { name: "Kontrak/Izin Pakai Gedung", desc: "Surat Perjanjian Kontrak/Izin Pakai Gedung dari Pemilik Gedung", tte: true, template: "" },
-    { name: "Rekening & Logo Organisasi", desc: "Nomor Rekening Organisasi & File Logo Organisasi", tte: false, template: "" }
+    { name: "Rekening Organisasi", desc: "Nomor / Buku Rekening atas nama Organisasi", tte: false, template: "" },
+    { name: "Logo Organisasi", desc: "File Logo Resmi Organisasi", tte: false, template: "" }
 ];
 
 const requirementsBerjenjang = [

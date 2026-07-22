@@ -2361,7 +2361,7 @@ class Admin extends BaseController
             }
             
             $tipeOrmas = $pendaftaran['tipe_ormas'] ?? 'Lokal';
-            $totalFiles = ($tipeOrmas === 'Lokal') ? 12 : 8;
+            $totalFiles = ($tipeOrmas === 'Lokal') ? 14 : 8;
             
             $verifiedCount = 0;
             foreach ($berkas as $fileInfo) {
